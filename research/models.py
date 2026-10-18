@@ -64,7 +64,10 @@ def load_conch(device: str = "cuda", hf_token: Optional[str] = None) -> Adapter:
 
     @torch.no_grad()
     def encode_texts(texts: List[str]) -> np.ndarray:
-        tokens = tokenize(texts=texts, tokenizer=tokenizer).to(device)
+        # transformers 5 removed batch_encode_plus, which conch's tokenize() uses
+        ids = tokenizer(texts, max_length=127, add_special_tokens=True, return_token_type_ids=False,
+                        truncation=True, padding="max_length", return_tensors="pt")["input_ids"]
+        tokens = torch.nn.functional.pad(ids, (0, 1), value=tokenizer.pad_token_id).to(device)
         emb = model.encode_text(tokens)
         return emb.float().cpu().numpy()
 

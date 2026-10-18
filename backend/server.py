@@ -77,6 +77,8 @@ def trust_flags(researcher: dict, conch: dict, judge: dict) -> list:
         flags.append("Outside validated scope (colon serrated polyps): results are not validated.")
     if not conch.get("calibrated"):
         flags.append("Feature scores are relative to this snip only (not yet calibrated on MHIST).")
+    if conch.get("judge_mode") == "zero-shot":
+        flags.append("Image judges are untrained (prompt-only); expect near-chance accuracy on this task.")
     panel = conch["panel"]
     if panel["agreement"] < 0.75:
         flags.append(f"Image judges are split ({panel['votes']}).")

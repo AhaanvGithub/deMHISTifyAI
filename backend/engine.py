@@ -64,6 +64,8 @@ class Engine:
         self.prompts: Dict[str, str] = json.loads(PROMPTS_PATH.read_text())
         self.text_emb = self._encode_texts(list(self.prompts))
         self.judges = self._load_judges()
+        heads_path = ROOT / "backend" / "config" / "heads.npz"
+        self.heads = dict(np.load(heads_path)) if heads_path.exists() else None  # trained by research/train_judges.py
         self.calib = json.loads(CALIB_PATH.read_text()) if CALIB_PATH.exists() else {}
         self.criteria_keys = [k for k in self.prompts if k.startswith("crit:")]
 
@@ -119,6 +121,16 @@ class Engine:
         p = np.exp(logits)
         return p / p.sum(axis=1, keepdims=True)
 
+    def _judge_probs(self, n: int, img_emb: np.ndarray, prompt_ids: Dict[str, str]) -> np.ndarray:
+        """Trained judge if heads.npz exists, else pure zero-shot. Columns follow CLASSES."""
+        if self.heads is None:
+            return self._probs(img_emb, prompt_ids)
+        h = self.heads
+        z = float(h["logit_scale"]) * (img_emb @ self.text_emb[prompt_ids["SSA"]] - img_emb @ self.text_emb[prompt_ids["HP"]])
+        logit = (img_emb @ h["W"][n] + h["b"][n] + h["alpha"][n] * z) / h["T"][n]
+        p_ssa = 1 / (1 + np.exp(-logit))
+        return np.stack([p_ssa, 1 - p_ssa], axis=1)
+
     def _criteria(self, img_emb: np.ndarray) -> np.ndarray:
         """[N, n_criteria] presence scores in 0..1, z-scored against MHIST if calibrated."""
         t = np.stack([self.text_emb[k] for k in self.criteria_keys])
@@ -158,8 +170,8 @@ class Engine:
             return {"error": "no_tissue", "tiles": [t.__dict__ for t in tiles]}
 
         judge_results, tile_probs = [], []
-        for j in self.judges:
-            p = self._probs(emb[j["condition"]], j["prompts"])  # [N, C]
+        for n, j in enumerate(self.judges):
+            p = self._judge_probs(n, emb[j["condition"]], j["prompts"])  # [N, C]
             tile_probs.append(p)
             snip_p = p[mask].mean(0)
             order = np.argsort(-snip_p)
@@ -201,4 +213,5 @@ class Engine:
                 for n, k in enumerate(self.criteria_keys)
             },
             "calibrated": bool(self.calib),
+            "judge_mode": "trained" if self.heads is not None else "zero-shot",
         }
