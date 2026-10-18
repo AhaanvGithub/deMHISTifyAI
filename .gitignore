@@ -1,0 +1,17 @@
+# data and model outputs never go in git (MHIST/CONCH licences forbid redistribution)
+data/
+emb/
+*.npz
+*.png
+*.jpg
+*.jpeg
+*.tif
+annotations.csv
+logs/
+# envs / builds
+.venv/
+__pycache__/
+node_modules/
+dist/
+out/
+.env
