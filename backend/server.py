@@ -52,6 +52,7 @@ def health():
         "conch_error": STATE["engine_error"],
         "vlm_ready": LOCATOR.ready,
         "vlm_error": LOCATOR.error,
+        "vlm_last_answer": LOCATOR.last_answer,
         "papers": len(LIBRARY.papers),
         "judge_model": llm.JUDGE_MODEL,
         "verdict_model": llm.VERDICT_MODEL,

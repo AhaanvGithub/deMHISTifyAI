@@ -65,6 +65,7 @@ class VisionLocator:
         self.model = None
         self.processor = None
         self.error: Optional[str] = None
+        self.last_answer: Optional[str] = None  # raw model text, for debugging
         self._ready = threading.Event()
         threading.Thread(target=self._load, daemon=True).start()
 
@@ -73,12 +74,13 @@ class VisionLocator:
             import torch
             from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 
-            kwargs = {"torch_dtype": torch.bfloat16, "device_map": "cuda"}
+            # eager attention: the default SDPA path produces garbage tokens on RTX 50-series (Blackwell)
+            kwargs = {"torch_dtype": torch.bfloat16, "device_map": "cuda", "attn_implementation": "eager"}
             try:
                 from transformers import BitsAndBytesConfig
 
                 kwargs["quantization_config"] = BitsAndBytesConfig(
-                    load_in_4bit=True, bnb_4bit_compute_dtype=torch.bfloat16
+                    load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.bfloat16
                 )
             except Exception:
                 pass  # no bitsandbytes: fall back to bf16 (~7.5 GB, tight on 8 GB)
@@ -106,6 +108,7 @@ class VisionLocator:
         with torch.no_grad():
             out = self.model.generate(**inputs, max_new_tokens=64, do_sample=False)
         answer = self.processor.batch_decode(out[:, inputs["input_ids"].shape[1] :], skip_special_tokens=True)[0]
+        self.last_answer = answer
 
         m = re.search(r"\[\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)\s*\]", answer)
         if not m:
