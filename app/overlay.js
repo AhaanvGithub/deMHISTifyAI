@@ -208,49 +208,110 @@ function renderConch(r) {
   }, 120 * i));
 }
 
+// jet-style colour scale like pathology probability maps: blue -> cyan -> green -> yellow -> red
+const JET = [[0, [40, 60, 220]], [0.3, [40, 200, 240]], [0.5, [70, 220, 120]], [0.7, [250, 225, 60]], [0.85, [250, 130, 40]], [1, [220, 30, 40]]];
+function jet(v) {
+  for (let i = 1; i < JET.length; i++) if (v <= JET[i][0]) {
+    const [a, ca] = JET[i - 1], [b, cb] = JET[i], t = (v - a) / (b - a);
+    return ca.map((x, k) => Math.round(x + (cb[k] - x) * t));
+  }
+  return JET[JET.length - 1][1];
+}
+const smooth = (e0, e1, x) => { const t = Math.min(Math.max((x - e0) / (e1 - e0), 0), 1); return t * t * (3 - 2 * t); };
+const refClass = () => heatRef === 'ai' ? result.panel.top : (parsed?.call || result.panel.top);
+
 function drawHeat() {
   if (!result) return;
-  const ref = heatRef === 'ai' ? result.panel.top : (parsed?.call || result.panel.top);
-  const H = result.heat, dpr = window.devicePixelRatio || 1;
+  const ref = refClass(), H = result.heat, dpr = window.devicePixelRatio || 1;
   const rect = tissue.getBoundingClientRect();
-  heat.width = Math.round(rect.width * dpr); heat.height = Math.round(rect.height * dpr);
+  for (const c of [heat, $('feat')]) { c.width = Math.round(rect.width * dpr); c.height = Math.round(rect.height * dpr); }
   const g = heat.getContext('2d'), a = $('opacity').value / 100;
   g.clearRect(0, 0, heat.width, heat.height);
 
-  // 1. paint one pixel per fine cell, then upscale with smoothing + a soft blur -> fluid map
+  // 1. probability of the reference call per fine cell; low values fade to transparent
   const small = document.createElement('canvas');
   small.width = H.cols; small.height = H.rows;
   const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
   for (let i = 0; i < H.p_ssa.length; i++) {
-    const s = ref === 'SSA' ? H.p_ssa[i] : 1 - H.p_ssa[i];
-    const strength = Math.min(Math.abs(s - 0.5) * 2, 1) ** 0.8;
-    const tissueOk = H.tissue[i] >= 0.25;
-    const [r, gg, b] = s >= 0.5 ? [52, 211, 153] : [248, 82, 96];
-    im.data.set(tissueOk ? [r, gg, b, Math.round(255 * a * strength)] : [120, 120, 130, Math.round(90 * a)], i * 4);
+    const v = ref === 'SSA' ? H.p_ssa[i] : 1 - H.p_ssa[i];
+    const alpha = H.tissue[i] < 0.25 ? 0 : smooth(0.3, 0.75, v) * 0.85 + (v > 0.2 ? 0.05 : 0);
+    im.data.set([...jet(v), Math.round(255 * a * alpha)], i * 4);
   }
   sg.putImageData(im, 0, 0);
-  const cellPx = heat.width / H.cols;
+  // two-step upscale + blur gives soft blob edges like slide-level probability maps
+  const mid = document.createElement('canvas');
+  mid.width = H.cols * 8; mid.height = H.rows * 8;
+  const mg = mid.getContext('2d');
+  mg.imageSmoothingEnabled = true; mg.imageSmoothingQuality = 'high';
+  mg.filter = 'blur(5px)';
+  mg.drawImage(small, 0, 0, mid.width, mid.height);
   g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-  g.filter = `blur(${Math.max(cellPx * 0.35, 1)}px)`;
-  g.drawImage(small, 0, 0, heat.width, heat.height);
-  g.filter = 'none';
+  g.drawImage(mid, 0, 0, heat.width, heat.height);
 
-  // 2. grid: faint minor lines per fine cell, stronger major lines per judge tile (aligned to the box edge)
-  const cw = heat.width / H.cols, ch = heat.height / H.rows;
-  const line = (x0, y0, x1, y1) => { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); };
-  g.lineWidth = 1;
-  g.strokeStyle = 'rgba(255,255,255,0.07)';
-  for (let c = 1; c < H.cols; c++) if (c % H.sub) line(Math.round(c * cw) + .5, 0, Math.round(c * cw) + .5, heat.height);
-  for (let r = 1; r < H.rows; r++) if (r % H.sub) line(0, Math.round(r * ch) + .5, heat.width, Math.round(r * ch) + .5);
-  g.strokeStyle = 'rgba(255,255,255,0.32)'; g.lineWidth = Math.max(1, dpr);
-  for (let c = H.sub; c < H.cols; c += H.sub) line(Math.round(c * cw), 0, Math.round(c * cw), heat.height);
-  for (let r = H.sub; r < H.rows; r += H.sub) line(0, Math.round(r * ch), heat.width, Math.round(r * ch));
-
-  // 3. labels on the major tiles
+  // 2. optional grid: faint sub-cells, stronger lines per judge tile
+  const show = $('showGrid').checked;
+  if (show) {
+    const cw = heat.width / H.cols, ch = heat.height / H.rows;
+    const line = (x0, y0, x1, y1) => { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); };
+    g.lineWidth = 1; g.strokeStyle = 'rgba(255,255,255,0.06)';
+    for (let c = 1; c < H.cols; c++) if (c % H.sub) line(Math.round(c * cw) + .5, 0, Math.round(c * cw) + .5, heat.height);
+    for (let r = 1; r < H.rows; r++) if (r % H.sub) line(0, Math.round(r * ch) + .5, heat.width, Math.round(r * ch) + .5);
+    g.strokeStyle = 'rgba(255,255,255,0.28)'; g.lineWidth = Math.max(1, dpr);
+    for (let c = H.sub; c < H.cols; c += H.sub) line(Math.round(c * cw), 0, Math.round(c * cw), heat.height);
+    for (let r = H.sub; r < H.rows; r += H.sub) line(0, Math.round(r * ch), heat.width, Math.round(r * ch));
+  }
   const tw = rect.width / result.grid.cols, th = rect.height / result.grid.rows;
-  $('colLabels').innerHTML = Array.from({ length: result.grid.cols }, (_, i) => `<span style="width:${tw}px">${i + 1}</span>`).join('');
-  $('rowLabels').innerHTML = Array.from({ length: result.grid.rows }, (_, i) => `<span style="height:${th}px">${String.fromCharCode(65 + (i % 26))}</span>`).join('');
+  $('colLabels').innerHTML = show ? Array.from({ length: result.grid.cols }, (_, i) => `<span style="width:${tw}px">${i + 1}</span>`).join('') : '';
+  $('rowLabels').innerHTML = show ? Array.from({ length: result.grid.rows }, (_, i) => `<span style="height:${th}px">${String.fromCharCode(65 + (i % 26))}</span>`).join('') : '';
+
+  $('colorbar').classList.remove('hidden');
+  $('cbLabel').textContent = `P(${LABEL[ref]})`;
+  drawFeatures();
 }
+
+// ---------- feature outlines from the literature judge ----------
+const FEAT_COLORS = ['#7cc4ff', '#c79bff', '#ffffff', '#5eead4'];
+let keyFeatures = [];
+function drawFeatures() {
+  const fc = $('feat'), g = fc.getContext('2d');
+  g.clearRect(0, 0, fc.width, fc.height);
+  document.querySelectorAll('.feat-label').forEach(e => e.remove());
+  if (!result || !$('showFeat').checked || !keyFeatures.length) return;
+  const H = result.heat, cw = fc.width / H.cols, ch = fc.height / H.rows, dpr = window.devicePixelRatio || 1;
+  keyFeatures.forEach((f, k) => {
+    const m = H.features && H.features[f.feature_id];
+    if (!m) return;
+    const vals = m.filter((_, i) => H.tissue[i] >= 0.25).sort((x, y) => x - y);
+    if (!vals.length) return;
+    const thr = Math.max(0.7, vals[Math.floor(vals.length * 0.9)]);  // strongest ~10% of tissue, and clearly above typical
+    const on = (r, c) => r >= 0 && c >= 0 && r < H.rows && c < H.cols && m[r * H.cols + c] >= thr && H.tissue[r * H.cols + c] >= 0.25;
+    g.strokeStyle = FEAT_COLORS[k % FEAT_COLORS.length]; g.lineWidth = 2 * dpr; g.lineJoin = g.lineCap = 'round';
+    g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 3 * dpr;
+    let best = null;
+    g.beginPath();
+    for (let r = 0; r < H.rows; r++) for (let c = 0; c < H.cols; c++) {
+      if (!on(r, c)) continue;
+      const x = c * cw, y = r * ch, v = m[r * H.cols + c];
+      if (!best || v > best.v) best = { r, c, v };
+      if (!on(r - 1, c)) { g.moveTo(x, y); g.lineTo(x + cw, y); }
+      if (!on(r + 1, c)) { g.moveTo(x, y + ch); g.lineTo(x + cw, y + ch); }
+      if (!on(r, c - 1)) { g.moveTo(x, y); g.lineTo(x, y + ch); }
+      if (!on(r, c + 1)) { g.moveTo(x + cw, y); g.lineTo(x + cw, y + ch); }
+    }
+    g.stroke(); g.shadowBlur = 0;
+    if (best) {
+      const lab = document.createElement('div');
+      lab.className = 'feat-label';
+      lab.style.borderColor = FEAT_COLORS[k % FEAT_COLORS.length];
+      lab.style.left = ((best.c + 0.5) * cw / dpr) + 'px';
+      lab.style.top = ((best.r + 0.5) * ch / dpr) + 'px';
+      lab.innerHTML = `${esc(f.feature)} <span class="${f.points_to === 'SSA' ? 'ssl' : 'hp'}">→ ${LABEL[f.points_to] || ''}</span>${(f.cites || []).map(c => `<sup>${c}</sup>`).join('')}`;
+      tissue.appendChild(lab);
+    }
+  });
+}
+$('showGrid').addEventListener('change', drawHeat);
+$('showFeat').addEventListener('change', drawFeatures);
 
 // hover readout: tile + sub-cell coordinates and local support for the current reference call
 const tip = document.createElement('div');
@@ -263,10 +324,11 @@ tissue.addEventListener('mousemove', e => {
   const fr = Math.min(H.rows - 1, Math.floor((e.clientY - r.top) / r.height * H.rows));
   const ref = heatRef === 'ai' ? result.panel.top : (parsed?.call || result.panel.top);
   const p = H.p_ssa[fr * H.cols + fc], s = ref === 'SSA' ? p : 1 - p;
+  const feats = Object.entries(H.features || {}).sort((x, y) => y[1][fr * H.cols + fc] - x[1][fr * H.cols + fc]).slice(0, 2).map(([k]) => k.replace(/_/g, ' '));
   const tile = `${String.fromCharCode(65 + Math.floor(fr / H.sub))}${Math.floor(fc / H.sub) + 1}`;
   const subc = `${'abcdefgh'[fr % H.sub]}${(fc % H.sub) + 1}`;
   tip.innerHTML = H.tissue[fr * H.cols + fc] < 0.25 ? `${tile}·${subc} <span class="muted">no tissue</span>`
-    : `${tile}·${subc} <b class="${s >= 0.5 ? 'good' : 'bad'}">${Math.round(s * 100)}%</b> <span class="muted">${s >= 0.5 ? 'supports' : 'contradicts'} ${LABEL[ref]}</span>`;
+    : `${tile}·${subc} <b style="color:rgb(${jet(s)})">P(${LABEL[ref]}) ${Math.round(s * 100)}%</b><div class="muted">strongest here: ${feats.join(', ')}</div>`;
   tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
   tip.classList.remove('hidden');
 });
@@ -280,6 +342,8 @@ document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
 function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
 function renderJudge(j) {
+  keyFeatures = (j.key_features || []).filter(f => f.feature_id).slice(0, 4);
+  drawFeatures();
   const el = $('litSummary'); el.classList.remove('muted');
   if (j.error) { el.innerHTML = '<span class="warn">Literature judge unavailable (Lumen).</span>'; return; }
   const agree = !parsed?.call || j.call === parsed.call;

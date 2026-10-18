@@ -16,6 +16,8 @@
   <div id="sel" class="sel hidden">
     <div id="tissue" class="tissue hidden">
       <canvas id="heat"></canvas>
+      <canvas id="feat"></canvas>
+      <div id="colorbar" class="colorbar hidden"><div class="cb-grad"></div><div class="cb-ticks"><span>1.0</span><span>0.5</span><span>0</span></div><div id="cbLabel" class="cb-label">P(SSL)</div></div>
       <div id="colLabels" class="axis cols"></div>
       <div id="rowLabels" class="axis rows"></div>
       <span class="handle nw"></span><span class="handle ne"></span><span class="handle sw"></span><span class="handle se"></span>
@@ -33,8 +35,9 @@
       <button data-ref="researcher" class="on">Your call</button>
       <button data-ref="ai">AI's call</button>
     </div>
-    <label>Heatmap <input id="opacity" type="range" min="0" max="100" value="55"></label>
-    <div class="legend"><span class="sw g"></span>supports <span class="sw r"></span>contradicts</div>
+    <label>Opacity <input id="opacity" type="range" min="0" max="100" value="70"></label>
+    <label class="chk"><input id="showGrid" type="checkbox" checked> Grid</label>
+    <label class="chk"><input id="showFeat" type="checkbox" checked> Features</label>
   </div>
 
   <aside id="panel" class="panel hidden">

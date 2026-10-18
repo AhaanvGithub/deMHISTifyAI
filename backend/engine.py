@@ -176,17 +176,24 @@ class Engine:
         raw_judges = [n for n, j in enumerate(self.judges) if j["condition"] == "raw"]
         p_win = np.mean([self._judge_probs(n, emb, self.judges[n]["prompts"])[:, 0] for n in raw_judges], axis=0)
 
+        crit_win = self._criteria(emb)  # [n_windows, n_criteria] feature presence per window
         acc, cnt = np.zeros((R, C)), np.zeros((R, C))
-        for (r, c), p in zip(starts, p_win):
+        cacc = np.zeros((len(self.criteria_keys), R, C))
+        for (r, c), p, cv in zip(starts, p_win, crit_win):
             acc[r : r + sub, c : c + sub] += p
             cnt[r : r + sub, c : c + sub] += 1
+            cacc[:, r : r + sub, c : c + sub] += cv[:, None, None]
         p_ssa = acc / np.maximum(cnt, 1)
+        crit_maps = cacc / np.maximum(cnt, 1)[None]
 
         # stained-pixel fraction per fine cell (same rule as the tile tissue check)
         a = np.asarray(snip.resize((C * 8, R * 8)), dtype=np.float32) / 255.0
         stained = ((a.mean(2) < 0.85) & ((a.max(2) - a.min(2)) > 0.08)).reshape(R, 8, C, 8).mean(axis=(1, 3))
         return {"rows": R, "cols": C, "sub": sub, "windows": len(starts),
-                "p_ssa": np.round(p_ssa, 4).ravel().tolist(), "tissue": np.round(stained, 3).ravel().tolist()}
+                "p_ssa": np.round(p_ssa, 4).ravel().tolist(), "tissue": np.round(stained, 3).ravel().tolist(),
+                # per-cell presence (0..1) of each diagnostic feature, for outlining features on the image
+                "features": {k.split(":", 1)[1]: np.round(crit_maps[i], 3).ravel().tolist()
+                             for i, k in enumerate(self.criteria_keys)}}
 
     def refine_heat(self, snip: Image.Image, sub: int = 8, tile_px: int = 224) -> dict:
         """Denser heatmap on the same major grid (called after the first answer is on screen)."""

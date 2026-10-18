@@ -89,7 +89,7 @@ Reason about THIS case: decide which features matter most here and why, the way 
 Cite only the provided excerpts, by their [P#] labels. Never invent citations. If the excerpts do not support a claim, say so.
 Respond with JSON only:
 {"call": "SSA" or "HP", "confidence": 0-100, "alt": the other class, "alt_confidence": 0-100,
- "key_features": [{"feature": str, "points_to": "SSA" or "HP", "why": str, "cites": ["P#"]}],
+ "key_features": [{"feature_id": "the [bracketed id] from the measurements", "feature": "short readable name", "points_to": "SSA" or "HP", "why": str, "cites": ["P#"]}]  (2-4 items),
  "reasoning": "at most 120 words, with [P#] citations",
  "caveats": "one sentence"}"""
 
@@ -107,7 +107,7 @@ def _judge_once(cli: OpenAI, payload: str, temperature: float) -> Optional[dict]
 
 
 def research_judge(criteria: dict, papers: List[dict]) -> dict:
-    feats = "\n".join(f"- {v['text']}: {v['score']:.2f}" for v in criteria.values())
+    feats = "\n".join(f"- [{k}] {v['text']}: {v['score']:.2f}" for k, v in criteria.items())
     refs = "\n\n".join(f"[{p['ref']}] {p['title']} ({p.get('year')})\n{p['excerpt']}" for p in papers) or "(no excerpts available)"
     payload = f"Feature measurements:\n{feats}\n\nLiterature excerpts:\n{refs}"
 

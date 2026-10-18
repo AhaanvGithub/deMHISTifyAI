@@ -130,3 +130,18 @@ sup { color: var(--accent); font-size: 9px; margin-left: 1px; }
   box-shadow: 0 6px 20px rgba(0,0,0,.4);
 }
 .tissue.locked { cursor: crosshair; }
+
+#feat { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.colorbar { position: absolute; left: calc(100% + 14px); top: 0; height: 160px; display: flex; gap: 5px; pointer-events: none; }
+.cb-grad { width: 10px; border-radius: 5px; background: linear-gradient(to top, rgb(40,60,220), rgb(40,200,240) 30%, rgb(70,220,120) 50%, rgb(250,225,60) 70%, rgb(250,130,40) 85%, rgb(220,30,40)); box-shadow: 0 0 0 1px rgba(255,255,255,.2); }
+.cb-ticks { display: flex; flex-direction: column; justify-content: space-between; font-size: 10px; color: rgba(255,255,255,.75); }
+.cb-label { position: absolute; top: calc(100% + 6px); left: -4px; font-size: 10px; color: rgba(255,255,255,.75); white-space: nowrap; }
+.chk { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+.chk input { accent-color: var(--accent); }
+.feat-label {
+  position: absolute; transform: translate(-50%, -140%); pointer-events: none; white-space: nowrap;
+  font-size: 11px; padding: 3px 8px; border-radius: 7px; border: 1.5px solid; background: rgba(12,14,20,.85); color: var(--text);
+  box-shadow: 0 4px 14px rgba(0,0,0,.45); animation: pop .3s ease-out;
+}
+.feat-label span { font-weight: 600; margin-left: 3px; }
+.feat-label .ssl { color: var(--ssl); } .feat-label .hp { color: var(--hp); }

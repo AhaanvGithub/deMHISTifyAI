@@ -1,0 +1,87 @@
+{
+  "linear": {
+    "trainable_params": 514,
+    "test": {
+      "bal_acc": 0.8044,
+      "auc": 0.8737,
+      "ece": 0.028
+    },
+    "stress": {
+      "gray": {
+        "bal_acc": 0.6451,
+        "auc": 0.843,
+        "ece": 0.0932,
+        "flip_rate": 0.2723
+      },
+      "jitter_strong": {
+        "bal_acc": 0.6841,
+        "auc": 0.8127,
+        "ece": 0.0769,
+        "flip_rate": 0.2088
+      },
+      "jpeg20": {
+        "bal_acc": 0.5472,
+        "auc": 0.6847,
+        "ece": 0.2173,
+        "flip_rate": 0.3869
+      }
+    }
+  },
+  "mlp": {
+    "trainable_params": 131841,
+    "test": {
+      "bal_acc": 0.8029,
+      "auc": 0.8719,
+      "ece": 0.0436
+    },
+    "stress": {
+      "gray": {
+        "bal_acc": 0.6654,
+        "auc": 0.8245,
+        "ece": 0.0832,
+        "flip_rate": 0.2733
+      },
+      "jitter_strong": {
+        "bal_acc": 0.7158,
+        "auc": 0.8045,
+        "ece": 0.0514,
+        "flip_rate": 0.1832
+      },
+      "jpeg20": {
+        "bal_acc": 0.5326,
+        "auc": 0.6624,
+        "ece": 0.2502,
+        "flip_rate": 0.435
+      }
+    }
+  },
+  "finetune": {
+    "trainable_params": 15494657,
+    "train_minutes": 11.3,
+    "test": {
+      "bal_acc": 0.8173,
+      "auc": 0.9108,
+      "ece": 0.0259
+    },
+    "stress": {
+      "gray": {
+        "bal_acc": 0.6204,
+        "auc": 0.8884,
+        "ece": 0.1377,
+        "flip_rate": 0.2845
+      },
+      "jitter_strong": {
+        "bal_acc": 0.7756,
+        "auc": 0.8861,
+        "ece": 0.0388,
+        "flip_rate": 0.1136
+      },
+      "jpeg20": {
+        "bal_acc": 0.5525,
+        "auc": 0.7918,
+        "ece": 0.1574,
+        "flip_rate": 0.3419
+      }
+    }
+  }
+}
