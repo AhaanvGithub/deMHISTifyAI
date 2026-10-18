@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="overlay">
+  <canvas id="shot"></canvas>
+  <canvas id="dim"></canvas>
+
+  <div id="chip" class="chip"></div>
+  <div id="hint" class="hint">Drag to select the slide region · <kbd>Esc</kbd> to cancel</div>
+  <div id="sizeTag" class="size-tag hidden"></div>
+
+  <!-- tissue box + heatmap live inside the selection -->
+  <div id="sel" class="sel hidden">
+    <div id="tissue" class="tissue hidden">
+      <canvas id="heat"></canvas>
+      <div id="colLabels" class="axis cols"></div>
+      <div id="rowLabels" class="axis rows"></div>
+      <span class="handle nw"></span><span class="handle ne"></span><span class="handle sw"></span><span class="handle se"></span>
+      <div id="tissueTag" class="tissue-tag">detecting tissue…</div>
+    </div>
+  </div>
+
+  <div id="actions" class="actions hidden">
+    <button id="analyzeBtn" class="primary">Analyze <kbd>⏎</kbd></button>
+    <button id="resetBtn">Reselect</button>
+  </div>
+
+  <div id="heatControls" class="heat-controls hidden">
+    <div class="seg">
+      <button data-ref="researcher" class="on">Your call</button>
+      <button data-ref="ai">AI's call</button>
+    </div>
+    <label>Heatmap <input id="opacity" type="range" min="0" max="100" value="55"></label>
+    <div class="legend"><span class="sw g"></span>supports <span class="sw r"></span>contradicts</div>
+  </div>
+
+  <aside id="panel" class="panel hidden">
+    <header>
+      <span class="logo">de<b>MHIST</b>ify</span>
+      <span class="scope">Validated for: colon serrated polyps</span>
+    </header>
+
+    <section id="youCard" class="card"></section>
+
+    <section class="card">
+      <h3>Image judges <small>8 × CONCH</small></h3>
+      <div id="panelSummary" class="summary muted">waiting…</div>
+      <div id="judges" class="judges"></div>
+    </section>
+
+    <section class="card">
+      <h3>Literature judge <small id="judgeModel">Lumen</small></h3>
+      <div id="litSummary" class="summary muted"><span class="spinner"></span> reading the papers…</div>
+      <div id="litBody"></div>
+    </section>
+
+    <section id="flagsCard" class="card flags hidden"></section>
+
+    <section class="card verdict">
+      <h3>Verdict</h3>
+      <div id="verdict" class="muted"><span class="spinner"></span> weighing everything…</div>
+    </section>
+
+    <footer>Research tool, not for diagnosis.</footer>
+  </aside>
+
+<script src="overlay.js"></script>
+</body>
+</html>

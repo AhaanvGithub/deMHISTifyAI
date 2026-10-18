@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="launcher">
+  <form id="f" class="bar">
+    <span class="logo">de<b>MHIST</b>ify</span>
+    <input id="q" autofocus spellcheck="false" placeholder="What do you think it is?  e.g. “sessile serrated lesion, 70%”">
+    <kbd>⏎ then snip</kbd>
+  </form>
+<script>
+  const q = document.getElementById('q');
+  document.getElementById('f').addEventListener('submit', e => {
+    e.preventDefault();
+    if (q.value.trim()) { window.demhist.submit(q.value.trim()); q.value = ''; }
+  });
+  window.demhist.onFocus(() => q.focus());
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') window.close?.(); });
+</script>
+</body>
+</html>

@@ -15,3 +15,4 @@ node_modules/
 dist/
 out/
 .env
+app/node_modules/
