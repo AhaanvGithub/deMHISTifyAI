@@ -54,7 +54,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--emb", required=True)
     ap.add_argument("--labels", required=True)
-    ap.add_argument("--logit-scale", type=float, default=100.0)  # CONCH's learned scale is ~100
+    ap.add_argument("--logit-scale", type=float, default=56.3)  # CONCH learned logit scale (measured: 56.3)
     ap.add_argument("--top-k", type=int, default=4)
     a = ap.parse_args()
 

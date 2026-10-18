@@ -29,6 +29,14 @@ CLASS_NAMES = {"SSA": "Sessile serrated lesion", "HP": "Hyperplastic polyp"}
 CONDITIONS = ["raw", "normalized"]
 
 
+def conch_tokenize(tokenizer, texts: List[str]) -> torch.Tensor:
+    """Same as conch.open_clip_custom.tokenize, but works with transformers 5
+    (which removed batch_encode_plus): 127 tokens, padded, plus one pad column."""
+    ids = tokenizer(texts, max_length=127, add_special_tokens=True, return_token_type_ids=False,
+                    truncation=True, padding="max_length", return_tensors="pt")["input_ids"]
+    return torch.nn.functional.pad(ids, (0, 1), value=tokenizer.pad_token_id)
+
+
 @dataclass
 class Tile:
     row: int
@@ -63,7 +71,7 @@ class Engine:
     @torch.no_grad()
     def _encode_texts(self, keys: List[str]) -> Dict[str, np.ndarray]:
         texts = [self.prompts[k] for k in keys]
-        tok = self._tokenize(texts=texts, tokenizer=self._tokenizer).to(self.device)
+        tok = conch_tokenize(self._tokenizer, texts).to(self.device)
         emb = self.model.encode_text(tok)
         emb = emb / emb.norm(dim=-1, keepdim=True)
         return dict(zip(keys, emb.float().cpu().numpy()))
@@ -121,13 +129,17 @@ class Engine:
             mu, sd = sims.mean(0), sims.std(0) + 1e-6
         return 1 / (1 + np.exp(-(sims - mu) / sd))
 
-    def _tissue(self, img_emb: np.ndarray) -> np.ndarray:
-        keys = ["gate:tissue", "gate:ui", "gate:blank"]
-        t = np.stack([self.text_emb[k] for k in keys])
-        logits = self.logit_scale * img_emb @ t.T
-        logits -= logits.max(axis=1, keepdims=True)
-        p = np.exp(logits)
-        return (p / p.sum(axis=1, keepdims=True))[:, 0]
+    @staticmethod
+    def _tissue(crops: List[Image.Image]) -> np.ndarray:
+        """Fraction of stained (non-white, coloured) pixels per tile. The region
+        finder already isolated the slide, so inside the box this only has to
+        skip empty glass / white space. (CONCH text gating was unreliable here.)"""
+        out = []
+        for c in crops:
+            a = np.asarray(c.resize((64, 64)), dtype=np.float32) / 255.0
+            stained = (a.mean(2) < 0.85) & ((a.max(2) - a.min(2)) > 0.08)
+            out.append(float(stained.mean()))
+        return np.array(out)
 
     def analyze(self, snip: Image.Image, tile_px: int = 224) -> dict:
         snip = snip.convert("RGB")
@@ -138,9 +150,9 @@ class Engine:
             "normalized": self.encode_images([view_macenko(c, None) for c in crops]),
         }
 
-        tissue = self._tissue(emb["raw"])
+        tissue = self._tissue(crops)
         for t, s in zip(tiles, tissue):
-            t.tissue_score, t.is_tissue = float(s), bool(s >= 0.5)
+            t.tissue_score, t.is_tissue = float(s), bool(s >= 0.25)
         mask = np.array([t.is_tissue for t in tiles])
         if not mask.any():
             return {"error": "no_tissue", "tiles": [t.__dict__ for t in tiles]}
