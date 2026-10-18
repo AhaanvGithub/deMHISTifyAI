@@ -7,6 +7,7 @@ the first 4 prompt ids for each class.
 """
 
 import json
+import os
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -23,6 +24,10 @@ from embed_views import view_macenko  # noqa: E402  (same normalisation as the r
 PROMPTS_PATH = ROOT / "research" / "mhist_prompts.json"
 JUDGES_PATH = ROOT / "backend" / "config" / "judges.json"
 CALIB_PATH = ROOT / "backend" / "config" / "calibration.json"
+
+from concurrent.futures import ThreadPoolExecutor
+
+_POOL = ThreadPoolExecutor(max_workers=max(4, (os.cpu_count() or 8) - 2))
 
 CLASSES = ["SSA", "HP"]
 CLASS_NAMES = {"SSA": "Sessile serrated lesion", "HP": "Hyperplastic polyp"}
@@ -81,8 +86,10 @@ class Engine:
     @torch.no_grad()
     def encode_images(self, images: List[Image.Image], batch_size: int = 64) -> np.ndarray:
         out = []
+        tensors = list(_POOL.map(self.preprocess, images))  # CPU preprocessing is the bottleneck: parallelise it
         for i in range(0, len(images), batch_size):
-            x = torch.stack([self.preprocess(im) for im in images[i : i + batch_size]]).to(self.device)
+            x = torch.stack(tensors[i : i + batch_size]).to(self.device)
+            # full fp32 on purpose: matches the research embeddings the judges are trained on
             out.append(self.model.encode_image(x, proj_contrast=True, normalize=True).float().cpu().numpy())
         return np.concatenate(out) if out else np.zeros((0, 512), np.float32)
 
@@ -153,13 +160,41 @@ class Engine:
             out.append(float(stained.mean()))
         return np.array(out)
 
+    def _dense_heat(self, snip: Image.Image, tiles: List[Tile], sub: int = 4) -> dict:
+        """Fine heatmap: slide a tile-sized window in steps of 1/sub of a tile, score
+        every window with the raw-condition judges, and give each fine cell the mean
+        of all windows covering it (up to sub*sub of them). Cells line up exactly
+        with the major tile grid: each major tile = sub x sub cells."""
+        w, h = snip.size
+        rows, cols = max(t.row for t in tiles) + 1, max(t.col for t in tiles) + 1
+        tw, th = w / cols, h / rows
+        R, C = rows * sub, cols * sub
+        cw, ch = w / C, h / R
+        starts = [(r, c) for r in range(R - sub + 1) for c in range(C - sub + 1)]
+        crops = [snip.crop((int(c * cw), int(r * ch), int(c * cw + tw), int(r * ch + th))) for r, c in starts]
+        emb = self.encode_images(crops)
+        raw_judges = [n for n, j in enumerate(self.judges) if j["condition"] == "raw"]
+        p_win = np.mean([self._judge_probs(n, emb, self.judges[n]["prompts"])[:, 0] for n in raw_judges], axis=0)
+
+        acc, cnt = np.zeros((R, C)), np.zeros((R, C))
+        for (r, c), p in zip(starts, p_win):
+            acc[r : r + sub, c : c + sub] += p
+            cnt[r : r + sub, c : c + sub] += 1
+        p_ssa = acc / np.maximum(cnt, 1)
+
+        # stained-pixel fraction per fine cell (same rule as the tile tissue check)
+        a = np.asarray(snip.resize((C * 8, R * 8)), dtype=np.float32) / 255.0
+        stained = ((a.mean(2) < 0.85) & ((a.max(2) - a.min(2)) > 0.08)).reshape(R, 8, C, 8).mean(axis=(1, 3))
+        return {"rows": R, "cols": C, "sub": sub, "windows": len(starts),
+                "p_ssa": np.round(p_ssa, 4).ravel().tolist(), "tissue": np.round(stained, 3).ravel().tolist()}
+
     def analyze(self, snip: Image.Image, tile_px: int = 224) -> dict:
         snip = snip.convert("RGB")
         tiles = self.make_grid(snip, tile_px)
         crops = [snip.crop(t.box) for t in tiles]
         emb = {
             "raw": self.encode_images(crops),
-            "normalized": self.encode_images([view_macenko(c, None) for c in crops]),
+            "normalized": self.encode_images(list(_POOL.map(lambda c: view_macenko(c, None), crops))),
         }
 
         tissue = self._tissue(crops)
@@ -192,6 +227,8 @@ class Engine:
             t.probs = {c: float(mean_tile[i, k]) for k, c in enumerate(CLASSES)}
             t.criteria = {k.split(":", 1)[1]: float(crit[i, n]) for n, k in enumerate(self.criteria_keys)}
 
+        heat = self._dense_heat(snip, tiles)
+
         votes = {c: sum(r["top"] == c for r in judge_results) for c in CLASSES}
         panel_p = mean_tile[mask].mean(0)
         order = np.argsort(-panel_p)
@@ -199,6 +236,7 @@ class Engine:
         return {
             "grid": {"rows": max(t.row for t in tiles) + 1, "cols": max(t.col for t in tiles) + 1},
             "tiles": [t.__dict__ for t in tiles],
+            "heat": heat,
             "judges": judge_results,
             "panel": {
                 "votes": votes,

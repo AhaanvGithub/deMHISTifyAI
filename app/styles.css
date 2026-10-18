@@ -124,3 +124,9 @@ sup { color: var(--accent); font-size: 9px; margin-left: 1px; }
 .panel footer { font-size: 11px; color: var(--muted); text-align: center; padding-top: 6px; }
 .spinner { display: inline-block; width: 11px; height: 11px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; vertical-align: -1px; margin-right: 4px; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.heat-tip {
+  position: fixed; z-index: 9; pointer-events: none; font-size: 12px; white-space: nowrap;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 5px 9px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.4);
+}
+.tissue.locked { cursor: crosshair; }

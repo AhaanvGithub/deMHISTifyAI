@@ -186,7 +186,7 @@ function renderYou(p) {
 
 function renderConch(r) {
   result = r;
-  $('tissueTag').textContent = `${r.grid.cols} × ${r.grid.rows} tiles`;
+  $('tissueTag').textContent = `${r.grid.cols} × ${r.grid.rows} tiles · ${r.heat.cols} × ${r.heat.rows} heatmap cells · hover for detail`;
   $('heatControls').classList.remove('hidden');
   drawHeat();
   const pnl = r.panel, agree = parsed?.call && pnl.top === parsed.call;
@@ -210,24 +210,66 @@ function renderConch(r) {
 function drawHeat() {
   if (!result) return;
   const ref = heatRef === 'ai' ? result.panel.top : (parsed?.call || result.panel.top);
+  const H = result.heat, dpr = window.devicePixelRatio || 1;
   const rect = tissue.getBoundingClientRect();
-  heat.width = rect.width; heat.height = rect.height;
-  const g = heat.getContext('2d'), { rows, cols } = result.grid;
-  const tw = heat.width / cols, th = heat.height / rows, a = $('opacity').value / 100;
+  heat.width = Math.round(rect.width * dpr); heat.height = Math.round(rect.height * dpr);
+  const g = heat.getContext('2d'), a = $('opacity').value / 100;
   g.clearRect(0, 0, heat.width, heat.height);
-  for (const t of result.tiles) {
-    const x = t.col * tw, y = t.row * th;
-    if (!t.is_tissue) { g.fillStyle = `rgba(120,120,130,${0.35 * a})`; g.fillRect(x, y, tw, th); continue; }
-    const s = t.probs[ref] ?? 0.5, strength = Math.min(Math.abs(s - 0.5) * 2, 1);
-    g.fillStyle = s >= 0.5 ? `rgba(52,211,153,${a * strength})` : `rgba(248,82,96,${a * strength})`;
-    g.fillRect(x, y, tw, th);
+
+  // 1. paint one pixel per fine cell, then upscale with smoothing + a soft blur -> fluid map
+  const small = document.createElement('canvas');
+  small.width = H.cols; small.height = H.rows;
+  const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
+  for (let i = 0; i < H.p_ssa.length; i++) {
+    const s = ref === 'SSA' ? H.p_ssa[i] : 1 - H.p_ssa[i];
+    const strength = Math.min(Math.abs(s - 0.5) * 2, 1) ** 0.8;
+    const tissueOk = H.tissue[i] >= 0.25;
+    const [r, gg, b] = s >= 0.5 ? [52, 211, 153] : [248, 82, 96];
+    im.data.set(tissueOk ? [r, gg, b, Math.round(255 * a * strength)] : [120, 120, 130, Math.round(90 * a)], i * 4);
   }
-  g.strokeStyle = 'rgba(255,255,255,0.22)'; g.lineWidth = 1;
-  for (let c = 1; c < cols; c++) { g.beginPath(); g.moveTo(c * tw, 0); g.lineTo(c * tw, heat.height); g.stroke(); }
-  for (let r = 1; r < rows; r++) { g.beginPath(); g.moveTo(0, r * th); g.lineTo(heat.width, r * th); g.stroke(); }
-  $('colLabels').innerHTML = Array.from({ length: cols }, (_, i) => `<span style="width:${tw}px">${i + 1}</span>`).join('');
-  $('rowLabels').innerHTML = Array.from({ length: rows }, (_, i) => `<span style="height:${th}px">${String.fromCharCode(65 + (i % 26))}</span>`).join('');
+  sg.putImageData(im, 0, 0);
+  const cellPx = heat.width / H.cols;
+  g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+  g.filter = `blur(${Math.max(cellPx * 0.35, 1)}px)`;
+  g.drawImage(small, 0, 0, heat.width, heat.height);
+  g.filter = 'none';
+
+  // 2. grid: faint minor lines per fine cell, stronger major lines per judge tile (aligned to the box edge)
+  const cw = heat.width / H.cols, ch = heat.height / H.rows;
+  const line = (x0, y0, x1, y1) => { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); };
+  g.lineWidth = 1;
+  g.strokeStyle = 'rgba(255,255,255,0.07)';
+  for (let c = 1; c < H.cols; c++) if (c % H.sub) line(Math.round(c * cw) + .5, 0, Math.round(c * cw) + .5, heat.height);
+  for (let r = 1; r < H.rows; r++) if (r % H.sub) line(0, Math.round(r * ch) + .5, heat.width, Math.round(r * ch) + .5);
+  g.strokeStyle = 'rgba(255,255,255,0.32)'; g.lineWidth = Math.max(1, dpr);
+  for (let c = H.sub; c < H.cols; c += H.sub) line(Math.round(c * cw), 0, Math.round(c * cw), heat.height);
+  for (let r = H.sub; r < H.rows; r += H.sub) line(0, Math.round(r * ch), heat.width, Math.round(r * ch));
+
+  // 3. labels on the major tiles
+  const tw = rect.width / result.grid.cols, th = rect.height / result.grid.rows;
+  $('colLabels').innerHTML = Array.from({ length: result.grid.cols }, (_, i) => `<span style="width:${tw}px">${i + 1}</span>`).join('');
+  $('rowLabels').innerHTML = Array.from({ length: result.grid.rows }, (_, i) => `<span style="height:${th}px">${String.fromCharCode(65 + (i % 26))}</span>`).join('');
 }
+
+// hover readout: tile + sub-cell coordinates and local support for the current reference call
+const tip = document.createElement('div');
+tip.className = 'heat-tip hidden';
+document.body.appendChild(tip);
+tissue.addEventListener('mousemove', e => {
+  if (state !== 'results' || !result) return tip.classList.add('hidden');
+  const r = tissue.getBoundingClientRect(), H = result.heat;
+  const fc = Math.min(H.cols - 1, Math.floor((e.clientX - r.left) / r.width * H.cols));
+  const fr = Math.min(H.rows - 1, Math.floor((e.clientY - r.top) / r.height * H.rows));
+  const ref = heatRef === 'ai' ? result.panel.top : (parsed?.call || result.panel.top);
+  const p = H.p_ssa[fr * H.cols + fc], s = ref === 'SSA' ? p : 1 - p;
+  const tile = `${String.fromCharCode(65 + Math.floor(fr / H.sub))}${Math.floor(fc / H.sub) + 1}`;
+  const subc = `${'abcdefgh'[fr % H.sub]}${(fc % H.sub) + 1}`;
+  tip.innerHTML = H.tissue[fr * H.cols + fc] < 0.25 ? `${tile}·${subc} <span class="muted">no tissue</span>`
+    : `${tile}·${subc} <b class="${s >= 0.5 ? 'good' : 'bad'}">${Math.round(s * 100)}%</b> <span class="muted">${s >= 0.5 ? 'supports' : 'contradicts'} ${LABEL[ref]}</span>`;
+  tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
+  tip.classList.remove('hidden');
+});
+tissue.addEventListener('mouseleave', () => tip.classList.add('hidden'));
 $('opacity').addEventListener('input', drawHeat);
 document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
   document.querySelectorAll('.seg button').forEach(x => x.classList.toggle('on', x === b));
