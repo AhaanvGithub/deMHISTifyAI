@@ -253,6 +253,17 @@ def load_open_clip_hub(spec: str, device: str = "cuda", hf_token: Optional[str] 
     )
 
 
+def _as_tensor(out):
+    """transformers 5 returns a model-output object from get_*_features; older versions a tensor."""
+    if isinstance(out, torch.Tensor):
+        return out
+    for k in ("image_embeds", "text_embeds", "pooler_output"):
+        v = getattr(out, k, None)
+        if v is not None:
+            return v
+    raise TypeError(f"unexpected output type {type(out)}")
+
+
 def load_hf_clip(repo_id: str, device: str = "cuda", hf_token: Optional[str] = None) -> Adapter:
     """Generic adapter for any Hugging Face `transformers` CLIPModel repo,
     e.g. "openai/clip-vit-base-patch32" or another HF-native CLIP checkpoint.
@@ -281,7 +292,7 @@ def load_hf_clip(repo_id: str, device: str = "cuda", hf_token: Optional[str] = N
 
     @torch.no_grad()
     def encode_images(batch: torch.Tensor) -> np.ndarray:
-        emb = model.get_image_features(pixel_values=batch.to(device))
+        emb = _as_tensor(model.get_image_features(pixel_values=batch.to(device)))
         emb = emb / emb.norm(dim=-1, keepdim=True)
         return emb.float().cpu().numpy()
 
@@ -289,7 +300,7 @@ def load_hf_clip(repo_id: str, device: str = "cuda", hf_token: Optional[str] = N
     def encode_texts(texts: List[str]) -> np.ndarray:
         inputs = processor(text=texts, return_tensors="pt", padding=True)
         inputs = {k: v.to(device) for k, v in inputs.items()}
-        emb = model.get_text_features(**inputs)
+        emb = _as_tensor(model.get_text_features(**inputs))
         emb = emb / emb.norm(dim=-1, keepdim=True)
         return emb.float().cpu().numpy()
 
