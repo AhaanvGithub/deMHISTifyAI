@@ -166,6 +166,7 @@ function layoutPanel() {
 function handle(ev, d) {
   if (ev === 'parsed') return renderYou(d);
   if (ev === 'conch') return renderConch(d);
+  if (ev === 'heat') { result.heat = d; $('tissueTag').textContent = `${result.grid.cols} × ${result.grid.rows} tiles · ${d.cols} × ${d.rows} heatmap cells (sharpened) · hover for detail`; return drawHeat(); }
   if (ev === 'judge') return renderJudge(d);
   if (ev === 'flags') return renderFlags(d);
   if (ev === 'verdict') return renderVerdict(d);

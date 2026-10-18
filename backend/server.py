@@ -122,7 +122,13 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...)):
         top_feats = sorted(conch["criteria"].values(), key=lambda v: -abs(v["score"] - 0.5))[:5]
         query = "sessile serrated lesion hyperplastic polyp " + " ".join(v["text"] for v in top_feats)
         papers = LIBRARY.search(query)
-        judge = POOL.submit(llm.research_judge, conch["criteria"], papers).result()
+        judge_future = POOL.submit(llm.research_judge, conch["criteria"], papers)
+        # while Lumen thinks, sharpen the heatmap on the GPU (stride 1/8 tile instead of 1/4)
+        try:
+            yield _sse("heat", engine.refine_heat(img, sub=8))
+        except Exception as e:
+            yield _sse("heat_error", {"message": str(e)})
+        judge = judge_future.result()
         yield _sse("judge", judge)
 
         flags = trust_flags(parsed, conch, judge)

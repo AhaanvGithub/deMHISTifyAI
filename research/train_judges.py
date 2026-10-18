@@ -35,11 +35,14 @@ def zs_logit(x, te, prompt_ids, scale):
     return scale * (x @ te[prompt_ids["SSA"]] - x @ te[prompt_ids["HP"]])
 
 
-def fit_head(x, z, y, seed, l2=1e-3, steps=200):
-    """Logistic head with the zero-shot logit as a learnable anchor; soft targets ok."""
+def fit_head(x, z, y, seed, l2=1e-5, steps=300):
+    """Logistic head with the zero-shot logit as a learnable anchor; soft targets ok.
+    Class-balanced: SSA and HP count equally (MHIST is ~31% SSA), i.e. a 50/50 prior."""
     g = torch.Generator().manual_seed(seed)
     idx = torch.randint(0, len(x), (len(x),), generator=g)  # bootstrap
     X, Z, Y = (torch.tensor(a, dtype=torch.float32)[idx] for a in (x, z, y))
+    prev = float(Y.mean())
+    sw = Y / (2 * prev) + (1 - Y) / (2 * (1 - prev))  # per-sample weight for soft targets
     w = torch.zeros(X.shape[1], requires_grad=True)
     b = torch.zeros(1, requires_grad=True)
     alpha = torch.ones(1, requires_grad=True)
@@ -48,22 +51,24 @@ def fit_head(x, z, y, seed, l2=1e-3, steps=200):
     def closure():
         opt.zero_grad()
         logit = X @ w + b + alpha * Z
-        loss = torch.nn.functional.binary_cross_entropy_with_logits(logit, Y) + l2 * (w ** 2).sum()
+        loss = (torch.nn.functional.binary_cross_entropy_with_logits(logit, Y, reduction="none") * sw).mean() + l2 * (w ** 2).sum()
         loss.backward()
         return loss
 
     opt.step(closure)
-    return w.detach().numpy(), float(b), float(alpha)
+    return w.detach().numpy(), float(b.detach()), float(alpha.detach())
 
 
 def fit_temperature(logit, y):
     t = torch.ones(1, requires_grad=True)
     L, Y = torch.tensor(logit, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
+    prev = float(Y.mean())
+    sw = Y / (2 * prev) + (1 - Y) / (2 * (1 - prev))  # same 50/50 prior as training
     opt = torch.optim.LBFGS([t], max_iter=100, line_search_fn="strong_wolfe")
 
     def closure():
         opt.zero_grad()
-        loss = torch.nn.functional.binary_cross_entropy_with_logits(L / t.clamp(min=0.05), Y)
+        loss = (torch.nn.functional.binary_cross_entropy_with_logits(L / t.clamp(min=0.05), Y, reduction="none") * sw).mean()
         loss.backward()
         return loss
 
@@ -121,7 +126,15 @@ def main():
     for n, (p, c) in enumerate(judges):
         x = V[COND_VIEW[c]]
         zl = zs_logit(x, te, p, a.logit_scale)
-        w, b, alpha = fit_head(x[tr], zl[tr], y_train_target[tr], seed=n)
+        # choose regularisation on the validation slice (never on test)
+        best = None
+        for l2 in (1e-6, 1e-5, 1e-4, 1e-3):
+            cand = fit_head(x[tr], zl[tr], y_train_target[tr], seed=n, l2=l2)
+            v_logit = x[val] @ cand[0] + cand[1] + cand[2] * zl[val]
+            score = roc_auc_score(y_hard[val], v_logit)
+            if best is None or score > best[0]:
+                best = (score, l2, cand)
+        _, l2_used, (w, b, alpha) = best
         raw_logit = x @ w + b + alpha * zl
         t = fit_temperature(raw_logit[val], y_hard[val])
         W.append(w); B.append(b); A.append(alpha); T.append(t)
@@ -131,7 +144,7 @@ def main():
         for sv in STRESS_VIEWS:  # same judge, image altered in non-biological ways
             xs = V[sv][test]
             P_stress[sv].append(sigmoid((xs @ w + b + alpha * zs_logit(xs, te, p, a.logit_scale)) / t))
-        rows.append({"judge": f"J{n + 1}", "prompt_set": p, "condition": c, "alpha": round(alpha, 3), "T": round(t, 3),
+        rows.append({"judge": f"J{n + 1}", "prompt_set": p, "condition": c, "alpha": round(alpha, 3), "T": round(t, 3), "l2": l2_used,
                      "zero_shot": {"bal_acc": balanced_accuracy_score(y_hard[test], p_zs > .5), "auc": roc_auc_score(y_hard[test], p_zs)},
                      "trained": {"bal_acc": balanced_accuracy_score(y_hard[test], p_tr > .5), "auc": roc_auc_score(y_hard[test], p_tr)}})
 

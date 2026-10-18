@@ -188,6 +188,11 @@ class Engine:
         return {"rows": R, "cols": C, "sub": sub, "windows": len(starts),
                 "p_ssa": np.round(p_ssa, 4).ravel().tolist(), "tissue": np.round(stained, 3).ravel().tolist()}
 
+    def refine_heat(self, snip: Image.Image, sub: int = 8, tile_px: int = 224) -> dict:
+        """Denser heatmap on the same major grid (called after the first answer is on screen)."""
+        snip = snip.convert("RGB")
+        return self._dense_heat(snip, self.make_grid(snip, tile_px), sub=sub)
+
     def analyze(self, snip: Image.Image, tile_px: int = 224) -> dict:
         snip = snip.convert("RGB")
         tiles = self.make_grid(snip, tile_px)

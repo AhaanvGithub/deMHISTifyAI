@@ -1,0 +1,200 @@
+{
+  "n_test": 977,
+  "soft_targets": true,
+  "judges": [
+    {
+      "judge": "J1",
+      "prompt_set": {
+        "SSA": "class:SSA:05",
+        "HP": "class:HP:05"
+      },
+      "condition": "raw",
+      "alpha": 0.121,
+      "T": 0.7,
+      "l2": 1e-06,
+      "zero_shot": {
+        "bal_acc": 0.621098955519539,
+        "auc": 0.6644223842967765
+      },
+      "trained": {
+        "bal_acc": 0.804373761930488,
+        "auc": 0.8737079056365927
+      }
+    },
+    {
+      "judge": "J2",
+      "prompt_set": {
+        "SSA": "class:SSA:05",
+        "HP": "class:HP:05"
+      },
+      "condition": "normalized",
+      "alpha": 0.111,
+      "T": 0.637,
+      "l2": 1e-06,
+      "zero_shot": {
+        "bal_acc": 0.6033810552854313,
+        "auc": 0.6645979650639294
+      },
+      "trained": {
+        "bal_acc": 0.7404826220061228,
+        "auc": 0.8274581307401403
+      }
+    },
+    {
+      "judge": "J3",
+      "prompt_set": {
+        "SSA": "class:SSA:09",
+        "HP": "class:HP:09"
+      },
+      "condition": "raw",
+      "alpha": 0.031,
+      "T": 0.736,
+      "l2": 1e-06,
+      "zero_shot": {
+        "bal_acc": 0.5928619665045921,
+        "auc": 0.6261998019088781
+      },
+      "trained": {
+        "bal_acc": 0.7849270664505672,
+        "auc": 0.8633846569421936
+      }
+    },
+    {
+      "judge": "J4",
+      "prompt_set": {
+        "SSA": "class:SSA:09",
+        "HP": "class:HP:09"
+      },
+      "condition": "normalized",
+      "alpha": 0.017,
+      "T": 0.612,
+      "l2": 1e-06,
+      "zero_shot": {
+        "bal_acc": 0.566711687376193,
+        "auc": 0.5867143886187647
+      },
+      "trained": {
+        "bal_acc": 0.7524086079596615,
+        "auc": 0.8433279308481902
+      }
+    },
+    {
+      "judge": "J5",
+      "prompt_set": {
+        "SSA": "class:SSA:07",
+        "HP": "class:HP:07"
+      },
+      "condition": "raw",
+      "alpha": 0.112,
+      "T": 0.685,
+      "l2": 1e-06,
+      "zero_shot": {
+        "bal_acc": 0.5676368629569601,
+        "auc": 0.5553079416531604
+      },
+      "trained": {
+        "bal_acc": 0.8040293535026112,
+        "auc": 0.8709751485683415
+      }
+    },
+    {
+      "judge": "J6",
+      "prompt_set": {
+        "SSA": "class:SSA:07",
+        "HP": "class:HP:07"
+      },
+      "condition": "normalized",
+      "alpha": 0.207,
+      "T": 0.683,
+      "l2": 1e-06,
+      "zero_shot": {
+        "bal_acc": 0.4975126057986674,
+        "auc": 0.5283045200792365
+      },
+      "trained": {
+        "bal_acc": 0.7554159913560238,
+        "auc": 0.8410904015847289
+      }
+    },
+    {
+      "judge": "J7",
+      "prompt_set": {
+        "SSA": "class:SSA:10",
+        "HP": "class:HP:10"
+      },
+      "condition": "raw",
+      "alpha": 0.022,
+      "T": 0.659,
+      "l2": 1e-06,
+      "zero_shot": {
+        "bal_acc": 0.5307964163515216,
+        "auc": 0.5865523140644697
+      },
+      "trained": {
+        "bal_acc": 0.7917567080857195,
+        "auc": 0.8700207095263822
+      }
+    },
+    {
+      "judge": "J8",
+      "prompt_set": {
+        "SSA": "class:SSA:10",
+        "HP": "class:HP:10"
+      },
+      "condition": "normalized",
+      "alpha": 0.007,
+      "T": 0.725,
+      "l2": 1e-06,
+      "zero_shot": {
+        "bal_acc": 0.5333423374752386,
+        "auc": 0.6414168017287953
+      },
+      "trained": {
+        "bal_acc": 0.7559945074734378,
+        "auc": 0.8341256978209977
+      }
+    }
+  ],
+  "zero_shot_panel": {
+    "bal_acc": 0.5935417792184405,
+    "auc": 0.6413110030614082,
+    "ece": 0.30304627420958374,
+    "mean_confidence": 0.7933225631713867
+  },
+  "trained_panel": {
+    "bal_acc": 0.7899063569241851,
+    "auc": 0.8720511435260221,
+    "ece": 0.0393174565802333,
+    "mean_confidence": 0.7744519114494324
+  },
+  "agreement_vs_accuracy": {
+    "acc_when_judges_agree": 0.8493506493506493,
+    "n_agree": 770,
+    "acc_when_judges_split": 0.5700483091787439,
+    "n_split": 207
+  },
+  "stress": {
+    "gray": {
+      "bal_acc": 0.7374864937871421,
+      "flip_rate": 0.17195496417604914
+    },
+    "jitter_mild": {
+      "bal_acc": 0.7953471096704483,
+      "flip_rate": 0.1023541453428864
+    },
+    "jitter_strong": {
+      "bal_acc": 0.7072775976949397,
+      "flip_rate": 0.19754350051177072
+    },
+    "jpeg20": {
+      "bal_acc": 0.5381933189267063,
+      "flip_rate": 0.38485158648925283
+    }
+  },
+  "vs_pathologists": {
+    "spearman_ai_votes_vs_pathologist_votes": 0.6844274419535818,
+    "p": 5.996129311167507e-136,
+    "ai_split_rate_on_4v3_cases": 0.31097560975609756,
+    "ai_split_rate_on_unanimous_cases": 0.13622291021671826
+  }
+}
