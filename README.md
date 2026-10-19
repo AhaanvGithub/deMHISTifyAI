@@ -189,7 +189,10 @@ Cross-validation outputs go to `data/models/cv/` (never `data/models/`, which th
 
 ## License
 
-Built for a hackathon and for research; not part of a publication. Free for non-commercial study,
-teaching, research and hackathon use with attribution; not for clinical use. Third-party models and data
-(CONCH, MUSK, PLIP, ConvNeXt weights, MHIST, OpenEvidence content) keep their own terms and are not
-included. See [LICENSE](LICENSE).
+[PolyForm Noncommercial 1.0.0](LICENSE): free to use, change and share for any non-commercial purpose
+(study, teaching, research, hackathon judging and demos); commercial use needs permission.
+
+- Built for a hackathon and for research; not part of a publication.
+- A research tool, not a medical device: not for diagnosing or treating patients.
+- Third-party models and data (CONCH, MUSK, PLIP, ConvNeXt weights, MHIST, OpenEvidence content) are not
+  included and keep their own terms; several forbid commercial use and sharing derivatives.
