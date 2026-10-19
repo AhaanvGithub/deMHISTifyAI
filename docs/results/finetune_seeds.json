@@ -1,16 +1,10 @@
 {
   "seeds": {
     "0": {
-      "val_auc": 0.9132,
       "test": {
         "bal_acc": 0.7903,
         "auc": 0.9025,
         "ece": 0.0322
-      },
-      "stress_auc": {
-        "gray": 0.884,
-        "jitter_strong": 0.8742,
-        "jpeg20": 0.7813
       },
       "pathologist_alignment": {
         "spearman_p_vs_votes": 0.7674,
@@ -21,16 +15,10 @@
       }
     },
     "1": {
-      "val_auc": 0.9177,
       "test": {
         "bal_acc": 0.8136,
         "auc": 0.9048,
         "ece": 0.0351
-      },
-      "stress_auc": {
-        "gray": 0.8871,
-        "jitter_strong": 0.8742,
-        "jpeg20": 0.7723
       },
       "pathologist_alignment": {
         "spearman_p_vs_votes": 0.7722,
@@ -41,16 +29,10 @@
       }
     },
     "2": {
-      "val_auc": 0.923,
       "test": {
         "bal_acc": 0.8251,
         "auc": 0.9071,
         "ece": 0.0226
-      },
-      "stress_auc": {
-        "gray": 0.8696,
-        "jitter_strong": 0.8801,
-        "jpeg20": 0.7717
       },
       "pathologist_alignment": {
         "spearman_p_vs_votes": 0.7668,
@@ -59,21 +41,36 @@
         "acc_on_4v3": 0.5915,
         "acc_on_unanimous": 0.9319
       }
+    },
+    "3": {
+      "test": {
+        "bal_acc": 0.8112,
+        "auc": 0.9091,
+        "ece": 0.0282
+      },
+      "pathologist_alignment": {
+        "spearman_p_vs_votes": 0.7769,
+        "mean_conf_on_4v3": 0.7452,
+        "mean_conf_on_unanimous": 0.8927,
+        "acc_on_4v3": 0.6098,
+        "acc_on_unanimous": 0.9412
+      }
     }
   },
-  "mean_auc": 0.9048,
-  "std_auc": 0.0019,
-  "mean_bal_acc": 0.8097,
-  "std_bal_acc": 0.0145,
+  "mean_auc": 0.9059,
+  "std_auc": 0.0025,
+  "mean_bal_acc": 0.81,
+  "std_bal_acc": 0.0126,
   "ensemble_of_seeds": {
-    "auc": 0.9065,
-    "bal_acc": 0.8166,
+    "auc": 0.9076,
+    "bal_acc": 0.8188,
+    "ece": 0.0344,
     "pathologist_alignment": {
-      "spearman_p_vs_votes": 0.7721,
-      "mean_conf_on_4v3": 0.7281,
-      "mean_conf_on_unanimous": 0.8719,
+      "spearman_p_vs_votes": 0.7745,
+      "mean_conf_on_4v3": 0.7309,
+      "mean_conf_on_unanimous": 0.8769,
       "acc_on_4v3": 0.6159,
-      "acc_on_unanimous": 0.9381
+      "acc_on_unanimous": 0.9412
     }
   }
 }

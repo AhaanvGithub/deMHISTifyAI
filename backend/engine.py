@@ -92,7 +92,7 @@ class Engine:
             branch = torch.nn.ModuleDict({
                 "blocks": copy.deepcopy(v.trunk.blocks[10:]), "norm": copy.deepcopy(v.trunk.norm),
                 "pool": copy.deepcopy(v.attn_pool_contrast), "ln": copy.deepcopy(v.ln_contrast)})
-            rename = {"conch.visual.trunk.blocks.10.": "blocks.0.", "conch.visual.trunk.blocks.11.": "blocks.1.",
+            rename = {"conch.visual.trunk.blocks.": "blocks.",  # sliced Sequential keeps indices 10, 11
                       "conch.visual.trunk.norm.": "norm.", "conch.visual.attn_pool_contrast.": "pool.",
                       "conch.visual.ln_contrast.": "ln."}
             sd = {}
