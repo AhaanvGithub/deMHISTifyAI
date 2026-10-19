@@ -48,12 +48,22 @@ def balanced_lr(X, ys):
                                                         sample_weight=w)
 
 
-def metrics(p, y, votes, cut=0.5):
+def natural_lr(X, y_hard):
+    """Platt scaling to the MAJORITY call at its real frequency: the displayed percentage then means "chance the
+    7-pathologist majority says SSL". (Fitting to the vote share instead squeezes percentages toward 50%; scored
+    against majority labels that gave ECE 6.8% vs 1.3% on training images, cross-fitted.)"""
+    return LogisticRegression(C=1e3, max_iter=5000).fit(X, y_hard)
+
+
+def metrics(p, y, votes, cut=0.5, p_shown=None):
+    """call metrics from the decision probability `p` and cut-off; calibration (ECE) from the displayed
+    probability `p_shown` (defaults to `p`)"""
+    p_shown = p if p_shown is None else p_shown
     split = (votes == 3) | (votes == 4)
     return {"bal_acc": round(float(balanced_accuracy_score(y, p > cut)), 4), "auc": round(float(roc_auc_score(y, p)), 4),
             "acc_vs_majority": round(float(((p > cut) == y).mean()), 4),
             "ssl_caught": round(float((p[y == 1] > cut).mean()), 4), "hp_caught": round(float((p[y == 0] <= cut).mean()), 4),
-            "ece": round(ece(p, y), 4), "spearman_vs_votes": round(float(spearmanr(p, votes)[0]), 4),
+            "ece": round(ece(p_shown, y), 4), "spearman_vs_votes": round(float(spearmanr(p, votes)[0]), 4),
             "acc_on_4v3": round(float(((p > cut) == y)[split].mean()), 4)}
 
 
@@ -118,16 +128,28 @@ def main():
     # 3. weights on all training images, calibration and cut-off from out-of-fold scores
     g, pred = cv_pred[pick]
     stack = balanced_lr(Oz[:, g], ystr)
+    # two calibrations of the same score: the CALL uses SSL/HP weighted equally (what balanced accuracy rewards);
+    # the DISPLAYED percentage is calibrated to the majority call at its real training frequency, so "80%" means the
+    # majority says SSL ~80% of the time on MHIST-like cases. Neither changes the ranking (AUC); the call's cut-off is set on training images.
     cal = balanced_lr(pred[:, None], ystr)
+    show = natural_lr(pred[:, None], ytr)
     p_tr = cal.predict_proba(pred[:, None])[:, 1]
+    s_tr = show.predict_proba(pred[:, None])[:, 1]
     cuts = np.linspace(0.2, 0.8, 121)
     cut = float(cuts[np.argmax([balanced_accuracy_score(ytr, p_tr > c) for c in cuts])])
 
     # 4. the one test evaluation of the chosen panel, plus context
-    p_ts = cal.predict_proba(stack.decision_function(Tz[:, g])[:, None])[:, 1]
+    z_ts = stack.decision_function(Tz[:, g])[:, None]
+    p_ts, s_ts = cal.predict_proba(z_ts)[:, 1], show.predict_proba(z_ts)[:, 1]
+    # the call's cut-off expressed on the displayed scale (the app shows "calls SSL above X%")
+    z_cut = (np.log(cut / (1 - cut)) - cal.intercept_[0]) / cal.coef_[0][0]  # score where the call flips
+    shown_cut = float(1 / (1 + np.exp(-(show.coef_[0][0] * z_cut + show.intercept_[0]))))
     out = {"members": a.members, "test_logits_from": source, "groups": res_groups, "best_group": best, "chosen": pick,
            "weights": dict(zip([a.members[k] for k in g], map(float, stack.coef_[0]))), "cut_off": round(cut, 3),
-           "train_oof": metrics(p_tr, ytr, votes[tr], cut), "TEST_chosen_panel": metrics(p_ts, y[ts], votes[ts], cut)}
+           "shown_cut_off": round(shown_cut, 3),
+           "calibration": {"call": {"coef": float(cal.coef_[0][0]), "intercept": float(cal.intercept_[0])},
+                           "shown": {"coef": float(show.coef_[0][0]), "intercept": float(show.intercept_[0])}},
+           "train_oof": metrics(p_tr, ytr, votes[tr], cut, s_tr), "TEST_chosen_panel": metrics(p_ts, y[ts], votes[ts], cut, s_ts)}
     ctx = {}
     for k, tag in enumerate(a.members):  # each member alone, calibrated on its own out-of-fold logits
         c = balanced_lr(O[:, [k]], ystr)
