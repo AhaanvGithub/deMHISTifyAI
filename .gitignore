@@ -16,3 +16,4 @@ dist/
 out/
 .env
 app/node_modules/
+papers/openevidence/

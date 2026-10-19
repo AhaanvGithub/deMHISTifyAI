@@ -43,7 +43,9 @@ def _json_from(text: str) -> dict:
 
 # ---------- paper library ----------
 class Library:
-    """papers/library.json: [{"id","title","authors","year","journal","doi","text"}]"""
+    """papers/library.json (built by research/build_library.py): evidence passages from the
+    OpenEvidence syntheses, each with the primary papers it cites:
+    [{"id","question","topic","heading","text","sources":[{"n","citation","title","year","doi"}]}]"""
 
     def __init__(self):
         self.papers = json.loads(LIBRARY_PATH.read_text(encoding="utf-8")) if LIBRARY_PATH.exists() else []
@@ -52,17 +54,17 @@ class Library:
             from sklearn.feature_extraction.text import TfidfVectorizer
 
             self._vec = TfidfVectorizer(stop_words="english", ngram_range=(1, 2), sublinear_tf=True)
-            self._mat = self._vec.fit_transform([f"{p['title']} {p['text']}" for p in self.papers])
+            self._mat = self._vec.fit_transform([f"{p['topic']} {p['heading']} {p['text']}" for p in self.papers])
 
-    def search(self, query: str, k: int = 6) -> List[dict]:
+    def search(self, query: str, k: int = 8) -> List[dict]:
         if not self.papers:
             return []
         sims = (self._mat @ self._vec.transform([query]).T).toarray().ravel()
         hits = []
         for rank, i in enumerate(sims.argsort()[::-1][:k]):
             p = self.papers[i]
-            hits.append({**{k2: p.get(k2) for k2 in ("title", "authors", "year", "journal", "doi")},
-                         "ref": f"P{rank + 1}", "excerpt": p["text"][:1800]})
+            hits.append({"ref": f"P{rank + 1}", "id": p["id"], "title": f"{p['topic']}: {p['heading']}",
+                         "excerpt": p["text"][:1800], "sources": p.get("sources", [])})
         return hits
 
 
@@ -84,7 +86,7 @@ def parse_researcher(text: str) -> dict:
 JUDGE_SYSTEM = """You are a gastrointestinal pathology research assistant comparing two diagnoses for a colon polyp image:
 SSA = sessile serrated lesion (sessile serrated adenoma/polyp); HP = hyperplastic polyp.
 You CANNOT see the image. An image model measured how strongly each histologic feature appears (0 = much weaker than typical, 0.5 = typical, 1 = much stronger than typical, relative to a reference set of colon polyp images). These measurements are noisy.
-You also get numbered literature excerpts [P1], [P2], ...
+You also get numbered literature excerpts [P1], [P2], ... (evidence syntheses that cite primary papers with their own [n] markers; cite an excerpt as [P#]).
 Reason about THIS case: decide which features matter most here and why, the way a pathologist weighs evidence; the field is contested, so do not apply a fixed checklist.
 Cite only the provided excerpts, by their [P#] labels. Never invent citations. If the excerpts do not support a claim, say so.
 Respond with JSON only:
@@ -108,7 +110,7 @@ def _judge_once(cli: OpenAI, payload: str, temperature: float) -> Optional[dict]
 
 def research_judge(criteria: dict, papers: List[dict]) -> dict:
     feats = "\n".join(f"- [{k}] {v['text']}: {v['score']:.2f}" for k, v in criteria.items())
-    refs = "\n\n".join(f"[{p['ref']}] {p['title']} ({p.get('year')})\n{p['excerpt']}" for p in papers) or "(no excerpts available)"
+    refs = "\n\n".join(f"[{p['ref']}] {p['title']}\n{p['excerpt']}" for p in papers) or "(no excerpts available)"
     payload = f"Feature measurements:\n{feats}\n\nLiterature excerpts:\n{refs}"
 
     cli = client()

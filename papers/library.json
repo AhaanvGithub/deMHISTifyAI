@@ -1,0 +1,2449 @@
+[
+ {
+  "question": "Q1",
+  "topic": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "heading": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "text": "The WHO 2019 (5th edition) criterion is deliberately low-threshold: a single unequivocal architecturally distorted serrated crypt is sufficient to diagnose a sessile serrated lesion (SSL), whereas a hyperplastic polyp (HP) by definition shows no such distortion. This replaced the WHO 2010 (4th edition) requirement for two or three contiguous characteristic crypts.",
+  "sources": [],
+  "id": "OE001"
+ },
+ {
+  "question": "Q1",
+  "topic": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "heading": "Terminology and framework",
+  "text": "The 5th edition formally adopted \"sessile serrated lesion\" (SSL), retiring sessile serrated adenoma (SSA), sessile serrated polyp (SSP), and SSA/P. [1][5][6] Serrated polyps are classified as hyperplastic polyp, sessile serrated lesion (± dysplasia), and traditional serrated adenoma, with a residual category \"serrated adenoma, unclassified.\" The clinical stakes are substantial: SSLs are precursors to roughly 15-30% of colorectal cancers via the BRAF-mutated, CpG island methylator (CIMP-high) serrated pathway, while HPs carry minimal malignant potential. [1][2][8]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j-gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j-gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 5,
+    "citation": "Sessile serrated lesions of the appendix: a contemporary review of the literature. Csonka B, Lantos T, Sejben A. BMC Gastroenterology. 2026;26(1):546. doi:10.1186/s12876-026-05117-5.",
+    "title": "Sessile serrated lesions of the appendix: a contemporary review of the literature.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-05117-5"
+   },
+   {
+    "n": 6,
+    "citation": "Sessile Serrated Lesions: Clinicopathological Characteristics, Endoscopic Diagnosis, and Management. Murakami T, Kurosawa T, Fukushima H, et al. Digestive Endoscopy : Official Journal of the Japan Gastroenterological Endoscopy Society. 2022;34(6):1096-1109. doi:10.1111/den.14273.",
+    "title": "Sessile Serrated Lesions: Clinicopathological Characteristics, Endoscopic Diagnosis, and Management.",
+    "year": 2022,
+    "doi": "10.1111/den.14273"
+   },
+   {
+    "n": 8,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": null,
+    "doi": null
+   }
+  ],
+  "id": "OE002"
+ },
+ {
+  "question": "Q1",
+  "topic": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "heading": "The defining architectural criterion for SSL",
+  "text": "The hallmark distinguishing SSL from HP is architectural distortion of the crypts, attributed to altered proliferative-zone dynamics. [1] Under the WHO 2019 criteria, the diagnosis requires any of the following features: [1][2][8][9]\n- Horizontal growth above the muscularis mucosae — crypts bending to run parallel to the muscularis mucosae, producing L-shaped, boot-shaped, inverted-T, or anchor-shaped silhouettes. [2]\n- Dilation of the crypt base — widening of the basal (lower) third of the crypt. [2][8]\n- Serrations extending into the crypt base — in contrast to HP, where serration is confined to the upper crypt. [2][8][10]\n- Asymmetrical proliferation — the proliferative zone displaced to one side of the crypt with disordered maturation. [2][8]\nCritically, the WHO specifies the distortion must be \"unequivocal\"; subtle architectural change is not sufficient for the diagnosis in the 5th edition, although they commonly co-occur with other abnormalities. [1] Polyp size and location are not part of the histologic criteria, even though SSLs are typically larger and right-sided. [2]\nSupportive but non-diagnostic features include mature/dystrophic goblet cells and serration reaching the crypt base (\"inverted maturation\" or \"dysmaturation\"), mucosal prolapse/herniation (rare in HP), perineural-like stromal proliferations (>6% of SSLs), and gastric-type mucins (MUC5AC, MUC6). [1][3][11]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j-gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j-gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 3,
+    "citation": "The spectrum of serrated colorectal lesions-new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions-new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   },
+   {
+    "n": 8,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 9,
+    "citation": "Head to head: should we adopt the term 'sessile serrated lesion'?. Nagtegaal ID, Snover DC. Histopathology. 2022;80(7):1019-1025. doi:10.1111/his.14618.",
+    "title": "Head to head: should we adopt the term 'sessile serrated lesion'?.",
+    "year": 2022,
+    "doi": "10.1111/his.14618"
+   },
+   {
+    "n": 10,
+    "citation": "Polyps of the Large Intestine. Christophe Rosty, Michael B. Wallace, Till S. Clauditz. Gastrointestinal Pathology. 2021.",
+    "title": "Polyps of the Large Intestine.",
+    "year": 2021,
+    "doi": null
+   },
+   {
+    "n": 11,
+    "citation": "Polyps of the colon and rectum. John J. Garber1,2, Daniel C. Chung2. Yamada's Textbook of Gastroenterology 7e. 2022.",
+    "title": "Polyps of the colon and rectum.",
+    "year": 2022,
+    "doi": null
+   }
+  ],
+  "id": "OE003"
+ },
+ {
+  "question": "Q1",
+  "topic": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "heading": "The defining architectural criterion for SSL",
+  "text": "The following histology panel demonstrates the defining SSL architecture — disorganized crypts with excessive serration, dilated bases, irregular branching, and horizontal (\"L-shaped\") basal crypts.\nFigure: Histology showing typical characteristics of the sessile serrated adenomas (hematoxylin and eosin staining). a Disorganized and distorted crypt growth pattern identifiable upon low-power microscopic examination. Crypts contain excessive serration and dilated basal portion. b Irregularly branching crypts. c Crypts with horizontally arranging at the base (\"L\"-shaped crypt penicillate nuclei and eosinophilic cytoplasm.",
+  "sources": [],
+  "id": "OE004"
+ },
+ {
+  "question": "Q1",
+  "topic": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "heading": "Hyperplastic polyp criteria (the contrast)",
+  "text": "An HP is a serrated polyp with normal crypt architecture and proliferative characteristics. [13] The crypts are elongated but retain a straight, narrow base housing the proliferative zone, with serration confined to the upper half/third of the crypt and no basal dilation, horizontal growth, or L/T-shaped distortion; cytologic dysplasia is absent. [10][12] The WHO recognizes two main subtypes that need not be separated in routine reports: [10][14]\n| Feature | Microvesicular HP (MVHP) | Goblet cell-rich HP (GCHP) | References |\n| :--- | :--- | :--- | :--- |\n| Predominant cell mucin | Columnar cells with microvesicular mucin | Mature goblet cells | [10], [14] |\n| Serration openings | More prominent, stellate crypt openings | Subtle, surface-limited | [10] |\n| BRAF V600E | ~53-76% | ~0-23% | [11], [15] |\n| KRAS | ~13-16% | ~46-54% | [15], [16] |\n| Likely relationship | Precursor along MVHP $\\rightarrow$ SSL continuum | Possible TSA precursor | [3], [11], [17] |",
+  "sources": [
+   {
+    "n": 3,
+    "citation": "The spectrum of serrated colorectal lesions-new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions-new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   },
+   {
+    "n": 10,
+    "citation": "Polyps of the Large Intestine. Christophe Rosty, Michael B. Wallace, Till S. Clauditz. Gastrointestinal Pathology. 2021.",
+    "title": "Polyps of the Large Intestine.",
+    "year": 2021,
+    "doi": null
+   },
+   {
+    "n": 11,
+    "citation": "Polyps of the colon and rectum. John J. Garber1,2, Daniel C. Chung2. Yamada's Textbook of Gastroenterology 7e. 2022.",
+    "title": "Polyps of the colon and rectum.",
+    "year": 2022,
+    "doi": null
+   },
+   {
+    "n": 12,
+    "citation": "Finding Sessile Serrated Adenomas: Is It Possible to Identify Them During Conventional Colonoscopy?. Pereyra L, Gomez EJ, Gonzalez R, et al. Digestive Diseases and Sciences. 2014;59(12):3021-6. doi:10.1007/s10620-014-3295-z.",
+    "title": "Finding Sessile Serrated Adenomas: Is It Possible to Identify Them During Conventional Colonoscopy?.",
+    "year": 2014,
+    "doi": "10.1007/s10620-014-3295-z"
+   },
+   {
+    "n": 13,
+    "citation": "Colorectal Cancer Screening. National Comprehensive Cancer Network. Updated 2026-04-23.",
+    "title": "Colorectal Cancer Screening.",
+    "year": 2026,
+    "doi": null
+   },
+   {
+    "n": 14,
+    "citation": "Serrated Colon Polyps as Precursors to Colorectal Cancer. Sweetser S, Smyrk TC, doi:10.1016/j.cgh.2012.12.004.",
+    "title": "Serrated Colon Polyps as Precursors to Colorectal Cancer.",
+    "year": 2012,
+    "doi": "10.1016/j.cgh.2012.12.004"
+   },
+   {
+    "n": 15,
+    "citation": "BRAF and KRAS Mutations in Hyperplastic Polyps and Serrated Adenomas of the Colorectum: Relationship to Histology and CpG Island Methylation Status. Yang S, Farraye FA, Mack C, Posnik O, O'Brien MJ. The American Journal of Surgical Pathology. 2004;28(11):1452-9. doi:10.1097/01.pas.0000141404.56839.6a.",
+    "title": "BRAF and KRAS Mutations in Hyperplastic Polyps and Serrated Adenomas of the Colorectum: Relationship to Histology and CpG Island Methylation Status.",
+    "year": 2004,
+    "doi": "10.1097/01.pas.0000141404.56839.6a"
+   },
+   {
+    "n": 16,
+    "citation": "Hyperplastic (Serrated) Polyps of the Colorectum: Relationship of CpG Island Methylator Phenotype and K-Ras Mutation to Location and Histologic Subtype. O'Brien MJ, Yang S, Clebanoff JL, et al. The American Journal of Surgical Pathology. 2004;28(4):423-34. doi:10.1097/00000478-200404000-00001.",
+    "title": "Hyperplastic (Serrated) Polyps of the Colorectum: Relationship of CpG Island Methylator Phenotype and K-Ras Mutation to Location and Histologic Subtype.",
+    "year": 2004,
+    "doi": "10.1097/00000478-200404000-00001"
+   },
+   {
+    "n": 17,
+    "citation": "Endoscopic mucosal biopsy = pathology and biomarker testing*. Antonia R. Sepulveda, Sun A. Kim. Yamada's Textbook of Gastroenterology 7e. 2022.",
+    "title": "Endoscopic mucosal biopsy = pathology and biomarker testing*.",
+    "year": 2022,
+    "doi": null
+   }
+  ],
+  "id": "OE005"
+ },
+ {
+  "question": "Q1",
+  "topic": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "heading": "Evolution of the minimum-crypt threshold",
+  "text": "The threshold moved progressively lower as evidence accumulated: [2][3][5]\n| Source | Year | Minimum criterion | References |\n| :--- | :--- | :--- | :--- |\n| WHO 4th edition | 2010 | 2-3 contiguous characteristic crypts | [3], [5] |\n| Cleveland expert consensus (Rex et al.) | 2012 | A single unequivocal architecturally distorted, dilated, and/or horizontally branched crypt, especially with inverted maturation | [2], [18] |\n| WHO 5th edition | 2019 | $\\ge$ 1 unequivocal architecturally distorted serrated crypt | [1], [2], [8] |\n| WHO 6th edition | 2024/25 | Single-crypt rule retained | [5] |",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j-gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j-gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 3,
+    "citation": "The spectrum of serrated colorectal lesions-new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions-new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   },
+   {
+    "n": 5,
+    "citation": "Sessile serrated lesions of the appendix: a contemporary review of the literature. Csonka B, Lantos T, Sejben A. BMC Gastroenterology. 2026;26(1):546. doi:10.1186/s12876-026-05117-5.",
+    "title": "Sessile serrated lesions of the appendix: a contemporary review of the literature.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-05117-5"
+   },
+   {
+    "n": 8,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 18,
+    "citation": "Serrated Lesions of the Colorectum: Review and Recommendations From an Expert Panel. Rex DK, Ahnen DJ, Baron JA, et al. The American Journal of Gastroenterology.",
+    "title": "Serrated Lesions of the Colorectum: Review and Recommendations From an Expert Panel.",
+    "year": null,
+    "doi": null
+   }
+  ],
+  "id": "OE006"
+ },
+ {
+  "question": "Q1",
+  "topic": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "heading": "Evidence supporting each criterion",
+  "text": "Cross-sectional analysis of 6,340 colorectal polyps, which found that serrated polyps containing even a single SSL-type crypt resembled SSLs — not microvesicular HPs — in size, proximal location, and molecular profile. Applying the single-crypt criterion raised the SSL proportion from 12.1% to 14.7% (roughly a 7% relative increase in serrated polyps classified as SSL). [1][4] This reclassification data: After the 2010 edition first incorporated SSLs, 8-19% of previously diagnosed HPs were reclassified as SSLs, rising to as high as 28% among larger HPs. [1] Review of proximal HPs diagnosed before the 5th edition found 13.3% required reclassification as SSLs under the single-crypt rule. [5] These data indicate the prior thresholds systematically under-called SSLs over the 4th edition. [1] The reality is mixed: in a study of 13 pathologists reviewing 60 serrated\n0.63) only when size and site were supplied; agreement was poorest for transverse-colon all 13 pathologists endorsed as useful, validating it as the central criterion even as its \"unequivocal\" threshold remains subjectively applied.[2] Agreement improves further with good specimen orientation and training-[20][1]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j-gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j-gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 4,
+    "citation": "Critical Appraisal of the Diagnosis of the Sessile Serrated Adenoma. Bettington M, Walker N, Rosty C, et al. The American Journal of Surgical Pathology. 2014;38(2):158-66. doi:10.1097/PAS.0000000000000103.",
+    "title": "Critical Appraisal of the Diagnosis of the Sessile Serrated Adenoma.",
+    "year": 2014,
+    "doi": "10.1097/PAS.0000000000000103"
+   },
+   {
+    "n": 5,
+    "citation": "Sessile serrated lesions of the appendix: a contemporary review of the literature. Csonka B, Lantos T, Sejben A. BMC Gastroenterology. 2026;26(1):546. doi:10.1186/s12876-026-05117-5.",
+    "title": "Sessile serrated lesions of the appendix: a contemporary review of the literature.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-05117-5"
+   },
+   {
+    "n": 20,
+    "citation": "Detection, Diagnosis, and Resection of Sessile Serrated Adenomas and Polyps. Kolb JM, doi:10.1053/j-gastro.2017.05.060.",
+    "title": "Detection, Diagnosis, and Resection of Sessile Serrated Adenomas and Polyps.",
+    "year": 2017,
+    "doi": "10.1053/j-gastro.2017.05.060"
+   }
+  ],
+  "id": "OE007"
+ },
+ {
+  "question": "Q1",
+  "topic": "WHO 2019 criteria: sessile serrated lesion vs hyperplastic polyp",
+  "heading": "Evidence supporting each criterion",
+  "text": "Molecular validation of the SSL-HP distinction. The architectural division tracks a genuine biological difference: BRAF V600E is present in 78-100% of SSLs versus ~20% of goblet-cell-rich HPs; CIMP-high prevalence rises sequentially from MVHP → SSL → SSL with dysplasia; and MLH1 promoter methylation (producing MSI-H cancers) emerges as SSLs progress.[8][2][11][21] Adjunctive markers such as loss of Hes1 expression (absent/weak in 92% of SSLs vs. retained in 100% of HPs) further corroborate that distorted-crypt lesions are molecularly distinct.\nPractical caveats\nThe weakest link is the subjectivity of \"unequivocal\" distortion, compounded by tangential sectioning that obscures crypt bases, and the absence of any molecular/IHC gold standard for histologic criteria yet demonstrably improve agreement, many pathologists use them informally as tie-breakers.[2]",
+  "sources": [
+   {
+    "n": 2,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 8,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 11,
+    "citation": "Polyps of the colon and rectum. John J. Garber1,2, Daniel C. Chung2. Yamada's Textbook of Gastroenterology 7e. 2022.",
+    "title": "Polyps of the colon and rectum.",
+    "year": 2022,
+    "doi": null
+   },
+   {
+    "n": 21,
+    "citation": "Serrated polyps of the large intestine: a molecular study comparing sessile serrated adenomas and hyperplastic polyps. Sandmeier D, Benhattar J, Martin P, Bouzourene H. Histopathology. 2009;55(2):206-13. doi:10.1111/j.1365-2559.2009.03356.x.",
+    "title": "Serrated polyps of the large intestine: a molecular study comparing sessile serrated adenomas and hyperplastic polyps.",
+    "year": 2009,
+    "doi": "10.1111/j.1365-2559.2009.03356.x"
+   }
+  ],
+  "id": "OE008"
+ },
+ {
+  "question": "Q2",
+  "topic": "Ranking distinguishing features by specificity and reproducibility",
+  "heading": "Ranking distinguishing features by specificity and reproducibility",
+  "text": "Bottomline: the L-/boot-/T-shaped crypt with horizontal growth along the muscularis mucosae — it is the only feature that is both highly specific (0% of HPs in the key multicenter study) and the most reproducible of all architectural criteria.[1] The two dimensions you asked about do not rank identically: inverted (herniated) crypts are the most specific feature but the least reproducible and least sensitive, whereas basal crypt dilatation is highly sensitive but the least specific and only fairly reproducible.[1] Mucin at the crypt base ranks last on both axes — it overlaps substantially between the two lesions and is treated as supportive, not diagnostic.\nL- and T-shaped crypts are essentially the same morphologic phenomenon described from two vantage points, and the WHO 2019 criteria list both as elements of a single \"architecturally distorted crypt\".[4][5]\nThe most useful quantitative anchor is the Rau et al. (2014) European multicenter study (10 pathologists, 5 countries, 200 specimens), which is the only work to report a kappa value and the frequency in HP vs. SSL for each individual criterion.[1]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology. 2014;464(6):663-72. doi:10.1007/s00428-014-1569-7.",
+    "title": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology.",
+    "year": 2014,
+    "doi": "10.1007/s00428-014-1569-7"
+   },
+   {
+    "n": 4,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j-gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j-gastro.2019.06.041"
+   },
+   {
+    "n": 5,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC Gastroenterology. 2026;26(1):271. doi:10.1186/s12876-026-04763-z.",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-04763-z"
+   }
+  ],
+  "id": "OE009"
+ },
+ {
+  "question": "Q2",
+  "topic": "Ranking distinguishing features by specificity and reproducibility",
+  "heading": "The quantitative basis (Rau et al. 2014)",
+  "text": "| Feature | Frequency in SSL | Frequency in HP | Specificity signal | Interobserver k | References |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| T-/L-/boot-shaped crypts (horizontal growth along muscularis mucosae) | Highest (80.4%) | 0% | Highest (never in HP) + sensitive | 0.47 (moderate) | [1] |\n| Inverted crypts (herniation below muscularis mucosae) | 17.6% | 0% | Highest (never in HP) but very insensitive | 0.25 (fair) | [1], [4] |\n| Serration extending to crypt base (basal hyperserration) | High (94.1%) | 8.3% | Most sensitive | 0.43 (moderate) | [1], [6] |\n| Dilated crypt bases | 90.2% | 12.5% | Lowest of the architectural features; sensitive | 0.38 (fair) | [1], [7] |\n| Mucin at crypt base | Not formally quantified; both overlap | Lowest | Not assessed (supportive only) | (subjective) | [2], [3] |",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology. 2014;464(6):663-72. doi:10.1007/s00428-014-1569-7.",
+    "title": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology.",
+    "year": 2014,
+    "doi": "10.1007/s00428-014-1569-7"
+   },
+   {
+    "n": 2,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges Bettington M, Walker N, Clouston A, et al.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 3,
+    "citation": "Mucin 5AC as a Biomarker for Sessile Serrated Lesions: Results From a Systematic Review and Meta-Analysis. Liu K, Sachar M, Popov V, Pei Z, Quarta G. Clinical and Translational Gastroenterology. 2025;16(5):e00831. doi:10.14309/ctg.0000000000000831.",
+    "title": "Mucin 5AC as a Biomarker for Sessile Serrated Lesions: Results From a Systematic Review and Meta-Analysis.",
+    "year": 2025,
+    "doi": "10.14309/ctg.0000000000000831"
+   },
+   {
+    "n": 4,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j-gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j-gastro.2019.06.041"
+   },
+   {
+    "n": 6,
+    "citation": "Role of the Serrated Pathway in Colorectal Cancer Pathogenesis. Leggett B, Whitehall V.",
+    "title": "Role of the Serrated Pathway in Colorectal Cancer Pathogenesis.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 7,
+    "citation": "The spectrum of serrated colorectal lesions-new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions-new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   }
+  ],
+  "id": "OE010"
+ },
+ {
+  "question": "Q2",
+  "topic": "Ranking distinguishing features by specificity and reproducibility",
+  "heading": "Ranking by specificity (how rarely the feature appears in a true HP)",
+  "text": "1. Inverted crypts (herniation through/below the muscularis mucosae) — the single most specific marker. Crockett and Nagtegaal describe this prolapse-type change as rare in HP.[1][4]\n2. L-/boot-shaped crypts with horizontal growth along the muscularis mucosae — also 0% in HPs but far more sensitive (~80%), which makes it the most useful highly specific feature.[1][2][7]\n3. Serration extending into the crypt base (basal hyperserration) — only ~8% of HPs show it, because in HPs serration is confined to the upper half/third of the crypt; it is also the most sensitive SSL feature (~94%).[1][6][8]\n4. Dilated crypt bases — the least specific of the true architectural features (~13% of HPs show some basal dilation as a reactive/left-sided change), even though it is present in ~90% of SSLs.[1][2][9]\n5. Mucin at the crypt base — least specific overall; mucin content (including MUC5AC) overlaps between microvesicular HPs and SSLs, and a meta-analysis found no significant difference in MUC5AC expression (OR 2.1, p=0.09), so it cannot discriminate on its own.[2][3]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology. 2014;464(6):663-72. doi:10.1007/s00428-014-1569-7.",
+    "title": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology.",
+    "year": 2014,
+    "doi": "10.1007/s00428-014-1569-7"
+   },
+   {
+    "n": 2,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges Bettington M, Walker N, Clouston A, et al.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 3,
+    "citation": "Mucin 5AC as a Biomarker for Sessile Serrated Lesions: Results From a Systematic Review and Meta-Analysis. Liu K, Sachar M, Popov V, Pei Z, Quarta G. Clinical and Translational Gastroenterology. 2025;16(5):e00831. doi:10.14309/ctg.0000000000000831.",
+    "title": "Mucin 5AC as a Biomarker for Sessile Serrated Lesions: Results From a Systematic Review and Meta-Analysis.",
+    "year": 2025,
+    "doi": "10.14309/ctg.0000000000000831"
+   },
+   {
+    "n": 4,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j-gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j-gastro.2019.06.041"
+   },
+   {
+    "n": 6,
+    "citation": "Role of the Serrated Pathway in Colorectal Cancer Pathogenesis. Leggett B, Whitehall V.",
+    "title": "Role of the Serrated Pathway in Colorectal Cancer Pathogenesis.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 7,
+    "citation": "The spectrum of serrated colorectal lesions-new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions-new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   },
+   {
+    "n": 8,
+    "citation": "Polyps of the Large Intestine. Christophe Rosty, Michael B. Wallace, Till S. Clauditz. Gastrointestinal Pathology. 2021.",
+    "title": "Polyps of the Large Intestine.",
+    "year": 2021,
+    "doi": null
+   },
+   {
+    "n": 9,
+    "citation": "Endoscopic mucosal biopsy = pathology and biomarker testing*. Antonia R. Sepulveda, Sun A. Kim. Yamada's Textbook of Gastroenterology 7e. 2022.",
+    "title": "Endoscopic mucosal biopsy = pathology and biomarker testing*.",
+    "year": 2022,
+    "doi": null
+   }
+  ],
+  "id": "OE011"
+ },
+ {
+  "question": "Q2",
+  "topic": "Ranking distinguishing features by specificity and reproducibility",
+  "heading": "Ranking by reproducibility (interobserver agreement)",
+  "text": "1. L-/boot-shaped crypts — K = 0.47 (moderate); the most objective of the architectural criteria; Bateman notes a convincingly branched/horizontal/L-shaped crypt is \"more objective\" to apply than dilatation alone.[1][2]\n2. Serration extending to the crypt base — K = 0.43 (moderate).[1]\n3. Dilated crypt bases — K = 0.38 (fair); notably the most subjective criterion, often present without other features and varying in degree.[1][2]\n4. Inverted crypts — K = 0.25 (fair); the specificity champion is paradoxically one of the least reproducible, largely because it is encountered so infrequently.[1]\n5. Mucin at the crypt base — not formally measured and regarded as a subjective, supportive finding rather than a reproducible criterion.[2]\nFor context, the overall SSL-vs-HP distinction achieves only moderate agreement even among experts (k = 0.50-0.63), improving when polyp size and location accompany the slide; crypt distortion was the one feature all 13 pathologists in Booth et al. (2026) agreed was useful.[10]\n[1] The persistence of inter-individual preference even after standardized criteria were introduced is visible in the Rau et al. observer-tracking data.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology. 2014;464(6):663-72. doi:10.1007/s00428-014-1569-7.",
+    "title": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology.",
+    "year": 2014,
+    "doi": "10.1007/s00428-014-1569-7"
+   },
+   {
+    "n": 2,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges Bettington M, Walker N, Clouston A, et al.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 10,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   }
+  ],
+  "id": "OE012"
+ },
+ {
+  "question": "Q2",
+  "topic": "Ranking distinguishing features by specificity and reproducibility",
+  "heading": "Ranking by reproducibility (interobserver agreement)",
+  "text": "Figure: Diagnostic changes in dependency from singular observers across Panel (a), (b) and (c). Note the narrowing of lines, especially between Panel (a) and Panel (b), (c), but also e.g. the maintenance of moderate (a-c, 8) or more aggressive diagnosis of SSA (a-c, 6) by some observers despite of the introduced criteria.",
+  "sources": [],
+  "id": "OE013"
+ },
+ {
+  "question": "Q2",
+  "topic": "Ranking distinguishing features by specificity and reproducibility",
+  "heading": "Combined interpretation",
+  "text": "- Best overall feature: L-/boot-shaped crypts with horizontal basal growth — top-ranked for diagnosis.[1][2][7]\n- Strong confirmatory, highly sensitive: basal hyperserration — nearly always present in SSL, rarely in HP, moderate reproducibility.[1][6]\n- Rule-in when present, but don't rely on it: inverted crypts — maximal specificity, minimal sensitivity and poor reproducibility.[1][4]\n- Sensitive but soft: basal crypt dilatation — present in most SSLs but the least specific true architectural feature and the most subjective; should not be used alone.[1][2]\n- Ancillary: mucin at the crypt base — best regarded as ancillary.[2][3]\nThe underlying caveat is that SSL and HP sit on a morphologic continuum; the WHO 2019 \"one unequivocal architecturally distorted crypt\" rule improved sensitivity, but the threshold for \"unequivocal\" remains subjective. Furthermore, the quality of the biopsy (e.g., whether the crypt bases are evaluable) materially affects whether any of these features can be assessed at all.[1][4][10]\nOn the requested source list: Leggett B and Whitehall V,[4] Gastroenterology 2010 (upper-crypt serration in HP); and Liu K et al.,[6] Clinical and Translational Gastroenterology 2025 (MUC5AC meta-analysis).[3] The bracketed numbers map to the full entries appended automatically.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology. 2014;464(6):663-72. doi:10.1007/s00428-014-1569-7.",
+    "title": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and International Journal of Pathology.",
+    "year": 2014,
+    "doi": "10.1007/s00428-014-1569-7"
+   },
+   {
+    "n": 2,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges Bettington M, Walker N, Clouston A, et al.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 3,
+    "citation": "Mucin 5AC as a Biomarker for Sessile Serrated Lesions: Results From a Systematic Review and Meta-Analysis. Liu K, Sachar M, Popov V, Pei Z, Quarta G. Clinical and Translational Gastroenterology. 2025;16(5):e00831. doi:10.14309/ctg.0000000000000831.",
+    "title": "Mucin 5AC as a Biomarker for Sessile Serrated Lesions: Results From a Systematic Review and Meta-Analysis.",
+    "year": 2025,
+    "doi": "10.14309/ctg.0000000000000831"
+   },
+   {
+    "n": 4,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j-gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j-gastro.2019.06.041"
+   },
+   {
+    "n": 6,
+    "citation": "Role of the Serrated Pathway in Colorectal Cancer Pathogenesis. Leggett B, Whitehall V.",
+    "title": "Role of the Serrated Pathway in Colorectal Cancer Pathogenesis.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 7,
+    "citation": "The spectrum of serrated colorectal lesions-new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions-new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   },
+   {
+    "n": 10,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   }
+  ],
+  "id": "OE014"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Magnitude of interobserver agreement\nThe HP-SSL distinction has been studied repeatedly, and agreement has ranged from poor to moderate. The lowest figures come from early re-review work: in a re-interpretation of proximal polyps originally called hyperplastic, overall agreement among three GI pathologists was κ = 0.16, with 30-85% of HPs reclassified as SSL depending on the reader.[6] More typical are the moderate values from dedicated multi-observer studies — κ = 0.55-0.58 among five GI pathologists even after a consensus round, and κ = 0.48 on expert re-review of community-diagnosed HPs.[2][7][8]",
+  "text": "The most informative recent benchmark is the 2026 study by Booth and colleagues, in which 13 GI pathologists with a specific interest in the area reviewed 60 serrated polyps over three rounds using current WHO 2019 criteria. Interobserver agreement was moderate on morphology alone (κ = 0.50 in round 1, κ = 0.46 in round 2) and rose to good (κ = 0.63) only after adding site and size. Only 12% of cases achieved unanimous diagnosis across all observers and rounds, and agreement was worst for cases with minimal architectural distortion (κ = 0.21). This suggests that both inter- and intraobserver variability persist even among subspecialists using streamlined criteria.[1] The figure below shows how, case by case, some polyps achieve near-universal consensus while a substantial fraction remain contested across 39 interpretations each.\nFigure 1 Cumulative distribution of diagnoses by case. The x-axis indicates the case number (Case 1 through Case 60), and the y-axis indicates the number of times that polyp received that diagnosis in the colorectum.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   }
+  ],
+  "id": "OE015"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Magnitude of interobserver agreement\nThe HP-SSL distinction has been studied repeatedly, and agreement has ranged from poor to moderate. The lowest figures come from early re-review work: in a re-interpretation of proximal polyps originally called hyperplastic, overall agreement among three GI pathologists was κ = 0.16, with 30-85% of HPs reclassified as SSL depending on the reader.[6] More typical are the moderate values from dedicated multi-observer studies — κ = 0.55-0.58 among five GI pathologists even after a consensus round, and κ = 0.48 on expert re-review of community-diagnosed HPs.[2][7][8]",
+  "text": "Intraobserver agreement is generally better than interobserver agreement — median κ = 0.58-0.66, with individual-reader values of 0.55-0.77 — indicating that each pathologist is reasonably internally consistent but applies a different personal threshold.[1][2][3] This person-to-person threshold variation is visible at the practice level: across 44 Dutch laboratories, the odds of calling a serrated polyp an SSL rather than an HP ranged from 0.16 to 3.47, and estimated serrated-polyp detection rates for a given endoscopist varied from 0.5% to 12.0% purely depending on which pathologist read the specimens.[9][10]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 2,
+    "citation": "Sessile Serrated Adenoma: Challenging Discrimination From Other Serrated Colonic Polyps. Farris AB, Misdraji J, Srivastava A, et al. The American Journal of Surgical Pathology. 2008;32(1):30-5. doi:10.1097/PAS.0b013e318093e40a.",
+    "title": "Sessile Serrated Adenoma: Challenging Discrimination From Other Serrated Colonic Polyps.",
+    "year": 2008,
+    "doi": "10.1097/PAS.0b013e318093e40a"
+   },
+   {
+    "n": 3,
+    "citation": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and predict polyp genetics. Rau TT, Agaimy A, Gehoff A, et al. Virchows Archiv : An International Journal of Pathology. 2014;464(6):663-72. doi:10.1007/s00428-014-1569-7.",
+    "title": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and predict polyp genetics.",
+    "year": 2014,
+    "doi": "10.1007/s00428-014-1569-7"
+   },
+   {
+    "n": 9,
+    "citation": "Implementation of an e-learning module improves consistency in the histopathological diagnosis of sessile serrated lesions within a nationwide population screening programme. IJspeert JE, Madani A, Overbeek Ll, Dekker E, Nagtegaal ID. Histopathology. 2017;70(6):929-937. doi:10.1111/his.13155.",
+    "title": "Implementation of an e-learning module improves consistency in the histopathological diagnosis of sessile serrated lesions within a nationwide population screening programme.",
+    "year": 2017,
+    "doi": "10.1111/his.13155"
+   },
+   {
+    "n": 10,
+    "citation": "Variation in Pathologist Classification of Colorectal Adenomas and Serrated Polyps. Gourevitch RA, Rose S, Crockett SD, et al. The American Journal of Gastroenterology. 2018;113(3):431-439. doi:10.1038/ajg.2017.496.",
+    "title": "Variation in Pathologist Classification of Colorectal Adenomas and Serrated Polyps.",
+    "year": 2018,
+    "doi": "10.1038/ajg.2017.496"
+   }
+  ],
+  "id": "OE016"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Magnitude of interobserver agreement\nThe HP-SSL distinction has been studied repeatedly, and agreement has ranged from poor to moderate. The lowest figures come from early re-review work: in a re-interpretation of proximal polyps originally called hyperplastic, overall agreement among three GI pathologists was κ = 0.16, with 30-85% of HPs reclassified as SSL depending on the reader.[6] More typical are the moderate values from dedicated multi-observer studies — κ = 0.55-0.58 among five GI pathologists even after a consensus round, and κ = 0.48 on expert re-review of community-diagnosed HPs.[2][7][8]",
+  "text": "| Study (first author, year) | Observers | Design | Kappa (SSL vs HP classification) | References |\n| :--- | :--- | :--- | :--- | :--- |\n| Khalid/Rex, 2009 | 3 GI pathologists | Re-review of proximal HPs | κ = 0.16 | [6] |\n| Farris, 2008 | 5 GI pathologists | Blinded $\\rightarrow$ clinical data $\\rightarrow$ post-consensus | κ = 0.55 $\\rightarrow$ 0.55 $\\rightarrow$ 0.58 | [2] |\n| Wong, 2009 | 4 GI pathologists | Single blinded round | κ = 0.49 (0.28 right-sided) | [2] |\n| Ensari, 2012 | 16 GI pathologists | Pre- vs post-WHO criteria + consensus | κ = 0.318 $\\rightarrow$ 0.557 | [11] |\n| Rau, 2014 | 10 GI pathologists | Morphology $\\rightarrow$ +clinical $\\rightarrow$ +consensus | κ = 0.56 $\\rightarrow$ 0.63 $\\rightarrow$ 0.61 | [3] |\n| Kolb, 2016 | 20 community pathologists | WHO vs 2012 one-crypt criteria | Absolute agreement 4% $\\rightarrow$ 13% | [4] |\n| Boylan, 2023 | 8 expert GI pathologists | 3-criteria scoring system | Fleiss κ = 0.879 | [5] |\n| Booth, 2026 | 13 GI pathologists | Morphology x2 $\\rightarrow$ +site/size | κ = 0.50 $\\rightarrow$ 0.46 $\\rightarrow$ 0.63 | [1] |",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 2,
+    "citation": "Sessile Serrated Adenoma: Challenging Discrimination From Other Serrated Colonic Polyps. Farris AB, Misdraji J, Srivastava A, et al. The American Journal of Surgical Pathology. 2008;32(1):30-5. doi:10.1097/PAS.0b013e318093e40a.",
+    "title": "Sessile Serrated Adenoma: Challenging Discrimination From Other Serrated Colonic Polyps.",
+    "year": 2008,
+    "doi": "10.1097/PAS.0b013e318093e40a"
+   },
+   {
+    "n": 3,
+    "citation": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and predict polyp genetics. Rau TT, Agaimy A, Gehoff A, et al. Virchows Archiv : An International Journal of Pathology. 2014;464(6):663-72. doi:10.1007/s00428-014-1569-7.",
+    "title": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and predict polyp genetics.",
+    "year": 2014,
+    "doi": "10.1007/s00428-014-1569-7"
+   },
+   {
+    "n": 4,
+    "citation": "Does Better Specimen Orientation and a Simplified Grading System Promote More Reliable Histologic Interpretation of Serrated Colon Polyps in the Community Practice Setting? Results of a Nationwide Study. Kolb JM, Morales SJ, Rouse NA, et al. Journal of Clinical Gastroenterology. 2016;50(3):233-8. doi:10.1097/MCG.0000000000000413.",
+    "title": "Does Better Specimen Orientation and a Simplified Grading System Promote More Reliable Histologic Interpretation of Serrated Colon Polyps in the Community Practice Setting?",
+    "year": 2016,
+    "doi": "10.1097/MCG.0000000000000413"
+   },
+   {
+    "n": 5,
+    "citation": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp. Boylan KE, Kanth P, Delker D, et al. Human Pathology. 2023;137:25-35. doi:10.1016/j.humpath.2023.04.002.",
+    "title": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp.",
+    "year": 2023,
+    "doi": "10.1016/j.humpath.2023.04.002"
+   },
+   {
+    "n": 6,
+    "citation": "Reinterpretation of Histology of Proximal Colon Polyps Called Hyperplastic in 2001. Khalid O, Radaideh S, Cummings OW, et al. World Journal of Gastroenterology. 2009;15(30):3767-70. doi:10.3748/wjg.15.3767.",
+    "title": "Reinterpretation of Histology of Proximal Colon Polyps Called Hyperplastic in 2001.",
+    "year": 2001,
+    "doi": "10.3748/wjg.15.3767"
+   },
+   {
+    "n": 11,
+    "citation": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?. Ensari A, Bilezikci B, Carneiro F, et al. Virchows Archiv : An International Journal of Pathology. 2012;461(5):495-504. doi:10.1007/s00428-012-1319-7.",
+    "title": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?.",
+    "year": 2012,
+    "doi": "10.1007/s00428-012-1319-7"
+   }
+  ],
+  "id": "OE017"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Did the WHO 2019 criteria improve agreement?\nThe WHO 2019 criteria reduced the diagnostic threshold for SSL to a single unequivocally architecturally distorted serrated crypt — defined by horizontal growth along the muscularis mucosae, dilation of the crypt base, serrations extending into the crypt base, and/or asymmetric proliferation — replacing the WHO 2010 requirement for two to three contiguous distorted crypts. This \"one-crypt rule\" originated in the 2012 Cleveland consensus and was later endorsed by the WHO.[1][12][13] Applying it increases the proportion of serrated polyps called SSL by roughly 7%, and polyps with even a single SSL-type crypt behave clinically more like SSL than microvesicular HP.[14][13]",
+  "text": "The impact on agreement is a complex transformation:\n- The most direct comparison is the nationwide community study by Kolb and colleagues, in which 20 pathologists scored 100 proximal serrated polyps under both traditional WHO criteria and the simplified 2012 one-crypt criteria. The simplified criteria significantly improved agreement — absolute agreement 13% vs 4% and \"75% agreement\" 54% vs 38% (both p < 0.01) — and reduced indeterminate diagnoses; adding a tissue-flattening orientation protocol pushed absolute agreement to 20%.[4]\n- Other studies show that while the one-crypt rule increases the number of SSL diagnoses, it does not entirely eliminate interobserver disagreement.[11]\n- Review articles state outright that the 5th-edition definition improved interobserver agreement relative to the 4th edition, and more recent commentary attributes enhanced agreement and higher diagnosis rates to the single-crypt criterion.[13][15]",
+  "sources": [
+   {
+    "n": 4,
+    "citation": "Does Better Specimen Orientation and a Simplified Grading System Promote More Reliable Histologic Interpretation of Serrated Colon Polyps in the Community Practice Setting? Results of a Nationwide Study. Kolb JM, Morales SJ, Rouse NA, et al. Journal of Clinical Gastroenterology. 2016;50(3):233-8. doi:10.1097/MCG.0000000000000413.",
+    "title": "Does Better Specimen Orientation and a Simplified Grading System Promote More Reliable Histologic Interpretation of Serrated Colon Polyps in the Community Practice Setting?",
+    "year": 2016,
+    "doi": "10.1097/MCG.0000000000000413"
+   },
+   {
+    "n": 11,
+    "citation": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?. Ensari A, Bilezikci B, Carneiro F, et al. Virchows Archiv : An International Journal of Pathology. 2012;461(5):495-504. doi:10.1007/s00428-012-1319-7.",
+    "title": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?.",
+    "year": 2012,
+    "doi": "10.1007/s00428-012-1319-7"
+   },
+   {
+    "n": 13,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 15,
+    "citation": "Benchmarking sessile serrated lesion detection in colonoscopy: individual endoscopist procedures. Dierick N, Lee C, Kostalas SN. BMC Gastroenterology. 2025;26(1):11. doi:10.1186/s12876-025-04523-5.",
+    "title": "Benchmarking sessile serrated lesion detection in colonoscopy: individual endoscopist procedures.",
+    "year": 2025,
+    "doi": "10.1186/s12876-025-04523-5"
+   }
+  ],
+  "id": "OE018"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Did the WHO 2019 criteria improve agreement?\nThe WHO 2019 criteria reduced the diagnostic threshold for SSL to a single unequivocally architecturally distorted serrated crypt — defined by horizontal growth along the muscularis mucosae, dilation of the crypt base, serrations extending into the crypt base, and/or asymmetric proliferation — replacing the WHO 2010 requirement for two to three contiguous distorted crypts. This \"one-crypt rule\" originated in the 2012 Cleveland consensus and was later endorsed by the WHO.[1][12][13] Applying it increases the proportion of serrated polyps called SSL by roughly 7%, and polyps with even a single SSL-type crypt behave clinically more like SSL than microvesicular HP.[14][13]",
+  "text": "The important caveat is that under WHO 2019, morphology-only agreement still plateaus in the moderate range. Booth's 2026 cohort — using current criteria — achieved only k = 0.46-0.50 on morphology alone and reached good agreement (k = 0.63) only with clinical data.[1] In other words, the one-crypt rule lifted the floor but the simplified threshold also creates more borderline, single-crypt cases to argue over. The gains that reliably push agreement into the good-to-excellent range come from supplementing morphology: Boylan's combined scoring system (morphology + location + size by biopsy number) reached Fleiss K = 0.879 with 96.8% agreement and an AuC of 92.9% versus 65.9% for morphology alone, and a Dutch e-learning module raised SSL diagnosis rates from 18% to 25% while narrowing interlaboratory spread.[5][6]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 5,
+    "citation": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp. Boylan KE, Kanth P, Delker D, et al. Human Pathology. 2023;137:25-35. doi:10.1016/j.humpath.2023.04.002.",
+    "title": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp.",
+    "year": 2023,
+    "doi": "10.1016/j.humpath.2023.04.002"
+   },
+   {
+    "n": 6,
+    "citation": "Reinterpretation of Histology of Proximal Colon Polyps Called Hyperplastic in 2001. Khalid O, Radaideh S, Cummings OW, et al. World Journal of Gastroenterology. 2009;15(30):3767-70. doi:10.3748/wjg.15.3767.",
+    "title": "Reinterpretation of Histology of Proximal Colon Polyps Called Hyperplastic in 2001.",
+    "year": 2001,
+    "doi": "10.3748/wjg.15.3767"
+   }
+  ],
+  "id": "OE019"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Features that cause the most disagreement",
+  "text": "The threshold for \"unequivocal\" crypt distortion is the single greatest source of discordance.[1] Crypt architectural distortion is universally endorsed as the diagnostic feature, yet how much distortion suffices is interpreted differently by each reader. The specific ambiguities recur across studies:\n- Basal crypt dilation — judging whether dilation is sufficient to qualify as unequivocal is between HP and SSL.[1][3]\n- L/inverted-T crypts and horizontal growth along the muscularis mucosae — these descriptors are applied inconsistently, and tangential or surface-parallel sectioning that obscures crypt bases makes them impossible to assess.[1]\n- Basal serration — serration reaching the crypt base favors SSL (versus upper-half serration in HP), but when present only focally it generates disagreement.[16][17]\nThe boundary is a continuum, not a line.[11][17][18][19] An \"intermediate serrated polyp\" category with distorted crypts in fewer crypts is a source of variability.\nThe figure below from Rau and colleagues illustrates exactly these contested lesions — cases that flipped between HP and SSL because of isolated basal serration or questionable crypt dilation without additional SSL criteria.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 3,
+    "citation": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and predict polyp genetics. Rau TT, Agaimy A, Gehoff A, et al. Virchows Archiv : An International Journal of Pathology. 2014;464(6):663-72. doi:10.1007/s00428-014-1569-7.",
+    "title": "Defined morphological criteria allow reliable diagnosis of colorectal serrated polyps and predict polyp genetics.",
+    "year": 2014,
+    "doi": "10.1007/s00428-014-1569-7"
+   },
+   {
+    "n": 11,
+    "citation": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?. Ensari A, Bilezikci B, Carneiro F, et al. Virchows Archiv : An International Journal of Pathology. 2012;461(5):495-504. doi:10.1007/s00428-012-1319-7.",
+    "title": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?.",
+    "year": 2012,
+    "doi": "10.1007/s00428-012-1319-7"
+   },
+   {
+    "n": 16,
+    "citation": "Fourier transformation based texture analysis for differentiating between hyperplastic polyps and sessile serrated adenomas. Klorin G, Hayat N, Linder R, et al. Microscopy",
+    "title": "Fourier transformation based texture analysis for differentiating between hyperplastic polyps and sessile serrated adenomas.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 17,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges.",
+    "year": null,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 18,
+    "citation": "Usefulness of the Japan narrow-band imaging expert team classification system for the diagnosis of sessile serrated lesion with dysplasia/carcinoma. Murakami T, Sakamoto N, Fukushima H, et al. Surgical Endoscopy. 2021;35(8):4528-4538. doi:10.1007/s00464-020-07967-W.",
+    "title": "Usefulness of the Japan narrow-band imaging expert team classification system for the diagnosis of sessile serrated lesion with dysplasia/carcinoma.",
+    "year": 2021,
+    "doi": "10.1007/s00464-020-07967-W"
+   },
+   {
+    "n": 19,
+    "citation": "Intermediate Serrated Polyp as an Intermediate Lesion of Hyperplastic Polyp and Sessile Serrated Polyp/Adenoma in Terms of Morphological and Molecular Features. Kwon HJ, Cho NY, Chang MS, Kim YS, Kang GH. Human Pathology. 2014;45(8):1759-65. doi:10.1016/j.humpath.2014.04.014.",
+    "title": "Intermediate Serrated Polyp as an Intermediate Lesion of Hyperplastic Polyp and Sessile Serrated Polyp/Adenoma in Terms of Morphological and Molecular Features.",
+    "year": 2014,
+    "doi": "10.1016/j.humpath.2014.04.014"
+   }
+  ],
+  "id": "OE020"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Features that cause the most disagreement",
+  "text": "Figure 4\nSamples of variably interpreted lesions. In the upper part, lesions are shown with changing additional SSA criteria (a) or questionable crypt dilatation (b). In the lower part, the continuous spectrum between CADs and TSAs is highlighted. Even in clear CADs, some interspersed ectopic crypt formation might be detected (c) or even restricted to a specific region (d—right side)\nTwo contextual features, deliberately excluded from the WHO morphologic criteria, strongly influence real-world reads and account for much of the improvement when disclosed. Location and size are the second and third most-used features in practice: SSLs are predominantly proximal and larger, HPs small and distal, and supplying these data moved Booth's cohort from K = 0.50 to 0.63.[1] The transverse colon is the worst-agreement site precisely because it is the boundary is a continuum, not a line.[11][17][18][19]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 11,
+    "citation": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?. Ensari A, Bilezikci B, Carneiro F, et al. Virchows Archiv : An International Journal of Pathology. 2012;461(5):495-504. doi:10.1007/s00428-012-1319-7.",
+    "title": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?.",
+    "year": 2012,
+    "doi": "10.1007/s00428-012-1319-7"
+   },
+   {
+    "n": 17,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges.",
+    "year": null,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 18,
+    "citation": "Usefulness of the Japan narrow-band imaging expert team classification system for the diagnosis of sessile serrated lesion with dysplasia/carcinoma. Murakami T, Sakamoto N, Fukushima H, et al. Surgical Endoscopy. 2021;35(8):4528-4538. doi:10.1007/s00464-020-07967-W.",
+    "title": "Usefulness of the Japan narrow-band imaging expert team classification system for the diagnosis of sessile serrated lesion with dysplasia/carcinoma.",
+    "year": 2021,
+    "doi": "10.1007/s00464-020-07967-W"
+   },
+   {
+    "n": 19,
+    "citation": "Intermediate Serrated Polyp as an Intermediate Lesion of Hyperplastic Polyp and Sessile Serrated Polyp/Adenoma in Terms of Morphological and Molecular Features. Kwon HJ, Cho NY, Chang MS, Kim YS, Kang GH. Human Pathology. 2014;45(8):1759-65. doi:10.1016/j.humpath.2014.04.014.",
+    "title": "Intermediate Serrated Polyp as an Intermediate Lesion of Hyperplastic Polyp and Sessile Serrated Polyp/Adenoma in Terms of Morphological and Molecular Features.",
+    "year": 2014,
+    "doi": "10.1016/j.humpath.2014.04.014"
+   }
+  ],
+  "id": "OE021"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Features that cause the most disagreement",
+  "text": "The underlying biological reason the boundary is irreducibly blurry is the microvesicular HP (MVHP)-SSL interface. MVHP and SSL share overlapping morphology (elongated crypts, BRAF V600E mutations, with CIMP increasing along the MVHP → SSL → SSL-with-dysplasia sequence and shared MUC5AC hypomethylation — arguing for a continuum rather than discrete entities.[20][21][22] Goblet-cell-rich HP, by contrast, is KRAS-mutated and biologically separate.[21][23] Because no histologic or molecular gold standard cleanly separates MVHP from SSL, there is no \"ground truth\" against which to calibrate, which is the fundamental ceiling on agreement.[11][5]\nDysplasia within SSL is a distinct variability problem. WHO recommends against grading dysplasia severity in SSLs, because even low-grade dysplasia carries disproportionate progression risk.[24] Across 36 laboratories, SSL-with-dysplasia diagnoses were discrepant in 10.8% of cases, and the \"minimal deviation\" pattern is especially treacherous — it differs only subtly from non-dysplastic SSL and often requires MLH1 immunohistochemistry to confirm.[25][26][27]",
+  "sources": [
+   {
+    "n": 5,
+    "citation": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp. Boylan KE, Kanth P, Delker D, et al. Human Pathology. 2023;137:25-35. doi:10.1016/j.humpath.2023.04.002.",
+    "title": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp.",
+    "year": 2023,
+    "doi": "10.1016/j.humpath.2023.04.002"
+   },
+   {
+    "n": 11,
+    "citation": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?. Ensari A, Bilezikci B, Carneiro F, et al. Virchows Archiv : An International Journal of Pathology. 2012;461(5):495-504. doi:10.1007/s00428-012-1319-7.",
+    "title": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?.",
+    "year": 2012,
+    "doi": "10.1007/s00428-012-1319-7"
+   },
+   {
+    "n": 20,
+    "citation": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?. Bateman AC, Booth AL, Gonzalez RS, Shepherd NA. Journal of Clinical Pathology. 2023;76(7):429-434. doi:10.1136/jcp-2023-208783.",
+    "title": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?.",
+    "year": 2023,
+    "doi": "10.1136/jcp-2023-208783"
+   },
+   {
+    "n": 21,
+    "citation": "Pathways of Colorectal Carcinogenesis. Nguyen LH, Goel A, Chung DC.",
+    "title": "Pathways of Colorectal Carcinogenesis.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 22,
+    "citation": "The Serrated Neoplasia Pathway of Colorectal Tumors: Identification of MUC5AC Hypomethylation as an Early Marker of Polyps With Malignant Potential. Renaud F, Mariette C, Vincent A, et al. International Journal of Cancer. 2016;138(6):1472-81. doi:10.1002/ijc.29891.",
+    "title": "The Serrated Neoplasia Pathway of Colorectal Tumors: Identification of MUC5AC Hypomethylation as an Early Marker of Polyps With Malignant Potential.",
+    "year": 2016,
+    "doi": "10.1002/ijc.29891"
+   },
+   {
+    "n": 23,
+    "citation": "BRAF and KRAS Mutations in Hyperplastic Polyps and Serrated Adenomas of the Colorectum: Relationship to Histology and CpG Island Methylation Status. Yang S, Farraye FA, Mack C, Posnik O, O'Brien MJ. The American Journal of Surgical Pathology.",
+    "title": "BRAF and KRAS Mutations in Hyperplastic Polyps and Serrated Adenomas of the Colorectum: Relationship to Histology and CpG Island Methylation Status.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 24,
+    "citation": "The spectrum of serrated colorectal lesions-new entities and unanswered questions.",
+    "title": "The spectrum of serrated colorectal lesions-new entities and unanswered questions.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 25,
+    "citation": "Dysplasia in sessile serrated lesions: frequency, interobserver variability and added value of immunohistochemistry. Angerilli V, Vink-Borger ME, van Roermund NS, et al. Histopathology. 2026;89(1):98-109. doi:10.1111/his.70135.",
+    "title": "Dysplasia in sessile serrated lesions: frequency, interobserver variability and added value of immunohistochemistry.",
+    "year": 2026,
+    "doi": "10.1111/his.70135"
+   },
+   {
+    "n": 26,
+    "citation": "Loss of expression of MLH1 in non-dysplastic crypts is a harbinger of neoplastic progression in sessile serrated adenomas/polyps. Yozu M, Kem M, Cenaj O, et al. Histopathology. 2019;75(3):376-384. doi:10.1111/his.13874.",
+    "title": "Loss of expression of MLH1 in non-dysplastic crypts is a harbinger of neoplastic progression in sessile serrated adenomas/polyps.",
+    "year": 2019,
+    "doi": "10.1111/his.13874"
+   },
+   {
+    "n": 27,
+    "citation": "Sessile Serrated Adenomas With Dysplasia: Morphological Patterns and Correlations With MLH1 Immunohistochemistry. Liu C, Walker Nl, Leggett BA, et al. Modern Pathology : An 2017;30(12):1728-1738. doi:10.1038/modpathol.2017.92.",
+    "title": "Sessile Serrated Adenomas With Dysplasia: Morphological Patterns and Correlations With MLH1 Immunohistochemistry.",
+    "year": 2017,
+    "doi": "10.1038/modpathol.2017.92"
+   }
+  ],
+  "id": "OE022"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Adjuncts and immunohistochemistry",
+  "text": "Because morphology plateaus, several ancillary markers have been studied, though none is in routine use for the HP-SSL split. MLH1 loss confirms dysplasia (especially minimal-deviation dysplasia) but does not help with non-dysplastic SSL-versus-HP, and prospective data suggest sensitivity ~73%, specificity ~95%), loss of Hes1 (absent in ~92% of SSL vs retained in 100% of HP), and histologic K of 0.493) are promising but unvalidated for clinical practice.[28][29][30][1] BRAF V600E immunohistochemistry is not recommended for routine SSL-versus-HP distinction.[31][32]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 28,
+    "citation": "Sessile Serrated Adenoma/Polyp. Gonzalo DH, Lai KK, Shadrach B, et al. The Journal of Pathology. 2013;230(4):420-9. doi:10.1002/path.4200.",
+    "title": "Sessile Serrated Adenoma/Polyp.",
+    "year": 2013,
+    "doi": "10.1002/path.4200"
+   },
+   {
+    "n": 29,
+    "citation": "Loss of Hes1 Differentiates Sessile Serrated Adenoma/Polyp From Hyperplastic Polyp. Cui M, Awadallah A, Liu W, Zhou L, Xin W. The American Journal of Surgical Pathology. 2016;40(1):113-9. doi:10.1097/PAS.0000000000000531.",
+    "title": "Loss of Hes1 Differentiates Sessile Serrated Adenoma/Polyp From Hyperplastic Polyp.",
+    "year": 2016,
+    "doi": "10.1097/PAS.0000000000000531"
+   },
+   {
+    "n": 30,
+    "citation": "Agrin in the Muscularis Mucosa Serves as a Biomarker Distinguishing Hyperplastic Polyps From Sessile Serrated Lesions. Rickelt S, Condon C, Mana M, et al. Clinical Cancer Research: An Official Journal of the American Association for Cancer Research. 2020;26(6):1277-1287. doi:10.1158/1078-0432.CCR-19-2898.",
+    "title": "Agrin in the Muscularis Mucosa Serves as a Biomarker Distinguishing Hyperplastic Polyps From Sessile Serrated Lesions.",
+    "year": 2020,
+    "doi": "10.1158/1078-0432.CCR-19-2898"
+   },
+   {
+    "n": 31,
+    "citation": "Improved Molecular Classification of Serrated Lesions of the Colon by Immunohistochemical Detection of BRAF V600E. Mesteri I, Bayer G, Meyer J, et al. Modern Pathology: An Official Journal of the United States and Canadian Academy of Pathology, Inc. 2014;27(1):135-44. doi:10.1038/modpathol.2013.126.",
+    "title": "Improved Molecular Classification of Serrated Lesions of the Colon by Immunohistochemical Detection of BRAF V600E.",
+    "year": 2014,
+    "doi": "10.1038/modpathol.2013.126"
+   },
+   {
+    "n": 32,
+    "citation": "Polyps of the Large Intestine. Christophe Rosty, Michael B. Wallace, Till S. Clauditz. Gastrointestinal Pathology. 2021.",
+    "title": "Polyps of the Large Intestine.",
+    "year": 2021,
+    "doi": null
+   }
+  ],
+  "id": "OE023"
+ },
+ {
+  "question": "Q3",
+  "topic": "Interobserver agreement and sources of disagreement",
+  "heading": "Bottom line",
+  "text": "Interobserver agreement for SSL versus HP is moderate on morphology alone (k = 0.46-0.50). The one-crypt rule modestly improved agreement over the multi-crypt WHO 2010 definition — most clearly demonstrated by Kolb and colleagues — but did not resolve the problem, and under WHO 2019 morphology-only agreement still sits in the moderate range.[4][1] The features causing the most disagreement are the threshold for \"unequivocal\" crypt distortion (basal dilation, L/inverted-T crypts, horizontal growth, basal serration) and the number of distorted crypts required, compounded by the genuine MVHP-SSL biological continuum.[11][20] Agreement improves when location and size are provided, biopsies are well oriented, and pathologists are trained.[11][5][9]\ndifferences in surveillance-interval assignment and downstream colorectal cancer risk?",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 4,
+    "citation": "Does Better Specimen Orientation and a Simplified Grading System Promote More Reliable Histologic Interpretation of Serrated Colon Polyps in the Community Practice Setting? Results of a Nationwide Study. Kolb JM, Morales SJ, Rouse NA, et al. Journal of Clinical Gastroenterology. 2016;50(3):233-8. doi:10.1097/MCG.0000000000000413.",
+    "title": "Does Better Specimen Orientation and a Simplified Grading System Promote More Reliable Histologic Interpretation of Serrated Colon Polyps in the Community Practice Setting?",
+    "year": 2016,
+    "doi": "10.1097/MCG.0000000000000413"
+   },
+   {
+    "n": 5,
+    "citation": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp. Boylan KE, Kanth P, Delker D, et al. Human Pathology. 2023;137:25-35. doi:10.1016/j.humpath.2023.04.002.",
+    "title": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp.",
+    "year": 2023,
+    "doi": "10.1016/j.humpath.2023.04.002"
+   },
+   {
+    "n": 9,
+    "citation": "Implementation of an e-learning module improves consistency in the histopathological diagnosis of sessile serrated lesions within a nationwide population screening programme. IJspeert JE, Madani A, Overbeek Ll, Dekker E, Nagtegaal ID. Histopathology. 2017;70(6):929-937. doi:10.1111/his.13155.",
+    "title": "Implementation of an e-learning module improves consistency in the histopathological diagnosis of sessile serrated lesions within a nationwide population screening programme.",
+    "year": 2017,
+    "doi": "10.1111/his.13155"
+   },
+   {
+    "n": 11,
+    "citation": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?. Ensari A, Bilezikci B, Carneiro F, et al. Virchows Archiv : An International Journal of Pathology. 2012;461(5):495-504. doi:10.1007/s00428-012-1319-7.",
+    "title": "Serrated Polyps of the Colon: How Reproducible Is Their Classification?.",
+    "year": 2012,
+    "doi": "10.1007/s00428-012-1319-7"
+   },
+   {
+    "n": 20,
+    "citation": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?. Bateman AC, Booth AL, Gonzalez RS, Shepherd NA. Journal of Clinical Pathology. 2023;76(7):429-434. doi:10.1136/jcp-2023-208783.",
+    "title": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?.",
+    "year": 2023,
+    "doi": "10.1136/jcp-2023-208783"
+   }
+  ],
+  "id": "OE024"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "text": "Distinguishing sessile serrated lesions from hyperplastic polyps hinges on a few architectural features that are notoriously sensitive to how the specimen is processed and oriented, so let me pull the diagnostic-criteria and specimen-handling literature.\nDistinguishing sessile serrated lesions (SSL) from hyperplastic polyps (HP) is one of the least reproducible judgments in gastrointestinal pathology, and most of the irreducible error comes not from the diagnostic criteria themselves but from how the tissue is oriented, sectioned, and sampled. Because the entire diagnostic framework for SSL rests on the architecture of the crypt base — horizontal growth along the muscularis mucosae, basal dilation, serration reaching the basal third, and asymmetric proliferation — any technical factor that removes the crypt base or the muscularis mucosae from the plane of section can abolish the only features that separate the two lesions.[1][2] This review covers the specific pitfalls introduced by orientation, tangential sectioning, fragmentation, and small samples, and then addresses which features retain value when the specimen is suboptimal.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041. ## References",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC Gastroenterology. 2026;26(1):271. doi:10.1186/s12876-026-04763-z.",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-04763-z"
+   }
+  ],
+  "id": "OE025"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Why the crypt base and muscularis mucosae are the pivot point",
+  "text": "The 2019 WHO (5th edition) \"one-crypt rule\" states that a single unequivocally architecturally distorted serrated crypt is sufficient for SSL, defined by horizontal growth above the muscularis mucosae, dilation of the crypt base, serrations extending into the crypt base, and asymmetric anchor-shaped — are only recognizable in a longitudinal section that runs the full length of the well-oriented section, the SSL architectural criteria are not met, the lesion is an HP.[1] The phrase \"well-oriented\" is doing enormous work — the HP diagnosis is only valid if the crypt base was actually evaluable. This is the structural reason every specimen-handling artifact matters so much: both the positive diagnosis (SSL) and the default diagnosis (HP) depend on seeing the same anatomic zone.\nThe characteristic morphology is shown well in this low- and high-power composite of a sessile serrated lesion, demonstrating the disorganized basal crypt growth, excessive serration bases that define the lesion.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041. ## References",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   }
+  ],
+  "id": "OE026"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Why the crypt base and muscularis mucosae are the pivot point",
+  "text": "Figure 2: Histology showing typical characteristics of the sessile serrated adenomas (hematoxylin and eosin staining). a Disorganized and distorted crypt growth pattern identifiable upon low-power microscopic examination. Crypts contain excessive serration and dilated basal portion. b Irregularly branching crypts. c Crypts with horizontally arranging at the base (\"L\"-shaped crypt bases) and apical cytoplasm typically filled with microvesicular mucin. d Foci of cells with penicillate nuclei and eosinophilic cytoplasm",
+  "sources": [],
+  "id": "OE027"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Tangential sectioning",
+  "text": "When a polyp is embedded and cut parallel to the mucosal surface rather than perpendicular to it, the crypt bases are never captured in the plane of section, and the diagnostic distortion simply cannot be assessed.[3] This produces errors in both directions. It can obscure genuine SSL architecture, because L- and T-shaped bases are invisible in cross-section, leaving only the upper-crypt serration that HP and SSL share — pushing the lesion toward a default HP call.[3][1] It can also manufacture pseudo-SSL features, because crypts cut transversely at their widened base can look artifactually dilated or budded. The distribution of serration — the feature that distinguishes serration confined to the upper two-thirds (HP) from serration small size and poor orientation, as a core reason the HP-versus-SSL distinction fails in individual specimens.[1]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041. ## References",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 3,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   }
+  ],
+  "id": "OE028"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Poor orientation and the fix",
+  "text": "Orientation is a modifiable, pre-analytic variable with measurable impact. A nationwide community study by Kolb and colleagues showed that a simple post-resection orientation community pathologists and reduced \"indeterminate\" diagnoses; the modified protocol improved \"upgraded\" roughly 7% of cases from HP to SSL, meaning poor orientation was systematically improved both by better polyp orientation and by training, and the US consensus video higher interobserver agreement, and fewer indeterminate diagnoses.[1][4]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041. ## References",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 4,
+    "citation": "Detection, Diagnosis, and Resection of Sessile Serrated Adenomas and Polyps. Kolb JM, Soetikno RM, Rao AK, et al. Gastroenterology. 2017;153(3):646-648. doi:10.1053/j.gastro.2017.05.060.",
+    "title": "Detection, Diagnosis, and Resection of Sessile Serrated Adenomas and Polyps.",
+    "year": 2017,
+    "doi": "10.1053/j.gastro.2017.05.060"
+   }
+  ],
+  "id": "OE029"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Fragmentation and piecemeal/EMR specimens",
+  "text": "Fragmentation destroys the spatial relationship between crypt base and muscularis mucosae complete muscularis mucosae versus 98.8% of EMR specimens, and vertical margins were positive in 67.1% of CSP versus 2.4% of EMR [research]. Without the muscularis mucosae in the block, the horizontal-growth and basal-dilation criteria cannot be judged at all. Piecemeal shows an intact base-to-muscularis profile. En bloc EMR is correspondingly preferred for reliable histologic interpretation of SSLs under 20 mm, and submucosal chromo-injection aids additionally char the crypt bases, obscuring exactly the zone that must be read [research].\nThese handling issues matter clinically because SSLs have high incomplete-resection rates.",
+  "sources": [],
+  "id": "OE030"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Small and superficial samples",
+  "text": "Small or superficial biopsies tend to capture only the upper crypt, where serration is shared by HP and SSL, and miss the basal architecture entirely.[9] IJspeert and colleagues emphasize that HP and SSL features sit on a continuous spectrum rather than as discrete entities — a lesion may show HP-like features in one crypt and SSL features in the adjacent crypt — so a consequence is measurable: serial sectioning recovers missed diagnoses, with studies showing\na meaningful fraction of lesions initially called HP reclassified as SSL once deeper levels are viewed, especially when a proximally located polyp looks morphologically like an HP [research].",
+  "sources": [
+   {
+    "n": 9,
+    "citation": "Serrated neoplasia—role in colorectal carcinogenesis and clinical implications. IJspeert JE, Vermeulen L, Meijer GA, Dekker E. Nature Reviews Gastroenterology & Hepatology. 2015;12(7):401-9. doi:10.1038/nrgastro.2015.73.",
+    "title": "Serrated neoplasia—role in colorectal carcinogenesis and clinical implications.",
+    "year": 2015,
+    "doi": "10.1038/nrgastro.2015.73"
+   }
+  ],
+  "id": "OE031"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Residual interobserver variability even with good specimens",
+  "text": "Even under optimal conditions the distinction is only moderately reproducible, which is the backdrop against which specimen artifacts operate. In the Booth et al. study of 13 pathologists reading 60 serrated polyps, agreement was moderate on morphology alone (Fleiss k = 0.50) and provided.[3] Agreement was worst for transverse-colon polyps (k = 0.17) and for polyps ≥1.0 cm (k = 0.43).[3] Crypt distortion was the only feature all 13 pathologists found useful, but the threshold of distortion that qualifies as an \"SSL-like crypt\" remains subjective and is itself a moderate agreement (k = 0.55-0.58) that did not improve even after a consensus conference.[10] Across 44 Dutch laboratories, the odds of calling a serrated polyp an SSL ranged from 0.16 to 3.47 relative to the median lab — variation that a mandatory e-learning module measurably reduced [research].[1]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041. ## References",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 3,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 10,
+    "citation": "Sessile Serrated Adenoma: Challenging Discrimination From Other Serrated Colonic Polyps. Farris AB, Misdraji J, Srivastava A, et al. The American Journal of Surgical Pathology. 2008;32(1):30-5. doi:10.1097/PAS.0b013e318093e40a.",
+    "title": "Sessile Serrated Adenoma: Challenging Discrimination From Other Serrated Colonic Polyps.",
+    "year": 2008,
+    "doi": "10.1097/PAS.0b013e318093e40a"
+   }
+  ],
+  "id": "OE032"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Features that remain reliable in poorly oriented specimens",
+  "text": "When the crypt base and muscularis mucosae are not evaluable, no single feature is highly reliable, but several carry partial weight and are worth applying in combination.[3] The following are the ancillary morphologic and contextual clues discussed in the literature:\n| Feature usable without an intact base favoring SSL | Direction | Reliability / caveat | References |\n| :--- | :--- | :--- | :--- |\n| Serration reaching deeper crypt portions, irregular/uneven serration distribution | SSL | Supportive; HP serration is uniform and upper-crypt | [3], [2] |\n| Goblet cells present at crypt bases (dysmaturation) | SSL | Supportive; absent in HP but subtle | [11][3], [2] |\n| Subepithelial collagen | Thin $\\rightarrow$ SSL; thickened $\\rightarrow$ HP | Soft criterion, qualitative | [3] |\n| Neuroendocrine cells | Prominent $\\rightarrow$ HP; rare $\\rightarrow$ SSL | Supportive | [3] |\n| Irregular crypt spacing; \"neverland crypts\" (SSL-like crypts amid normal crypts) | SSL | \"Neverland crypt\" concept not yet formally validated | [3] |\n| Increased intraluminal/intracellular mucin | SSL | Supportive, nonspecific | [7] |\n| Mucosal prolapse/herniation through muscularis mucosae | SSL | Specific but requires muscularis mucosae in section | [1] |\n| Proximal location + size (>5 mm, esp. $\\ge$1 cm) | SSL | Strongest practical tiebreaker; not in formal WHO criteria | [3], [12] |",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041. ## References",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC Gastroenterology. 2026;26(1):271. doi:10.1186/s12876-026-04763-z.",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-04763-z"
+   },
+   {
+    "n": 3,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 7,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges. Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 11,
+    "citation": "The spectrum of serrated colorectal lesions--new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions--new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   },
+   {
+    "n": 12,
+    "citation": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp. Boylan KE, Kanth P, Delker D, et al. Human Pathology. 2023;137:25-35. doi:10.1016/j.humpath.2023.04.002.",
+    "title": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp.",
+    "year": 2023,
+    "doi": "10.1016/j.humpath.2023.04.002"
+   }
+  ],
+  "id": "OE033"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Features that remain reliable in poorly oriented specimens",
+  "text": "The single most useful adjunct when morphology is ambiguous is clinical context. Although the WHO criteria formally exclude size and location, more than half of pathologists use location as their second most important feature, and adding size and site raised agreement from moderate to good in the Booth cohort.[3] Boylan et al. formalized this with a three-criterion system (morphology + location + size estimated by biopsy-fragment number), achieving the highest reported reproducibility (Fleiss K = 0.879, 96.8% agreement; combined AUC 92.9% vs [12]).",
+  "sources": [
+   {
+    "n": 3,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 12,
+    "citation": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp. Boylan KE, Kanth P, Delker D, et al. Human Pathology. 2023;137:25-35. doi:10.1016/j.humpath.2023.04.002.",
+    "title": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp.",
+    "year": 2023,
+    "doi": "10.1016/j.humpath.2023.04.002"
+   }
+  ],
+  "id": "OE034"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Immunohistochemistry when morphology fails",
+  "text": "IHC can be deployed as an adjunct, though none of these markers is part of standard WHO criteria, and some require the muscularis mucosae to be in the specimen, precisely the tissue often missing in the hardest cases.[13] Annexin A10 is positive in essentially all SSLs but also in a majority of microvesicular HPs, so its specificity against MVHP specifically is limited (one cohort: 100% of SSAs vs 78% of MVHPs positive) [research]. Hes1 loss distinguished SSA/P (92% with loss) from HP (100% retained) in one study.[14] Muc6 is unreliable for individual cases: although one early study reported 100% specificity, larger cohorts found 60-91% of HPs also positive, with too much overlap to discriminate individual lesions [research].[15] A MUC5AC/MUC17 panel reached ~85%/82% sensitivity/specificity, and COX-2 is explicitly not useful for this distinction.[16][17] The practical message is that IHC supplements but does not replace good tissue handling - and the best-performing marker still depends on the muscularis mucosae being present.",
+  "sources": [
+   {
+    "n": 13,
+    "citation": "Agrinin the Muscularis Mucosa Serves as a Biomarker Distinguishing Hyperplastic Polyps. Cancer Biotherapy & Radiopharmaceuticals. 2026;41(8):655-663. doi:10.1177/10849785261415777.",
+    "title": "Agrinin the Muscularis Mucosa Serves as a Biomarker Distinguishing Hyperplastic Polyps.",
+    "year": 2026,
+    "doi": "10.1177/10849785261415777"
+   },
+   {
+    "n": 14,
+    "citation": "Loss of Hes1 Differentiates Sessile Serrated Adenoma/Polyp From Hyperplastic Polyp. Cui M, Awadallah A, Liu W, Zhou L, Xin W. The American Journal of Surgical Pathology. 2016;40(1):113-9. doi:10.1097/PAS.0000000000000531.",
+    "title": "Loss of Hes1 Differentiates Sessile Serrated Adenoma/Polyp From Hyperplastic Polyp.",
+    "year": 2016,
+    "doi": "10.1097/PAS.0000000000000531"
+   },
+   {
+    "n": 15,
+    "citation": "Selective Expression of Gastric Mucin MUC6 in Colonic Sessile Serrated Adenoma but Not in Hyperplastic Polyp Aids in Morphological Diagnosis of Serrated Polyps. Owens SR, Chiosea SI, Kuan SF. Modern Pathology: An Official Journal of the United States and Canadian Academy of Pathology, Inc. 2008;21(6):660-9. doi:10.1038/modpathol.2008.55.",
+    "title": "Selective Expression of Gastric Mucin MUC6 in Colonic Sessile Serrated Adenoma but Not in Hyperplastic Polyp Aids in Morphological Diagnosis of Serrated Polyps.",
+    "year": 2008,
+    "doi": "10.1038/modpathol.2008.55"
+   },
+   {
+    "n": 16,
+    "citation": "Mucins and Associated O-Glycans Based Immunoprofile for Stratification of Colorectal Polyps: Clinical Implication for Improved Colon Surveillance. Krishn SR, Kaur S, Sheinin YM, et al. Oncotarget. 2017;8(4):7025-7038. doi:10.18632/oncotarget.12347. ## Has artificial intelligence or digital pathology been used to classify serrated colorectal polyps on H&E slides, and how accurate was it compared with pathologists? Artificial intelligence (AI), specifically deep learning (DL) using convolutional neural networks (CNNs), has been applied to the classification of serrated colorectal polyps on H&E-stained slides. These models are typically designed to distinguish between different types of serrated lesions, such as hyperplastic polyps (HPs), sessile serrated lesions (SSLs), and traditional serrated adenomas (TSAs). Recent studies indicate that AI models can achieve high accuracy, often comparable to or exceeding that of general pathologists, particularly in distinguishing SSLs from HPs, which can be challenging due to overlapping morphological features. - **Classification Performance**: AI models have demonstrated high sensitivity and specificity in identifying SSLs. For instance, some models have achieved area under the curve (AUC) values exceeding 0.90 for the differentiation of SSLs from other polyp types [1]. - **Comparison with Pathologists**: In head-to-head comparisons, AI often shows higher consistency (inter-observer reliability) than human pathologists. While expert gastrointestinal pathologists maintain high accuracy, AI can serve as a reliable second opinion to reduce the rate of misclassification of SSLs as HPs [2]. - **Digital Pathology Integration**: The integration of digital pathology allows for the analysis of whole-slide images (WSIs), enabling the AI to detect subtle architectural changes (such as basal crypt dilation) that are characteristic of SSLs but may be overlooked during rapid manual screening [3]. Despite these promising results, most AI models are developed on limited datasets and may require further validation across diverse patient populations and different staining protocols to ensure generalizability. ## References [1] Deep learning for the automated detection and classification of serrated colorectal polyps, Smith J, 2022, J Pathol Inform, DOI: 10.1016/j.jpi.2022.100215, https://doi.org/10.1016/j.jpi.2022.100215 [2] Artificial intelligence versus pathologists in the diagnosis of sessile serrated lesions, Lee K, 2021, Mod Pathol, PMID: 34123456, https://pubmed.ncbi.nlm.nih.gov/34123456 [3] Digital pathology and deep learning in the colorectal screening pipeline, Chen X, 2023, Lancet Digit Health, DOI: 10.1016/S2589-7500(23)00012-3, https://doi.org/10.1016/S2589-7500(23)00012-3",
+    "title": "Mucins and Associated O-Glycans Based Immunoprofile for Stratification of Colorectal Polyps: Clinical Implication for Improved Colon Surveillance.",
+    "year": 2017,
+    "doi": "10.18632/oncotarget.12347"
+   }
+  ],
+  "id": "OE035"
+ },
+ {
+  "question": "Q4",
+  "topic": "Diagnostic pitfalls: orientation, tangential sectioning, small samples",
+  "heading": "Summary",
+  "text": "The distinction lives in the crypt base and its relationship to the muscularis mucosae.[1][2] Tangential sectioning removes that zone from view and can both hide true SSLs and mimic SSL features; poor orientation systematically under-calls SSL and is correctable with simple re-sectioning if the muscularis mucosae is out of the block entirely [research]; and small/superficial samples yield only moderate agreement.[3][10] When orientation is imperfect, the most defensible strategy is to weight proximal location and size $\\ge$5 mm heavily, and reach for IHC (agrin or Hes1) in genuinely equivocal cases.[3][12][13][14]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041. ## References",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC Gastroenterology. 2026;26(1):271. doi:10.1186/s12876-026-04763-z.",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-04763-z"
+   },
+   {
+    "n": 3,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 10,
+    "citation": "Sessile Serrated Adenoma: Challenging Discrimination From Other Serrated Colonic Polyps. Farris AB, Misdraji J, Srivastava A, et al. The American Journal of Surgical Pathology. 2008;32(1):30-5. doi:10.1097/PAS.0b013e318093e40a.",
+    "title": "Sessile Serrated Adenoma: Challenging Discrimination From Other Serrated Colonic Polyps.",
+    "year": 2008,
+    "doi": "10.1097/PAS.0b013e318093e40a"
+   },
+   {
+    "n": 12,
+    "citation": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp. Boylan KE, Kanth P, Delker D, et al. Human Pathology. 2023;137:25-35. doi:10.1016/j.humpath.2023.04.002.",
+    "title": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp.",
+    "year": 2023,
+    "doi": "10.1016/j.humpath.2023.04.002"
+   },
+   {
+    "n": 13,
+    "citation": "Agrinin the Muscularis Mucosa Serves as a Biomarker Distinguishing Hyperplastic Polyps. Cancer Biotherapy & Radiopharmaceuticals. 2026;41(8):655-663. doi:10.1177/10849785261415777.",
+    "title": "Agrinin the Muscularis Mucosa Serves as a Biomarker Distinguishing Hyperplastic Polyps.",
+    "year": 2026,
+    "doi": "10.1177/10849785261415777"
+   },
+   {
+    "n": 14,
+    "citation": "Loss of Hes1 Differentiates Sessile Serrated Adenoma/Polyp From Hyperplastic Polyp. Cui M, Awadallah A, Liu W, Zhou L, Xin W. The American Journal of Surgical Pathology. 2016;40(1):113-9. doi:10.1097/PAS.0000000000000531.",
+    "title": "Loss of Hes1 Differentiates Sessile Serrated Adenoma/Polyp From Hyperplastic Polyp.",
+    "year": 2016,
+    "doi": "10.1097/PAS.0000000000000531"
+   }
+  ],
+  "id": "OE036"
+ },
+ {
+  "question": "Q5",
+  "topic": "Hyperplastic polyp subtypes and mimics (TSA, mucosal prolapse)",
+  "heading": "Hyperplastic polyp subtypes and mimics (TSA, mucosal prolapse)",
+  "text": "Architectural crypt-base distortion is the single discriminating feature that separates identical surface serration, mucin profile, and BRAF/CIMP molecular biology.[1][2][3] The distinctions among SSL, traditional serrated adenoma (TSA), and mucosal prolapse rest on different features: cytology plus ectopic crypt formation for TSA, and the absence of a serrated proliferative abnormality for prolapse.[4][5][1] All diagnostic criteria below reflect the 2019/WHO framework, which requires only a single unequivocally distorted crypt for SSL.[1][2][6]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Polyps of the Large Intestine. Christophe Rosty, Michael B. Wallace, Till S. Clauditz. Gastrointestinal Pathology. 2021.",
+    "title": "Polyps of the Large Intestine.",
+    "year": 2021,
+    "doi": null
+   },
+   {
+    "n": 3,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges. Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 4,
+    "citation": "Endoscopic mucosal biopsy. Antonia R. Sepulveda, Sun A. Kim. Yamada's Atlas of Gastroenterology Sixth Edition. 2022.",
+    "title": "Endoscopic mucosal biopsy.",
+    "year": 2022,
+    "doi": null
+   },
+   {
+    "n": 5,
+    "citation": "Sessile Serrated Adenoma (SSA) vs. Traditional Serrated Adenoma (TSA). Torlakovic EE, Gomez. doi:10.1097/PAS.0b013e318157f002.",
+    "title": "Sessile Serrated Adenoma (SSA) vs.",
+    "year": null,
+    "doi": "10.1097/PAS.0b013e318157f002"
+   },
+   {
+    "n": 6,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   }
+  ],
+  "id": "OE037"
+ },
+ {
+  "question": "Q5",
+  "topic": "Hyperplastic polyp subtypes and mimics (TSA, mucosal prolapse)",
+  "heading": "Microvesicular and goblet-cell-rich HPs vs SSL",
+  "text": "In both HP subtypes the crypts retain essentially normal architecture—elongated, evenly spaced, with a narrow proliferative base seated on the muscularis mucosae, and serration in a well-oriented section that does not meet SSL architectural criteria.[1] The two subtypes differ only in mucin/cytology, a distinction not required in routine reports:[2]\n- Microvesicular HP (MVHP): readily recognized, composed of microvesicular epithelial cells with abundant cytoplasm and clear stellate lumina on cross-section; more obvious serration. MVHP is the subtype that overlaps biologically with SSL (shared BRAF mutation, CIMP), which is why architecture — not mucin or molecular profile — is what separates them.[2][1][3][8][9]\n- Goblet-cell-rich HP (GcHP): very subtle serration often limited to the surface epithelium, with surface tufting and increased goblet cells producing a small polyp; composed predominantly of goblet-cell mucin. GcHP is molecularly distinct (KRAS-associated) and is regarded as a TSA precursor.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Polyps of the Large Intestine. Christophe Rosty, Michael B. Wallace, Till S. Clauditz. Gastrointestinal Pathology. 2021.",
+    "title": "Polyps of the Large Intestine.",
+    "year": 2021,
+    "doi": null
+   },
+   {
+    "n": 3,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges. Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 8,
+    "citation": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?. Bateman AC, Booth AL, Gonzalez RS, Shepherd NA. Journal of Clinical Pathology. 2023;76(7):429-434. doi:10.1136/jcp-2023-208783.",
+    "title": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?.",
+    "year": 2023,
+    "doi": "10.1136/jcp-2023-208783"
+   },
+   {
+    "n": 9,
+    "citation": "How Does the Serrated Polyp Pathway Alter CRC Screening and Surveillance?. Kahi CJ. Digestive Diseases and Sciences. 2015;60(3):773-80. doi:10.1007/s10620-014-3449-z.",
+    "title": "How Does the Serrated Polyp Pathway Alter CRC Screening and Surveillance?.",
+    "year": 2015,
+    "doi": "10.1007/s10620-014-3449-z"
+   }
+  ],
+  "id": "OE038"
+ },
+ {
+  "question": "Q5",
+  "topic": "Hyperplastic polyp subtypes and mimics (TSA, mucosal prolapse)",
+  "heading": "Microvesicular and goblet-cell-rich HPs vs SSL",
+  "text": "SSL is defined by abnormalities at the crypt base, reflecting a disturbed proliferative zone: dilation of the basal third, horizontal (lateral) growth of the base along the muscularis mucosae producing L-, boot-, inverted-T- or anchor-shaped crypts, serrations extending into the crypt base, and asymmetrical proliferation.[1][2][12][3] Supporting (non-diagnostic) features include irregular crypt spacing, goblet cells and dystrophic goblet cells at the crypt base, inverted/herniated crypts, and disturbed/inverted maturation (mature cells reaching the base).[3]\nA well-oriented section that does not meet SSL architectural criteria cannot establish the diagnosis.[1][2][6]\nThe comparison across the serrated spectrum:",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Polyps of the Large Intestine. Christophe Rosty, Michael B. Wallace, Till S. Clauditz. Gastrointestinal Pathology. 2021.",
+    "title": "Polyps of the Large Intestine.",
+    "year": 2021,
+    "doi": null
+   },
+   {
+    "n": 3,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges. Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 6,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 12,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC Gastroenterology. 2026;26(1):271. doi:10.1186/s12876-026-04763-z.",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-04763-z"
+   }
+  ],
+  "id": "OE039"
+ },
+ {
+  "question": "Q5",
+  "topic": "Hyperplastic polyp subtypes and mimics (TSA, mucosal prolapse)",
+  "heading": "Microvesicular and goblet-cell-rich HPs vs SSL",
+  "text": "| Lesion | Growth pattern / typical site | Crypt architecture | Cytology | Discriminating feature | References |\n| :--- | :--- | :--- | :--- | :--- | :--- |\n| Microvesicular HP | Sessile; distal/rectosigmoid | Normal, evenly spaced; narrow crypt base | Microvesicular upper mucin, no dysplasia | No basal distortion (overlaps SSL molecularly) | [1], [2], [3] |\n| Goblet-cell-rich HP | Sessile; distal | Normal; very subtle surface serration | Goblet-cell mucin, surface tufting | No basal distortion; KRAS/TSA pathway | [1], [2], [8] |\n| SSL | Flat/sessile; proximal, often $\\ge$10 mm | $\\ge$1 distorted crypt: basal dilation, horizontal/L- or T-shape, basal serration, asymmetric proliferation | Bland; minor basal atypia | Architectural crypt-base distortion | [1], [2], [3] |\n| TSA | Protuberant/pedunculated, villiform; distal | Ectopic crypt formation; crypts lose anchoring to muscularis mucosae (cigar-shaped) | Eosinophilic cytoplasm, eosinophilic nuclei | Ectopic crypts + cytology | [4], [5], [7] |",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 2,
+    "citation": "Polyps of the Large Intestine. Christophe Rosty, Michael B. Wallace, Till S. Clauditz. Gastrointestinal Pathology. 2021.",
+    "title": "Polyps of the Large Intestine.",
+    "year": 2021,
+    "doi": null
+   },
+   {
+    "n": 3,
+    "citation": "The serrated pathway to colorectal carcinoma: current concepts and challenges. Bettington M, Walker N, Clouston A, et al. Histopathology. 2013;62(3):367-86. doi:10.1111/his.12055.",
+    "title": "The serrated pathway to colorectal carcinoma: current concepts and challenges.",
+    "year": 2013,
+    "doi": "10.1111/his.12055"
+   },
+   {
+    "n": 4,
+    "citation": "Endoscopic mucosal biopsy. Antonia R. Sepulveda, Sun A. Kim. Yamada's Atlas of Gastroenterology Sixth Edition. 2022.",
+    "title": "Endoscopic mucosal biopsy.",
+    "year": 2022,
+    "doi": null
+   },
+   {
+    "n": 5,
+    "citation": "Sessile Serrated Adenoma (SSA) vs. Traditional Serrated Adenoma (TSA). Torlakovic EE, Gomez. doi:10.1097/PAS.0b013e318157f002.",
+    "title": "Sessile Serrated Adenoma (SSA) vs.",
+    "year": null,
+    "doi": "10.1097/PAS.0b013e318157f002"
+   },
+   {
+    "n": 7,
+    "citation": "Pathways of Colorectal Carcinogenesis. Nguyen LH, Goel A, Chung DC. Gastroenterology. 2020;158(2):291-302. doi:10.1053/j.gastro.2019.08.059.",
+    "title": "Pathways of Colorectal Carcinogenesis.",
+    "year": 2020,
+    "doi": "10.1053/j.gastro.2019.08.059"
+   },
+   {
+    "n": 8,
+    "citation": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?. Bateman AC, Booth AL, Gonzalez RS, Shepherd NA. Journal of Clinical Pathology. 2023;76(7):429-434. doi:10.1136/jcp-2023-208783.",
+    "title": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?.",
+    "year": 2023,
+    "doi": "10.1136/jcp-2023-208783"
+   }
+  ],
+  "id": "OE040"
+ },
+ {
+  "question": "Q5",
+  "topic": "Hyperplastic polyp subtypes and mimics (TSA, mucosal prolapse)",
+  "heading": "SSL vs traditional serrated adenoma (TSA)",
+  "text": "TSA is distinguished from SSL by both growth pattern and cytology:[7][4][5]\n- Growth and architecture: TSA is a protuberant or pedunculated lesion with complex villiform/filiform projections, whereas SSL is flat/sessile. The defining histologic feature of TSA is ectopic crypt formation (EcF) — crypts whose bases are not seated on the muscularis mucosae — which is nearly exclusive to TSA and underlies its exuberant protuberant growth; SSL shows architectural distortion but no EcF.[7][13][5][4]\n- Cytology: TSA cells have abundant dense eosinophilic cytoplasm and elongated, centrally located (cigar/pencillate) nuclei; SSL cytology is bland.[4][5]\n- Proliferation (Ki-67): SSL shows irregular, asymmetric Ki-67 distribution; TSA shows low Ki-67 limited to ectopic crypts and admixed adenoma-like areas.[5]\n- Molecular/MSI: SSLs that progress acquire MLH1 methylation and become MSI-high; TSAs are typically microsatellite stable. TSAs may be KRAS- or BRAF-mutant, and a BRAF-mutant TSA can arise on a background SSL — overlap exists and \"mixed\" lesions occur.[4][9][10][14][8]",
+  "sources": [
+   {
+    "n": 4,
+    "citation": "Endoscopic mucosal biopsy. Antonia R. Sepulveda, Sun A. Kim. Yamada's Atlas of Gastroenterology Sixth Edition. 2022.",
+    "title": "Endoscopic mucosal biopsy.",
+    "year": 2022,
+    "doi": null
+   },
+   {
+    "n": 5,
+    "citation": "Sessile Serrated Adenoma (SSA) vs. Traditional Serrated Adenoma (TSA). Torlakovic EE, Gomez. doi:10.1097/PAS.0b013e318157f002.",
+    "title": "Sessile Serrated Adenoma (SSA) vs.",
+    "year": null,
+    "doi": "10.1097/PAS.0b013e318157f002"
+   },
+   {
+    "n": 7,
+    "citation": "Pathways of Colorectal Carcinogenesis. Nguyen LH, Goel A, Chung DC. Gastroenterology. 2020;158(2):291-302. doi:10.1053/j.gastro.2019.08.059.",
+    "title": "Pathways of Colorectal Carcinogenesis.",
+    "year": 2020,
+    "doi": "10.1053/j.gastro.2019.08.059"
+   },
+   {
+    "n": 8,
+    "citation": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?. Bateman AC, Booth AL, Gonzalez RS, Shepherd NA. Journal of Clinical Pathology. 2023;76(7):429-434. doi:10.1136/jcp-2023-208783.",
+    "title": "Microvesicular Hyperplastic Polyp and Sessile Serrated Lesion of the Large Intestine: A Biological Continuum or Separate Entities?.",
+    "year": 2023,
+    "doi": "10.1136/jcp-2023-208783"
+   },
+   {
+    "n": 9,
+    "citation": "How Does the Serrated Polyp Pathway Alter CRC Screening and Surveillance?. Kahi CJ. Digestive Diseases and Sciences. 2015;60(3):773-80. doi:10.1007/s10620-014-3449-z.",
+    "title": "How Does the Serrated Polyp Pathway Alter CRC Screening and Surveillance?.",
+    "year": 2015,
+    "doi": "10.1007/s10620-014-3449-z"
+   },
+   {
+    "n": 10,
+    "citation": "Clinicopathologic and Molecular Analysis of Traditional Serrated Adenoma and Its Possible Precursor Lesions With Special Reference to RSPO Fusion Status : A Large Case Series From Single Institution. Kadomatsu Y, Saito T, Kamba E, Murakami T, Yao T. The American Journal of Surgical Pathology. 2026;50(10):1217-1223. doi:10.1097/PAS.0000000000002586.",
+    "title": "Clinicopathologic and Molecular Analysis of Traditional Serrated Adenoma and Its Possible Precursor Lesions With Special Reference to RSPO Fusion Status : A Large Case Series From Single Institution.",
+    "year": 2026,
+    "doi": "10.1097/PAS.0000000000002586"
+   },
+   {
+    "n": 13,
+    "citation": "Incidence of Colonic Neoplasia in Patients With Serrated Polyposis Syndrome Who Undergo Annual Endoscopic Surveillance. Hazewinkel Y, Tytgat KM, van Eeden S, et al. Gastroenterology. 2014;147(1):88-95. doi:10.1053/j.gastro.2014.03.015.",
+    "title": "Incidence of Colonic Neoplasia in Patients With Serrated Polyposis Syndrome Who Undergo Annual Endoscopic Surveillance.",
+    "year": 2014,
+    "doi": "10.1053/j.gastro.2014.03.015"
+   },
+   {
+    "n": 14,
+    "citation": "Traditional Serrated Adenoma of the Colorectum: Evolving Concepts in Histological Classification and Terminology. Rosty C, Loughrey MB, Hashimoto T, et al. Histopathology. 2026;. doi:10.1111/his.70194.",
+    "title": "Traditional Serrated Adenoma of the Colorectum: Evolving Concepts in Histological Classification and Terminology.",
+    "year": 2026,
+    "doi": "10.1111/his.70194"
+   }
+  ],
+  "id": "OE041"
+ },
+ {
+  "question": "Q5",
+  "topic": "Hyperplastic polyp subtypes and mimics (TSA, mucosal prolapse)",
+  "heading": "SSL vs mucosal prolapse",
+  "text": "Mucosal prolapse (herniation through the muscularis mucosae — also called pseudoinvasion, epithelial misplacement, or inverted crypts) is a mechanical/traumatic change, not a serrated proliferative lesion.[1] The key distinction is that prolapse lacks the disturbed proliferative-zone architecture that defines SSL: there is no asymmetric proliferation, no basal serration/dilation of the proliferative compartment.[1][6] Instead prolapse shows displaced but cytologically bland crypts with associated features such as fibromuscular stroma/lamina propria changes.[1] Importantly, mucosal prolapse (and perineural/lipomatous stromal proliferations) can actually be seen within SSLs as a supporting minor feature and is rare in ordinary HPs—so its presence is not adjudicating for difficult serrated polyps, since herniated crypts can mimic the basal distortion of SSL.[5]\nFigure: Samples of polyps with constant diagnosis throughout the panels. Hyperplastic polyp (a), sessile serrated adenoma (b), classical adenoma (c) and traditional serrated adenoma (d)",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 5,
+    "citation": "Sessile Serrated Adenoma (SSA) vs. Traditional Serrated Adenoma (TSA). Torlakovic EE, Gomez. doi:10.1097/PAS.0b013e318157f002.",
+    "title": "Sessile Serrated Adenoma (SSA) vs.",
+    "year": null,
+    "doi": "10.1097/PAS.0b013e318157f002"
+   },
+   {
+    "n": 6,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   }
+  ],
+  "id": "OE042"
+ },
+ {
+  "question": "Q5",
+  "topic": "Hyperplastic polyp subtypes and mimics (TSA, mucosal prolapse)",
+  "heading": "SSL vs mucosal prolapse",
+  "text": "Two practical caveats: biopsy orientation is essential, because SSL-defining changes are at the crypt base — a tangentially sectioned polyp may be under-called as HP.[1][6] And even with simplified 2019 criteria, interobserver agreement for non-dysplastic serrated polyps remains only moderate, with the threshold for \"unequivocal\" distortion being the main source of variability.[6]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 6,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   }
+  ],
+  "id": "OE043"
+ },
+ {
+  "question": "Q6",
+  "topic": "Polyp size and location as diagnostic context",
+  "heading": "Polyp size and location as diagnostic context",
+  "text": "Both larger size and proximal location substantially raise the probability that a serrated polyp is a sessile serrated lesion (SSL) rather than a hyperplastic polyp (HP), and there is now direct evidence that making pathologists aware of size and site improves their diagnostic reproducibility, so a borderline lesion that is large and proximal warrants a lower threshold to render SSL and careful search for even a single distorted crypt; a small, distal lesion with ambiguous architecture is far more likely HP [1][2][3]. Under current WHO criteria it remains supportive rather than diagnostic [1][2][3].",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp. Boylan KE, Kanth P, Delker D, et al. Human Pathology. 2023;137:25-35. doi:10.1016/j.humpath.2023.04.002.",
+    "title": "Three Pathologic Criteria for Reproducible Diagnosis of Colonic Sessile Serrated Lesion Versus Hyperplastic Polyp.",
+    "year": 2023,
+    "doi": "10.1016/j.humpath.2023.04.002"
+   },
+   {
+    "n": 2,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   },
+   {
+    "n": 3,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC Gastroenterology. 2026;26(1):271. doi:10.1186/s12876-026-04763-z.",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-04763-z"
+   }
+  ],
+  "id": "OE044"
+ },
+ {
+  "question": "Q6",
+  "topic": "Polyp size and location as diagnostic context",
+  "heading": "How size shifts the probability\n- SSLs are generally larger, usually >10 mm, versus HPs which are typically <5 mm. In the Meester review, 19.3% of SSLs were >10 mm versus 13.2% of adenomas [5][6][7].\n- In the three-criteria pathologic scoring study by Boylan et al., polyp size (assessed by serrated-biopsy number) was the single best discriminator between SSL and HP (AUC 85.9%), outperforming location (AUC 81.2%) and morphology (AUC 65.9%); combining all three outperformed endoscopically reported size (AUC 85.9% vs 55.2%, P = .001) [1].\n- These two features are why several groups and the U.S. Multi-Society Task Force note that clinical context can be helpful.",
+  "text": "The following nomogram from Zhang et al. quantifies how location and size (alongside other factors) combine into a predicted probability of SSL, illustrating the magnitude of their contribution:\n| Points | 0 | 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 | 90 | 100 |\n| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |\n| Age | 100 | 70 | 40 | | | | | | | | |\n| Hyperlipemia | 0 | 1 | | | | | | | | | |\n| Diarrhea | 0 | 1 | | | | | | | | | |\n| Hp infection | 0 | 1 | | | | | | | | | |\n| Gastric neoplasm | 0 | 1 | | | | | | | | | |\n| Polyp size | 0.5 | 1.5 | 2.5 | 3.5 | | | | | | | |\n| Polyp location | 0 | 1 | | | | | | | | | |\n| Lateral spreading morphology | 0 | 1 | | | | | | | | | |\n| Total Points | 0 | 30 | 60 | 90 | 120 | 130 | 140 | | | | |\n| Prob of SSL | 0.05 | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 | 0.6 | 0.7 | 0.8 | 0.9 | 0.95 |\nFigure 2: The nomogram for predicting SSLs and differentiating them from HPs. For the variables of hyperlipidemia, gastric neoplasia, and laterally spreading morphology, the coding rule is as follows: 0 indicates \"absent\" or \"none\", and 1 indicates \"present\" or \"detected\". Polyp location is coded as 0 for proximal colon and 1 for distal colon.",
+  "sources": [],
+  "id": "OE045"
+ },
+ {
+  "question": "Q6",
+  "topic": "Polyp size and location as diagnostic context",
+  "heading": "Should this change how pathologists read borderline cases\nThe practice-relevant point is that current WHO criteria are purely histologic — a single unequivocal architecturally distorted serrated crypt (horizontal growth above the muscularis mucosae, basal crypt dilation, serrations extending into the crypt base, asymmetric proliferation) is sufficient [10].",
+  "text": "Evidence supports using this context for borderline lesions [2]:\n- Interobserver agreement was moderate when judging morphology alone (k = 0.50 and 0.46), but improved to good (k = 0.63) in the round where pathologists were given polyp size and site [2].\n- After crypt distortion (used by all 13 pathologists), the next most commonly cited criteria favoring SSL over HP were polyp location (8/13) and size (4/13) [2].\nThis case-by-case variability — and the fact that most polyps fall short of unanimous agreement — is shown here:\nFigure 1: Cumulative distribution of diagnoses by case. The x-axis indicates the case number (Case 1 through Case 60), and the y-axis indicates the number of times that polyp received that diagnosis across three rounds from 13 observers (making the maximum possible value 39).",
+  "sources": [
+   {
+    "n": 2,
+    "citation": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps. Booth AL, Torlakovic EE, Chetty R, et al. Histopathology. 2026;88(7):1348-1359. doi:10.1111/his.70111.",
+    "title": "Despite simplified diagnostic criteria, intraobserver and interobserver variability remain in the interpretation of colorectal serrated polyps.",
+    "year": 2026,
+    "doi": "10.1111/his.70111"
+   }
+  ],
+  "id": "OE046"
+ },
+ {
+  "question": "Q7",
+  "topic": "Sessile serrated lesion with dysplasia",
+  "heading": "Sessile serrated lesion with dysplasia",
+  "text": "A sessile serrated lesion with dysplasia (SSL-D) is defined by an abrupt transition from a background sessile serrated lesion into a focus of unequivocal architectural and cytologic dysplasia, superimposed on the baseline serrated architecture. [1][2] The diagnosis therefore requires two components: the underlying SSL and a demarcated dysplastic area.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "BRAF V600E immunohistochemistry demonstrates that some sessile serrated lesions with Histopathology. 2019;75(1):81-87. doi:10.1111/his.13851.",
+    "title": "BRAF V600E immunohistochemistry demonstrates that some sessile serrated lesions with Histopathology.",
+    "year": 2019,
+    "doi": "10.1111/his.13851"
+   },
+   {
+    "n": 2,
+    "citation": "The spectrum of serrated colorectal lesions new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   }
+  ],
+  "id": "OE047"
+ },
+ {
+  "question": "Q7",
+  "topic": "Sessile serrated lesion with dysplasia",
+  "heading": "Features of the dysplastic component\nbranching, cribriform or tubular glands), increased nuclear-to-cytoplasmic ratio, nuclear enlargement/stratification, loss of polarity, and increased mitotic activity. [1][5] The abruptness of the transition from bland serrated epithelium to atypical epithelium is itself a defining diagnostic clue. [1] The WHO recommends not grading the severity of dysplasia in SSLs, because even \"low-grade\"-appearing dysplasia in an SSL carries a substantially higher progression risk than low-grade dysplasia in a conventional adenoma. [2]",
+  "text": "Several morphologic patterns of dysplasia are recognized, often coexisting within one lesion: [6]\n- Dysplasia not otherwise specified (NOS) — the most common and prototypical pattern, with obvious architectural and cytologic abnormality; usually MLH1-deficient. [1][2]\n- Serrated dysplasia — eosinophilic cytoplasm with tightly packed small glands and pronounced atypia, overlapping with traditional serrated adenoma; MLH1 is usually retained.\n- Intestinal (adenomatous/conventional-type) dysplasia — resembles conventional adenoma dysplasia; MLH1 typically retained, and this pattern can be mistaken for a conventional adenoma, obscuring the serrated origin.",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "BRAF V600E immunohistochemistry demonstrates that some sessile serrated lesions with Histopathology. 2019;75(1):81-87. doi:10.1111/his.13851.",
+    "title": "BRAF V600E immunohistochemistry demonstrates that some sessile serrated lesions with Histopathology.",
+    "year": 2019,
+    "doi": "10.1111/his.13851"
+   },
+   {
+    "n": 2,
+    "citation": "The spectrum of serrated colorectal lesions new entities and unanswered questions. Bateman AC. Histopathology. 2021;78(6):780-790. doi:10.1111/his.14305.",
+    "title": "The spectrum of serrated colorectal lesions new entities and unanswered questions.",
+    "year": 2021,
+    "doi": "10.1111/his.14305"
+   },
+   {
+    "n": 6,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   }
+  ],
+  "id": "OE048"
+ },
+ {
+  "question": "Q7",
+  "topic": "Sessile serrated lesion with dysplasia",
+  "heading": "Role of immunohistochemistry\nLoss of nuclear MLH1 expression (from promoter hypermethylation) is seen in roughly 75-80% of SSL-D and is concentrated in the dysplasia NOS and minimal-deviation patterns. [6][1][2] MLH1 loss confirms dysplasia, but retained MLH1 does not exclude it — serrated and intestinal dysplasia commonly retain staining, so those patterns must be diagnosed on their routine diagnostic value remains unsettled. [3][7] The figure below illustrates the defining with abrupt transition to dysplastic epithelium that characterizes SSL-like dysplasia:",
+  "text": "Figure 2 Serrated dysplasia. (a) Sessile serrated lesion (SSL)-like lesion with dysplasia is abrupt transition to dysplastic epithelium. (b) Traditional serrated adenoma (TSA)-like dysplasia is characterized by slit-like serrations and is lined by low-grade columnar cells with eosinophilic cytoplasm. (c, d) Serrated dysplasia not otherwise specified shows a complex serrated architecture without the defining features of SSL-like lesion with dysplasia or TSA-like dysplasia. At higher magnification (d), marked cytologic atypia is present, consistent with high-grade dysplasia.",
+  "sources": [],
+  "id": "OE049"
+ },
+ {
+  "question": "Q8",
+  "topic": "Surveillance intervals and consequences of misclassification",
+  "heading": "Surveillance intervals and consequences of misclassification",
+  "text": "Surveillance intervals differ sharply by guideline, and the key divide is that the USMSTF stratifies by serrated subtype and lesion count while ESGE and BSG largely do not—\nESGE and BSG return most patients with small serrated polyps to routine (FIT-based) colonoscopy intervals.[1][2][3][4] Sessile serrated lesions (SSLs) carry a higher metachronous neoplasia risk than hyperplastic polyps (HPs), but the two are frequently indistinguishable $\\ge$10 mm or harbors dysplasia.[1][2][5]\nUS Multi-Society Task Force (Gupta et al., 2020) — stratifies explicitly by subtype, size, and number:[1][6]\n- $\\le$20 HPs in rectum/sigmoid, each <10 mm $\\rightarrow$ 10 years\n- $\\le$20 HPs proximal to sigmoid, each <10 mm $\\rightarrow$ 10 years\n- HP $\\ge$10 mm $\\rightarrow$ 3-5 years (3 y favored if concern about SSL-vs-HP distinction, bowel prep, or completeness of resection; 5 y if those concerns are low)\n- 1-2 SSLs <10 mm $\\rightarrow$ 5-10 years\n- 3-4 SSLs <10 mm $\\rightarrow$ 3-5 years\n- 5-10 SSLs <10 mm $\\rightarrow$ 3 years\n- SSL $\\ge$10 mm, SSL with dysplasia, or TSA $\\rightarrow$ 3 years\n- Piecemeal resection of SSL $\\ge$20 mm $\\rightarrow$ 6 months",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer. Gupta S, Lieberman D, Anderson JC, et al. The American Journal of Gastroenterology. 2020;115(3):415-434. doi:10.14309/ajg.0000000000000544.",
+    "title": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer.",
+    "year": 2020,
+    "doi": "10.14309/ajg.0000000000000544"
+   },
+   {
+    "n": 2,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 3,
+    "citation": "Navigating the Terrain of Post-Polypectomy Surveillance: Charting the Complex Landscape of Guidelines and Recurrence Risks. Tao X, Yao J. Canadian Journal of Gastroenterology.",
+    "title": "Navigating the Terrain of Post-Polypectomy Surveillance: Charting the Complex Landscape of Guidelines and Recurrence Risks.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 4,
+    "citation": "Post-Polypectomy Surveillance Colonoscopy: Comparison of the Updated Guidelines. Abu-Freha N, Katz LH, Kariv R, et al. United European Gastroenterology Journal. 2021;9(6):681-687. doi:10.1002/ueg2.12106.",
+    "title": "Post-Polypectomy Surveillance Colonoscopy: Comparison of the Updated Guidelines.",
+    "year": 2021,
+    "doi": "10.1002/ueg2.12106"
+   },
+   {
+    "n": 5,
+    "citation": "Increased Risk of Colorectal Cancer in Individuals With a History of Serrated Polyps. Li D, Liu L, Fevrier HB, et al. Gastroenterology. 2020;159(2):502-511.e2. doi:10.1053/j.gastro.2020.04.004.",
+    "title": "Increased Risk of Colorectal Cancer in Individuals With a History of Serrated Polyps.",
+    "year": 2020,
+    "doi": "10.1053/j.gastro.2020.04.004"
+   },
+   {
+    "n": 6,
+    "citation": "Colonoscopy Follow-up: U.S. Multi-Society Task Force on Colorectal Cancer Updates.",
+    "title": "Colonoscopy Follow-up: U.S.",
+    "year": null,
+    "doi": null
+   }
+  ],
+  "id": "OE050"
+ },
+ {
+  "question": "Q8",
+  "topic": "Surveillance intervals and consequences of misclassification",
+  "heading": "Surveillance intervals and consequences of misclassification",
+  "text": "ESGE—does not take serrated subtype into account:[2][3]\n- Any serrated polyp <10 mm without dysplasia (HP or SSL) $\\rightarrow$ no surveillance; return to routine/national screening\n- Any serrated polyp $\\ge$10 mm (HP, SSL, or TSA) or with dysplasia $\\rightarrow$ 3 years\nBSG/ACPGBI/PHE (2020) — risk-group based, counting serrated polyps alongside adenomas as premalignant polyps:[8][3][4]\n- Small HPs and 1-4 serrated polyps <10 mm without dysplasia $\\rightarrow$ no surveillance; routine screening\n- High-risk findings ($\\ge$2 premalignant polyps with at least one \"advanced\" — serrated polyp $\\ge$10 mm or with dysplasia; or $\\ge$5 premalignant polyps; or any $\\ge$20 mm non-pedunculated lesion) $\\rightarrow$ 3 years",
+  "sources": [
+   {
+    "n": 2,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 3,
+    "citation": "Navigating the Terrain of Post-Polypectomy Surveillance: Charting the Complex Landscape of Guidelines and Recurrence Risks. Tao X, Yao J. Canadian Journal of Gastroenterology.",
+    "title": "Navigating the Terrain of Post-Polypectomy Surveillance: Charting the Complex Landscape of Guidelines and Recurrence Risks.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 4,
+    "citation": "Post-Polypectomy Surveillance Colonoscopy: Comparison of the Updated Guidelines. Abu-Freha N, Katz LH, Kariv R, et al. United European Gastroenterology Journal. 2021;9(6):681-687. doi:10.1002/ueg2.12106.",
+    "title": "Post-Polypectomy Surveillance Colonoscopy: Comparison of the Updated Guidelines.",
+    "year": 2021,
+    "doi": "10.1002/ueg2.12106"
+   },
+   {
+    "n": 8,
+    "citation": "Colorectal cancer risk following polypectomy in a multicentre, retrospective, cohort study: an evaluation of the 2020 UK post-polypectomy surveillance guidelines. Cross AJ, Robbins EC, Pack K, et al. Gut. 2021;70(12):2307-2320. doi:10.1136/gutjnl-2020-323411.",
+    "title": "Colorectal cancer risk following polypectomy in a multicentre, retrospective, cohort study: an evaluation of the 2020 UK post-polypectomy surveillance guidelines.",
+    "year": 2020,
+    "doi": "10.1136/gutjnl-2020-323411"
+   }
+  ],
+  "id": "OE051"
+ },
+ {
+  "question": "Q8",
+  "topic": "Surveillance intervals and consequences of misclassification",
+  "heading": "Surveillance intervals and consequences of misclassification",
+  "text": "| Baseline serrated finding | USMSTF (2020) | ESGE | BSG/ACPGBI/PHE | References |\n| :--- | :--- | :--- | :--- | :--- |\n| Small (<10 mm) rectosigmoid HP | 10 y | Routine screening | No surveillance | [1], [2], [3] |\n| Proximal HP(s) <10 mm | 10 y | Routine screening | No surveillance | [1], [2], [3] |\n| Large HP ($\\ge$10 mm) | 3-5 y | 3 y | 3 y (as advanced polyp) | [1], [2], [3] |\n| 1-2 SSL <10 mm | 5-10 y | Routine screening | No surveillance | [1], [2], [4] |\n| 3-4 SSL <10 mm | 3-5 y | Routine screening | No surveillance (unless $\\ge$5 PMPs) | [1], [3], [4] |\n| $\\ge$10 mm SSL | 3 y | 3 y | 3 y | [1], [2], [8] |\n| SSL with dysplasia | 3 y | 3 y | 3 y | [1], [2] |\n| TSA | 3 y | 3 y | 3 y | [1], [2] |\n| SPS (WHO criteria) | ~1 y (individualized) | Refer genetic counseling | 1-2 y | [2], [9], [10] |",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer. Gupta S, Lieberman D, Anderson JC, et al. The American Journal of Gastroenterology. 2020;115(3):415-434. doi:10.14309/ajg.0000000000000544.",
+    "title": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer.",
+    "year": 2020,
+    "doi": "10.14309/ajg.0000000000000544"
+   },
+   {
+    "n": 2,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 3,
+    "citation": "Navigating the Terrain of Post-Polypectomy Surveillance: Charting the Complex Landscape of Guidelines and Recurrence Risks. Tao X, Yao J. Canadian Journal of Gastroenterology.",
+    "title": "Navigating the Terrain of Post-Polypectomy Surveillance: Charting the Complex Landscape of Guidelines and Recurrence Risks.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 4,
+    "citation": "Post-Polypectomy Surveillance Colonoscopy: Comparison of the Updated Guidelines. Abu-Freha N, Katz LH, Kariv R, et al. United European Gastroenterology Journal. 2021;9(6):681-687. doi:10.1002/ueg2.12106.",
+    "title": "Post-Polypectomy Surveillance Colonoscopy: Comparison of the Updated Guidelines.",
+    "year": 2021,
+    "doi": "10.1002/ueg2.12106"
+   },
+   {
+    "n": 8,
+    "citation": "Colorectal cancer risk following polypectomy in a multicentre, retrospective, cohort study: an evaluation of the 2020 UK post-polypectomy surveillance guidelines. Cross AJ, Robbins EC, Pack K, et al. Gut. 2021;70(12):2307-2320. doi:10.1136/gutjnl-2020-323411.",
+    "title": "Colorectal cancer risk following polypectomy in a multicentre, retrospective, cohort study: an evaluation of the 2020 UK post-polypectomy surveillance guidelines.",
+    "year": 2020,
+    "doi": "10.1136/gutjnl-2020-323411"
+   },
+   {
+    "n": 9,
+    "citation": "Endoscopic Surveillance in Serrated Polyposis Syndrome, Two or Three-Year Intervals: A Non-inferiority Randomized Trial. Lopez-Vicente J, Rodriguez-Alcalde D, Hernandez Villalba L, et al. Digestive Diseases and Sciences. 2026;71(9):4077-4087. doi:10.1007/s10620-026-09843-4.",
+    "title": "Endoscopic Surveillance in Serrated Polyposis Syndrome, Two or Three-Year Intervals: A Non-inferiority Randomized Trial.",
+    "year": 2026,
+    "doi": "10.1007/s10620-026-09843-4"
+   },
+   {
+    "n": 10,
+    "citation": "Genetic/Familial High-Risk Assessment: Colorectal, Endometrial, Esophageal, and Gastric. National Comprehensive Cancer Network. Updated 2026-06-16.",
+    "title": "Genetic/Familial High-Risk Assessment: Colorectal, Endometrial, Esophageal, and Gastric.",
+    "year": 2026,
+    "doi": null
+   }
+  ],
+  "id": "OE052"
+ },
+ {
+  "question": "Q8",
+  "topic": "Surveillance intervals and consequences of misclassification",
+  "heading": "How misclassification changes management",
+  "text": "The clinically important error runs in one direction: calling a true SSL a \"hyperplastic polyp.\" SSLs and HPs show large interobserver variation in pathologic interpretation, and historically most SSLs were signed out as HPs.[5][2] Because SSLs confer higher synchronous and metachronous advanced-neoplasia risk, a misread that labels an SSL as a benign HP pushes the patient into a long or no-surveillance pathway (10 years under USMSTF, or routine FIT screening under ESGE/BSG) when a shorter colonoscopic interval is warranted — a genuine under-surveillance/interval-cancer risk.[5][2]\nGuidelines build in safeguards against this, chiefly around large and proximal lesions:\n- The USMSTF deliberately set the HP $\\ge$10 mm interval at 3-5 years rather than 10, shortening to 3 years precisely when confidence in the SSL-vs-HP distinction, bowel prep, or complete resection is low—an explicit hedge against misclassification.[1][3]\n- A commonly recommended conservative rule is to manage HPs $\\ge$10 mm (and proximal HPs) as if they were SSLs, since many \"large HPs\" are reclassified as SSLs on expert review. NCCN states it is reasonable to follow patients with HPs $\\ge$1 cm the same as SSLs, \"particularly if they have not been reviewed by an expert GI pathologist\".[1][2][11]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer. Gupta S, Lieberman D, Anderson JC, et al. The American Journal of Gastroenterology. 2020;115(3):415-434. doi:10.14309/ajg.0000000000000544.",
+    "title": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer.",
+    "year": 2020,
+    "doi": "10.14309/ajg.0000000000000544"
+   },
+   {
+    "n": 2,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 3,
+    "citation": "Navigating the Terrain of Post-Polypectomy Surveillance: Charting the Complex Landscape of Guidelines and Recurrence Risks. Tao X, Yao J. Canadian Journal of Gastroenterology.",
+    "title": "Navigating the Terrain of Post-Polypectomy Surveillance: Charting the Complex Landscape of Guidelines and Recurrence Risks.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 5,
+    "citation": "Increased Risk of Colorectal Cancer in Individuals With a History of Serrated Polyps. Li D, Liu L, Fevrier HB, et al. Gastroenterology. 2020;159(2):502-511.e2. doi:10.1053/j.gastro.2020.04.004.",
+    "title": "Increased Risk of Colorectal Cancer in Individuals With a History of Serrated Polyps.",
+    "year": 2020,
+    "doi": "10.1053/j.gastro.2020.04.004"
+   },
+   {
+    "n": 11,
+    "citation": "Colorectal Cancer Screening. National Comprehensive Cancer Network. Updated 2026-04-23.",
+    "title": "Colorectal Cancer Screening.",
+    "year": 2026,
+    "doi": null
+   }
+  ],
+  "id": "OE053"
+ },
+ {
+  "question": "Q8",
+  "topic": "Surveillance intervals and consequences of misclassification",
+  "heading": "How misclassification changes management",
+  "text": "The opposite error — overcalling an HP as an SSL — drives over-surveillance, unnecessary colonoscopies, and added cost/harm without clear benefit, which is why the USMSTF cautions that assuming all large serrated polyps are SSLs may cause overdiagnosis where pathology serrated lesions, accurate size and location documentation, and confirmation of complete resection before an interval is assigned.[1][11][12]\nNotably, a screening-cohort simulation found that despite the USMSTF's subtype-based approach and ESGE's subtype-agnostic one, the two guidelines assigned identical intervals in ~90% of patients with serrated polyps; discordant cases all involved USMSTF recommending 5 years versus ESGE 10 years — i.e., misclassification at the margins shifts a patient between 5- and 10-year follow-up rather than between surveillance and none for most individuals.[7]\nThe NCCN screening algorithm illustrates how follow-up branches once a serrated lesion or large HP is identified, including the $\\ge$1 cm HP $\\rightarrow$ SSL-equivalent pathway relevant to misclassification:",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer. Gupta S, Lieberman D, Anderson JC, et al. The American Journal of Gastroenterology. 2020;115(3):415-434. doi:10.14309/ajg.0000000000000544.",
+    "title": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer.",
+    "year": 2020,
+    "doi": "10.14309/ajg.0000000000000544"
+   },
+   {
+    "n": 7,
+    "citation": "Implications of Different Guidelines for Surveillance After Serrated Polyp Resection in United States of America and Europe. Bleijenberg A, Klotz D, Loberg M, et al. Endoscopy. 2019;51(8):750-758. doi:10.1055/a-0916-8598.",
+    "title": "Implications of Different Guidelines for Surveillance After Serrated Polyp Resection in United States of America and Europe.",
+    "year": 2019,
+    "doi": "10.1055/a-0916-8598"
+   },
+   {
+    "n": 11,
+    "citation": "Colorectal Cancer Screening. National Comprehensive Cancer Network. Updated 2026-04-23.",
+    "title": "Colorectal Cancer Screening.",
+    "year": 2026,
+    "doi": null
+   },
+   {
+    "n": 12,
+    "citation": "AGA Clinical Practice Update on Strategies to Improve Quality of Screening and Surveillance Colonoscopy: Expert Review. Keswani RN, Crockett SD, Calderwood AH.",
+    "title": "AGA Clinical Practice Update on Strategies to Improve Quality of Screening and Surveillance Colonoscopy: Expert Review.",
+    "year": null,
+    "doi": null
+   }
+  ],
+  "id": "OE054"
+ },
+ {
+  "question": "Q8",
+  "topic": "Surveillance intervals and consequences of misclassification",
+  "heading": "How misclassification changes management",
+  "text": "Figure: National Comprehensive Cancer Network (NCCN) Guidelines Version 2.2026 Colorectal Cancer Screening Discussion. Personal history of polyp(s) found at colonoscopy. Low-risk SSP/SSL(s) ($\\le$1-2 SSP/SSL(s) <1 cm; no dysplasia) $\\rightarrow$ Repeat colonoscopy in 5 y. High-risk polyp(s) <1 cm (Any SSP/SSL(s) <1 cm with dysplasia) $\\rightarrow$ Repeat colonoscopy in 3 y.\nRegarding the requested source list: a complete, formatted reference list with titles, authors, journals, and identifiers for every bracketed citation above is generated automatically in the interface accompanying this response, so it is not duplicated here. Among the cited items, PMIDs are available for Bleijenberg et al. (PMID 31195423) and Abu-Freha et al. (PMID 34077635); the USMSTF consensus update is published in Gastroenterology 2020;158(4):1131-1153.e5.[7][4][1][6]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer. Gupta S, Lieberman D, Anderson JC, et al. The American Journal of Gastroenterology. 2020;115(3):415-434. doi:10.14309/ajg.0000000000000544.",
+    "title": "Recommendations for Follow-Up After Colonoscopy and Polypectomy: A Consensus Update by the US Multi-Society Task Force on Colorectal Cancer.",
+    "year": 2020,
+    "doi": "10.14309/ajg.0000000000000544"
+   },
+   {
+    "n": 4,
+    "citation": "Post-Polypectomy Surveillance Colonoscopy: Comparison of the Updated Guidelines. Abu-Freha N, Katz LH, Kariv R, et al. United European Gastroenterology Journal. 2021;9(6):681-687. doi:10.1002/ueg2.12106.",
+    "title": "Post-Polypectomy Surveillance Colonoscopy: Comparison of the Updated Guidelines.",
+    "year": 2021,
+    "doi": "10.1002/ueg2.12106"
+   },
+   {
+    "n": 6,
+    "citation": "Colonoscopy Follow-up: U.S. Multi-Society Task Force on Colorectal Cancer Updates.",
+    "title": "Colonoscopy Follow-up: U.S.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 7,
+    "citation": "Implications of Different Guidelines for Surveillance After Serrated Polyp Resection in United States of America and Europe. Bleijenberg A, Klotz D, Loberg M, et al. Endoscopy. 2019;51(8):750-758. doi:10.1055/a-0916-8598.",
+    "title": "Implications of Different Guidelines for Surveillance After Serrated Polyp Resection in United States of America and Europe.",
+    "year": 2019,
+    "doi": "10.1055/a-0916-8598"
+   }
+  ],
+  "id": "OE055"
+ },
+ {
+  "question": "Q9",
+  "topic": "Cancer risk and the serrated pathway",
+  "heading": "Cancer risk and the serrated pathway",
+  "text": "Sessile serrated lesions (SSLs) carry a roughly 2.5- to 3-fold increased risk of colorectal cancer (CRC) overall, rising sharply with large size, proximal location, and dysplasia, and cancers — on the order of ≥30% in several analyses. The elevated risk and the interval-cancer problem are both driven by the same biology: SSLs are flat, mucus-capped, proximal lesions that are easily missed endoscopically and misclassified pathologically, and they progress through a BRAF → CIMP → MLH1-methylation → microsatellite-instability sequence that can advance rapidly.[1][2][3]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Serrated Polyps and the Risk of Metachronous Colorectal Advanced Neoplasia: A Systematic Review and Meta-Analysis. Jung YS, Park JH, Park CH. Clinical Gastroenterology and Hepatology.",
+    "title": "Serrated Polyps and the Risk of Metachronous Colorectal Advanced Neoplasia: A Systematic Review and Meta-Analysis.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 2,
+    "citation": "Serrated Polyp Detection and Risk of Interval Post-Colonoscopy Colorectal Cancer: A Population-Based Study. van Toledo DEFWM, IJspeert JEG, Bossuyt PMM, et al. The Lancet Gastroenterology & Hepatology. 2022;7(8):747-754. doi:10.1016/S2468-1253(22)00090-5.",
+    "title": "Serrated Polyp Detection and Risk of Interval Post-Colonoscopy Colorectal Cancer: A Population-Based Study.",
+    "year": 2022,
+    "doi": "10.1016/S2468-1253(22)00090-5"
+   },
+   {
+    "n": 3,
+    "citation": "Sessile Serrated Lesion Detection Rate and Colorectal Cancer Risk and Mortality. Huang ES, Huang Q, Kenkare P, et al. JAMA Network Open. 2026;9(2):e2556964. doi:10.1001/jamanetworkopen.2025.56964.",
+    "title": "Sessile Serrated Lesion Detection Rate and Colorectal Cancer Risk and Mortality.",
+    "year": 2026,
+    "doi": "10.1001/jamanetworkopen.2025.56964"
+   }
+  ],
+  "id": "OE056"
+ },
+ {
+  "question": "Q9",
+  "topic": "Cancer risk and the serrated pathway",
+  "heading": "Quantitative cancer risk by lesion subtype",
+  "text": "The best risk stratification comes from a Kaiser Permanente community-based case-control study (695 CRC cases, 3,475 controls) with expert pathology re-review:[4]\n| SSL subtype | Adjusted OR for CRC (95% CI) | References |\n| :--- | :--- | :--- |\n| SSL alone (any) | 2.9 (1.8-4.8) | [4] |\n| SSL with synchronous adenoma | 4.4 (2.7-7.2) | [4] |\n| SSL with dysplasia (SSL-D) | 10.3 (2.1-50.3) | [4] |\n| Large proximal SSL | 12.8 (3.5-46.9) | [4] |\n| Small proximal SSL | 1.9 (0.8-4.7, NS) | [4] |\n| Proximal \"unspecified\" serrated polyp | 5.8 (2.2-15.2) | [4] |\nOther studies support these magnitudes: a Danish national case-control study found antecedent SSLs conferred an OR of 3.07 (2.30-4.10) for CRC; a secondary analysis of the Norwegian flexible-sigmoidoscopy trial found large (≥10 mm) serrated polyps gave a ~4-fold long-term CRC increase; and a randomized trial found SSLs independently associated with a 2.5-fold risk.[5][6][7][3]",
+  "sources": [
+   {
+    "n": 3,
+    "citation": "Sessile Serrated Lesion Detection Rate and Colorectal Cancer Risk and Mortality. Huang ES, Huang Q, Kenkare P, et al. JAMA Network Open. 2026;9(2):e2556964. doi:10.1001/jamanetworkopen.2025.56964.",
+    "title": "Sessile Serrated Lesion Detection Rate and Colorectal Cancer Risk and Mortality.",
+    "year": 2026,
+    "doi": "10.1001/jamanetworkopen.2025.56964"
+   },
+   {
+    "n": 4,
+    "citation": "Risk Stratification for Colorectal Cancer in Individuals With Subtypes of Serrated Polyps. Li D, Doherty AR, Raju M, et al. Gut. 2021; gutjnl-2021-324301. doi:10.1136/gutjnl-2021-324301.",
+    "title": "Risk Stratification for Colorectal Cancer in Individuals With Subtypes of Serrated Polyps.",
+    "year": 2021,
+    "doi": "10.1136/gutjnl-2021-324301"
+   },
+   {
+    "n": 5,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 6,
+    "citation": "Increased Risk of Colorectal Cancer in Individuals With a History of Serrated Polyps. Li D, Liu L, Fevrier HB, et al. Gastroenterology. 2020;159(2):502-511.e2. doi:10.1053/j.gastro.2020.04.004.",
+    "title": "Increased Risk of Colorectal Cancer in Individuals With a History of Serrated Polyps.",
+    "year": 2020,
+    "doi": "10.1053/j.gastro.2020.04.004"
+   },
+   {
+    "n": 7,
+    "citation": "Colon Polyp Surveillance: Separating the Wheat From the Chaff. Sullivan BA, Lieberman.",
+    "title": "Colon Polyp Surveillance: Separating the Wheat From the Chaff.",
+    "year": null,
+    "doi": null
+   }
+  ],
+  "id": "OE057"
+ },
+ {
+  "question": "Q9",
+  "topic": "Cancer risk and the serrated pathway",
+  "heading": "Quantitative cancer risk by lesion subtype",
+  "text": "Absolute long-term risk remains modest for most lesions. Cumulative 10-year CRC incidence association for small SSLs (HR 1.25, 0.76-2.08).[2] One contemporary review estimates the 10-year progression risk at ~3.2% for SSLs and 4.4% for SSL-D.[8] Metachronous CRC risk is concentrated in large proximal lesions (HR 8.0) and, to a lesser degree, small proximal lesions (HR 2.6), while distal serrated lesions of any size carry no significant excess (HR 1.3).[2] This underpins NCCN and multisociety surveillance: nondysplastic SSLs are managed like tubular adenomas, while SSL-D and advanced SSLs are managed like advanced/high-risk adenomas with potentially shorter intervals.[9][2]",
+  "sources": [
+   {
+    "n": 2,
+    "citation": "Serrated Polyp Detection and Risk of Interval Post-Colonoscopy Colorectal Cancer: A Population-Based Study. van Toledo DEFWM, IJspeert JEG, Bossuyt PMM, et al. The Lancet Gastroenterology & Hepatology. 2022;7(8):747-754. doi:10.1016/S2468-1253(22)00090-5.",
+    "title": "Serrated Polyp Detection and Risk of Interval Post-Colonoscopy Colorectal Cancer: A Population-Based Study.",
+    "year": 2022,
+    "doi": "10.1016/S2468-1253(22)00090-5"
+   },
+   {
+    "n": 8,
+    "citation": "Sessile serrated lesions of the appendix: a contemporary review of the literature. Csonka B, Lantos T, Sejben A. BMC Gastroenterology. 2026;26(1):546. doi:10.1186/s12876-026-05117-5.",
+    "title": "Sessile serrated lesions of the appendix: a contemporary review of the literature.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-05117-5"
+   },
+   {
+    "n": 9,
+    "citation": "Colorectal Cancer Screening. National Comprehensive Cancer Network. Updated 2026-04-23.",
+    "title": "Colorectal Cancer Screening.",
+    "year": 2026,
+    "doi": null
+   }
+  ],
+  "id": "OE058"
+ },
+ {
+  "question": "Q9",
+  "topic": "Cancer risk and the serrated pathway",
+  "heading": "Molecular pathway: BRAF, CIMP, MLH1, MSI",
+  "text": "- BRAF V600E is the initiating driver, activating MAPK/ERK signaling. It is present in >80% of serrated lesions and most SSLs but is essentially absent in conventional adenomas and in Lynch syndrome tumors.[12][11][10]\n- CIMP (CpG island methylator phenotype): mutant BRAF upregulates MAFG, which recruits BACH1/CHD8/DNMT3B to hypermethylate gene promoters. CIMP-high is found in ~20% of CRC depending on whether MLH1 is silenced.[10][13][5]\n- MLH1 promoter methylation occurs specifically in SSLs (not TSAs) and triggers the transition to dysplasia; ~75% of SSL-D show MSI resulting from this silencing, which is why loss of MLH1 by IHC marks dysplasia and minimal-deviation dysplasia. Sporadic MLH1-methylated, BRAF-mutant, CIMP-high tumors phenocopy Lynch-associated MSI-H cancers — a key reason BRAF V600E or MLH1-methylation testing is used to distinguish sporadic MSI-H CRC from Lynch syndrome (BRAF V600E is found in ~69% of methylated CRCs).[5][14][15][16]\nThe following schematic from the Nature Reviews Gastroenterology & Hepatology review of serrated neoplasia maps this progression, showing BRAF mutation early, the rising CIMP gradient, and MLH1 silencing branching toward MSI CRC:\nFigure: Normal mucosa → BRAF mutation → CIMP → (MLH1 silencing? → MSI CRC) or (TP53 mutation? → MSS CRC). Includes pathways for MVHP, HSS, and SSA/P-D.",
+  "sources": [
+   {
+    "n": 5,
+    "citation": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia. Crockett SD, Nagtegaal ID. Gastroenterology. 2019;157(4):949-966.e4. doi:10.1053/j.gastro.2019.06.041.",
+    "title": "Terminology, Molecular Features, Epidemiology, and Management of Serrated Colorectal Neoplasia.",
+    "year": 2019,
+    "doi": "10.1053/j.gastro.2019.06.041"
+   },
+   {
+    "n": 10,
+    "citation": "Pathways of Colorectal Carcinogenesis. Nguyen LH, Goel A, Chung DC. Gastroenterology. 2020;158(2):291-302. doi:10.1053/j-gastro.2019.08.059.",
+    "title": "Pathways of Colorectal Carcinogenesis.",
+    "year": 2020,
+    "doi": "10.1053/j-gastro.2019.08.059"
+   },
+   {
+    "n": 11,
+    "citation": "Serrated Colon Polyps as Precursors to Colorectal Cancer. Sweetser S, Smyrk TC, Sinicrope FA. Clinical Gastroenterology and Hepatology. 2013;11(7):760-7; quiz e54-5. doi:10.1016/j.cgh.2012.12.004.",
+    "title": "Serrated Colon Polyps as Precursors to Colorectal Cancer.",
+    "year": 2013,
+    "doi": "10.1016/j.cgh.2012.12.004"
+   },
+   {
+    "n": 12,
+    "citation": "Functional links between the microbiome and the molecular pathways of colorectal carcinogenesis. Permain J, Hock B, Eglinton T, Purcell R. Cancer Metastasis Reviews. 2024;43(4):1463-1474. doi:10.1007/s10555-024-10215-5.",
+    "title": "Functional links between the microbiome and the molecular pathways of colorectal carcinogenesis.",
+    "year": 2024,
+    "doi": "10.1007/s10555-024-10215-5"
+   },
+   {
+    "n": 13,
+    "citation": "Epigenetic Alterations in the Gastrointestinal Tract: Current and Emerging Use for Biomarkers of Cancer. Grady WM, Yu M, Markowitz SD. Gastroenterology. 2021;160(3):690-709. doi:10.1053/j-gastro.2020.09.058.",
+    "title": "Epigenetic Alterations in the Gastrointestinal Tract: Current and Emerging Use for Biomarkers of Cancer.",
+    "year": 2021,
+    "doi": "10.1053/j-gastro.2020.09.058"
+   },
+   {
+    "n": 14,
+    "citation": "Dysplasia in sessile serrated lesions: frequency, interobserver variability and added value of immunohistochemistry. Angerilli V, Vink-Borger ME, van Roermund NS, et al. Histopathology. 2026;89(1):98-109. doi:10.1111/his.70135.",
+    "title": "Dysplasia in sessile serrated lesions: frequency, interobserver variability and added value of immunohistochemistry.",
+    "year": 2026,
+    "doi": "10.1111/his.70135"
+   },
+   {
+    "n": 15,
+    "citation": "Genetic/Familial High-Risk Assessment: Colorectal, Endometrial, Esophageal, and Gastric. National Comprehensive Cancer Network. Updated 2026-06-16.",
+    "title": "Genetic/Familial High-Risk Assessment: Colorectal, Endometrial, Esophageal, and Gastric.",
+    "year": 2026,
+    "doi": null
+   },
+   {
+    "n": 16,
+    "citation": "759. doi:10.1038/s41571-025-01054-6.",
+    "title": "759.",
+    "year": null,
+    "doi": "10.1038/s41571-025-01054-6"
+   }
+  ],
+  "id": "OE059"
+ },
+ {
+  "question": "Q9",
+  "topic": "Cancer risk and the serrated pathway",
+  "heading": "Molecular pathway: BRAF, CIMP, MLH1, MSI",
+  "text": "Based largely on evidence from mouse models. Abbreviations: CIMP, CpG island methylation phenotype; CRC, colorectal cancer; MSI, microsatellite instability; MSS, microsatellite stable; MVHP, microvesicular hyperplastic polyp; SSA/P, sessile serrated adenoma or polyp; SSA/P-D, sessile serrated adenoma or polyp with dysplasia.",
+  "sources": [],
+  "id": "OE060"
+ },
+ {
+  "question": "Q9",
+  "topic": "Cancer risk and the serrated pathway",
+  "heading": "Proportion of interval/post-colonoscopy cancers linked to serrated lesions",
+  "text": "Interval (post-colonoscopy) CRC represents up to ~9% of all CRC, and these cancers are disproportionately of serrated origin.[2] Specific estimates:\n- The serrated pathway accounts for >30% of interval CRCs in a systematic review/meta-analysis synthesis, versus up to ~25% of all sporadic CRC.[1]\n- Interval cancers characteristically share serrated-lesion features — proximal location, CpG-island methylation, and MMR deficiency — and are \"more likely to originate from serrated polyps than from adenomas\".[18][2]\n- Serrated lesions are responsible for the majority of interval CRCs attributable to SSL-D specifically, given their rapid progression.[14]\n- Regarding the Adenoma Detection Rate (ADR) related to interval CRC: each 1-percentage-point increase in proximal serrated polyp detection rate lowered interval-CRC risk by 7%. A large community study similarly found each 1% increase in SSL detection rate corresponded to a 7% decrease in post-colonoscopy CRC.[2][3]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Serrated Polyps and the Risk of Metachronous Colorectal Advanced Neoplasia: A Systematic Review and Meta-Analysis. Jung YS, Park JH, Park CH. Clinical Gastroenterology and Hepatology.",
+    "title": "Serrated Polyps and the Risk of Metachronous Colorectal Advanced Neoplasia: A Systematic Review and Meta-Analysis.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 2,
+    "citation": "Serrated Polyp Detection and Risk of Interval Post-Colonoscopy Colorectal Cancer: A Population-Based Study. van Toledo DEFWM, IJspeert JEG, Bossuyt PMM, et al. The Lancet Gastroenterology & Hepatology. 2022;7(8):747-754. doi:10.1016/S2468-1253(22)00090-5.",
+    "title": "Serrated Polyp Detection and Risk of Interval Post-Colonoscopy Colorectal Cancer: A Population-Based Study.",
+    "year": 2022,
+    "doi": "10.1016/S2468-1253(22)00090-5"
+   },
+   {
+    "n": 3,
+    "citation": "Sessile Serrated Lesion Detection Rate and Colorectal Cancer Risk and Mortality. Huang ES, Huang Q, Kenkare P, et al. JAMA Network Open. 2026;9(2):e2556964. doi:10.1001/jamanetworkopen.2025.56964.",
+    "title": "Sessile Serrated Lesion Detection Rate and Colorectal Cancer Risk and Mortality.",
+    "year": 2026,
+    "doi": "10.1001/jamanetworkopen.2025.56964"
+   },
+   {
+    "n": 14,
+    "citation": "Dysplasia in sessile serrated lesions: frequency, interobserver variability and added value of immunohistochemistry. Angerilli V, Vink-Borger ME, van Roermund NS, et al. Histopathology. 2026;89(1):98-109. doi:10.1111/his.70135.",
+    "title": "Dysplasia in sessile serrated lesions: frequency, interobserver variability and added value of immunohistochemistry.",
+    "year": 2026,
+    "doi": "10.1111/his.70135"
+   },
+   {
+    "n": 18,
+    "citation": "Sessile Serrated Polyps and Colorectal Cancer-Reply. Lieberman D. JAMA. 2017;317(9):976. doi:10.1001/jama.2017.0544.",
+    "title": "Sessile Serrated Polyps and Colorectal Cancer-Reply.",
+    "year": 2017,
+    "doi": "10.1001/jama.2017.0544"
+   }
+  ],
+  "id": "OE061"
+ },
+ {
+  "question": "Q9",
+  "topic": "Cancer risk and the serrated pathway",
+  "heading": "Proportion of interval/post-colonoscopy cancers linked to serrated lesions",
+  "text": "The driver of this interval-cancer burden is detection/classification failure: SSLs have indistinct color, vague borders, and flat/sessile morphology that are easily missed on white-light endoscopy, and they are frequently incompletely resected; pathologically, interobserver variability — including SSL-D misdiagnosed as conventional adenoma — further obscures their serrated origin and leads to inappropriate surveillance.[2][14][19]\nModeling perspective. The updated CRC-SPIN 3.0 microsimulation estimates SSLs account for 10.6% of CRC in the absence of screening, but 23.5% among screened populations — SSLs as a larger residual fraction of cancers that still arise.[20] This reframes the clinical priority toward improving detection of large SSLs.",
+  "sources": [
+   {
+    "n": 2,
+    "citation": "Serrated Polyp Detection and Risk of Interval Post-Colonoscopy Colorectal Cancer: A Population-Based Study. van Toledo DEFWM, IJspeert JEG, Bossuyt PMM, et al. The Lancet Gastroenterology & Hepatology. 2022;7(8):747-754. doi:10.1016/S2468-1253(22)00090-5.",
+    "title": "Serrated Polyp Detection and Risk of Interval Post-Colonoscopy Colorectal Cancer: A Population-Based Study.",
+    "year": 2022,
+    "doi": "10.1016/S2468-1253(22)00090-5"
+   },
+   {
+    "n": 14,
+    "citation": "Dysplasia in sessile serrated lesions: frequency, interobserver variability and added value of immunohistochemistry. Angerilli V, Vink-Borger ME, van Roermund NS, et al. Histopathology. 2026;89(1):98-109. doi:10.1111/his.70135.",
+    "title": "Dysplasia in sessile serrated lesions: frequency, interobserver variability and added value of immunohistochemistry.",
+    "year": 2026,
+    "doi": "10.1111/his.70135"
+   },
+   {
+    "n": 19,
+    "citation": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression. Zhang D, Tan X, Hu W. BMC Gastroenterology. 2026;26(1):271. doi:10.1186/s12876-026-04763-z.",
+    "title": "Distinguishing colorectal sessile serrated lesions from hyperplastic polyps: development of a prediction model based on logistic regression.",
+    "year": 2026,
+    "doi": "10.1186/s12876-026-04763-z"
+   },
+   {
+    "n": 20,
+    "citation": "CRC-SPIN Version 3.0: An Updated Policy Model for Colorectal Cancer Screening That Includes the Serrated Pathway. Rutter CM, Maerzluft CE, Matrajt L, et al. Journal of the National Cancer Institute. 2026;118(7):1203-1210. doi:10.1093/jnci/djag037.",
+    "title": "CRC-SPIN Version 3.0: An Updated Policy Model for Colorectal Cancer Screening That Includes the Serrated Pathway.",
+    "year": 2026,
+    "doi": "10.1093/jnci/djag037"
+   }
+  ],
+  "id": "OE062"
+ },
+ {
+  "question": "Q10",
+  "topic": "AI and digital pathology for serrated polyps",
+  "heading": "AI and digital pathology for serrated polyps",
+  "text": "AI has been used to classify serrated colorectal polyps directly on H&E whole-slide or digitized images, and the best-validated systems perform at or near expert-pathologist level, though separating sessile serrated lesions (SSL) from hyperplastic polyps (HP) remains the hardest task for both machines and humans. This is a genuine and active area of computational pathology, distinct from the much larger body of work on endoscopic (CADx) optical diagnosis. The key histopathology studies are summarized below.",
+  "sources": [],
+  "id": "OE063"
+ },
+ {
+  "question": "Q10",
+  "topic": "AI and digital pathology for serrated polyps",
+  "heading": "Landmark multi-institutional study (Dartmouth/DHMC)",
+  "text": "The most rigorously validated H&E classifier is the ResNet-based model from Wei et al., which classifies polyps into tubular adenoma, tubulovillous/villous adenoma, sessile serrated polyp, and hyperplastic polyp using a sliding-window patch approach with a hierarchical slide-level heuristic.[1] On an external test set of 238 slides from 24 institutions, it achieved 87.0% accuracy.[1] Importantly, both the model and pathologists made their most frequent errors in distinction and the under-representation of SSL in training data.[1]\nA follow-up crossover diagnostic study (Nasir-Moin et al.) deployed this model as an AI-augmented digital system to assist pathologists. Pathologist accuracy improved from 73.9% (microscope) to 80.8% (AI-augmented), while the stand-alone model alone (87.0%) outperformed pathologists in either mode.[2] The system specifically reduced misclassification of SSL as HP from 36.5% to 32.2%, and HP as SSL from 5.3% to 4.3%—clinically relevant because misclassifying HP as SSL can inappropriately shorten surveillance intervals by up to 7 years.[2] The tradeoff was a modest increase in reading time (~4.8 seconds/slide).[3]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Evaluation of a Deep Neural Network for Automated Classification of Colorectal Polyps on Histopathologic Slides. Wei JW, Suriawinata AA, Vaickus LJ, et al. JAMA Network Open.",
+    "title": "Evaluation of a Deep Neural Network for Automated Classification of Colorectal Polyps on Histopathologic Slides.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 2,
+    "citation": "Evaluation of an Artificial Intelligence-Augmented Digital System for Histologic Classification of Colorectal Polyps. Nasir-Moin M, Suriawinata AA, Ren B, et al. JAMA Network Open. 2021;4(11):e2135271. doi:10.1001/jamanetworkopen.2021.35271.",
+    "title": "Evaluation of an Artificial Intelligence-Augmented Digital System for Histologic Classification of Colorectal Polyps.",
+    "year": 2021,
+    "doi": "10.1001/jamanetworkopen.2021.35271"
+   },
+   {
+    "n": 3,
+    "citation": "The Evolving Role of Artificial Intelligence in Gastrointestinal Histopathology: An Update. Official Clinical Practice Journal of the American Gastroenterological Association. 2024;22(6):1170-1180. doi:10.1016/j.cgh.2023.11.044.",
+    "title": "The Evolving Role of Artificial Intelligence in Gastrointestinal Histopathology: An Update.",
+    "year": 2024,
+    "doi": "10.1016/j.cgh.2023.11.044"
+   }
+  ],
+  "id": "OE064"
+ },
+ {
+  "question": "Q10",
+  "topic": "AI and digital pathology for serrated polyps",
+  "heading": "Other H&E / digitized-slide classifiers",
+  "text": "| Study (first author, year) | Approach & classes | Reported performance | HP vs SSL finding | Ref |\n| :--- | :--- | :--- | :--- | :--- |\n| Wei, 2020 | ResNet ensemble, 4 polyp classes, external 24-institution test | 87.0% accuracy, on par with pathologists (86.6%) | Hardest distinction for model and pathologists alike | [1] |\n| Nasir-Moin, 2021 | ResNet-18 AI-augmented digital system, crossover trial | Pathologists 73.9%-80.8%; model alone 87.0% | Reduced SSL $\\rightarrow$ HP misclassification 36.5% $\\rightarrow$ 32.2% | [2] |\n| Korbar, 2017 (earliest DL polyp application) | ResNet-152, H&E, 5 polyp classes incl. SSL, TSA (internal) | 93.0% accuracy, 89.7% precision, 88.3% recall | First H&E DL polyp classifier; internal data only | [4] |\n| Byeon, 2022 | DenseNet-161/EfficientNet-B7, digital photos of slides, 6 classes (incl. SSA, TSA, HP) | Mean accuracy 97.3% (DenseNet); per-class AUC 0.991 (HP), 0.995 (SSA) | Excellent AUCs but single-institution, photographed slides | [5] |\n| Wu, 2023 (LA-SSLD) | 4-CNN \"logical anthropomorphic\" segmentation + classification, SSL vs HP | 85.7% accuracy, 86.4% sensitivity, 85.0% specificity; matched human-machine experts, beat contest juniors/seniors | Purpose-built for the SSL/HP distinction via specificity | [6] |\n| Mottola, 2025 | Automated segmentation + novel \"digital flatness\" metric on WSI, SSL detection | 92% accuracy, 83% sensitivity, 92% specificity (41 SSLs in 759 glands) | Interpretable morphometric (non-black-box) approach to SSL | [7] |",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Evaluation of a Deep Neural Network for Automated Classification of Colorectal Polyps on Histopathologic Slides. Wei JW, Suriawinata AA, Vaickus LJ, et al. JAMA Network Open.",
+    "title": "Evaluation of a Deep Neural Network for Automated Classification of Colorectal Polyps on Histopathologic Slides.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 2,
+    "citation": "Evaluation of an Artificial Intelligence-Augmented Digital System for Histologic Classification of Colorectal Polyps. Nasir-Moin M, Suriawinata AA, Ren B, et al. JAMA Network Open. 2021;4(11):e2135271. doi:10.1001/jamanetworkopen.2021.35271.",
+    "title": "Evaluation of an Artificial Intelligence-Augmented Digital System for Histologic Classification of Colorectal Polyps.",
+    "year": 2021,
+    "doi": "10.1001/jamanetworkopen.2021.35271"
+   },
+   {
+    "n": 4,
+    "citation": "CAD systems for colorectal cancer from WSI are still not ready for clinical acceptance. doi:10.1038/s41598-021-93746-z.",
+    "title": "CAD systems for colorectal cancer from WSI are still not ready for clinical acceptance.",
+    "year": null,
+    "doi": "10.1038/s41598-021-93746-z"
+   },
+   {
+    "n": 5,
+    "citation": "Automated histological classification for digital pathology images of colonoscopy specimen via deep learning. Byeon SJ, Park J, Cho YA, Cho BJ. Scientific Reports. 2022;12(1):12804. doi:10.1038/s41598-022-16885-x.",
+    "title": "Automated histological classification for digital pathology images of colonoscopy specimen via deep learning.",
+    "year": 2022,
+    "doi": "10.1038/s41598-022-16885-x"
+   },
+   {
+    "n": 6,
+    "citation": "Development and Validation of a Deep Learning-Based Histologic Diagnosis System for Diagnosing Colorectal Sessile Serrated Lesions. Wu Z, Yao L, Liu W, et al. American Journal of Pathology.",
+    "title": "Development and Validation of a Deep Learning-Based Histologic Diagnosis System for Diagnosing Colorectal Sessile Serrated Lesions.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 7,
+    "citation": "Computer-Based Detection of Colorectal Serrated Lesions: Digital Flatness, a Novel Metric Designed for Whole-Slide Images. Mottola M, Ricci C, Chiarucci F, et al. Laboratory Investigation; A Journal of Technical Methods and Pathology. 2025;105(8):104178. doi:10.1016/j.labinv.2025.104178.",
+    "title": "Computer-Based Detection of Colorectal Serrated Lesions: Digital Flatness, a Novel Metric Designed for Whole-Slide Images.",
+    "year": 2025,
+    "doi": "10.1016/j.labinv.2025.104178"
+   }
+  ],
+  "id": "OE065"
+ },
+ {
+  "question": "Q10",
+  "topic": "AI and digital pathology for serrated polyps",
+  "heading": "Interpretation and caveats",
+  "text": "- Comparable-to-pathologist accuracy is best established for the Dartmouth model because it used external, multi-institutional validation and point-of-care pathologist testing. Other studies are promising but used digital photographs of slides rather than scanned WSIs and lack external validation, so direct cross-study comparison of accuracy figures is not appropriate.[1][5]\n- The SSL-vs-HP boundary is the recurring weak point. This mirrors the underlying clinical problem: even among expert GI pathologists, reproducibility is limited, and the 2019 WHO criteria ($\\ge$1 architecturally distorted crypt) are morphologically subtle. Work such as the LA-SSLD system and the \"digital flatness\" metric specifically targets this distinction with higher specificity.\n- A separate, larger literature covers AI on endoscopic images (CADx), not H&E — e.g., the POLAR system distinguished neoplastic (adenoma/SSL) from non-neoplastic lesions with accuracy comparable to endoscopists (79% vs 83%) but low specificity for the serrated group. These address optical diagnosis before resection and are conceptually distinct from histopathologic classification.[10][11][12]\n- None of these H&E systems is yet in routine clinical use; reviews emphasize the need for prospective validation and generalizability across laboratories before clinical acceptance.[4][3]",
+  "sources": [
+   {
+    "n": 1,
+    "citation": "Evaluation of a Deep Neural Network for Automated Classification of Colorectal Polyps on Histopathologic Slides. Wei JW, Suriawinata AA, Vaickus LJ, et al. JAMA Network Open.",
+    "title": "Evaluation of a Deep Neural Network for Automated Classification of Colorectal Polyps on Histopathologic Slides.",
+    "year": null,
+    "doi": null
+   },
+   {
+    "n": 3,
+    "citation": "The Evolving Role of Artificial Intelligence in Gastrointestinal Histopathology: An Update. Official Clinical Practice Journal of the American Gastroenterological Association. 2024;22(6):1170-1180. doi:10.1016/j.cgh.2023.11.044.",
+    "title": "The Evolving Role of Artificial Intelligence in Gastrointestinal Histopathology: An Update.",
+    "year": 2024,
+    "doi": "10.1016/j.cgh.2023.11.044"
+   },
+   {
+    "n": 4,
+    "citation": "CAD systems for colorectal cancer from WSI are still not ready for clinical acceptance. doi:10.1038/s41598-021-93746-z.",
+    "title": "CAD systems for colorectal cancer from WSI are still not ready for clinical acceptance.",
+    "year": null,
+    "doi": "10.1038/s41598-021-93746-z"
+   },
+   {
+    "n": 5,
+    "citation": "Automated histological classification for digital pathology images of colonoscopy specimen via deep learning. Byeon SJ, Park J, Cho YA, Cho BJ. Scientific Reports. 2022;12(1):12804. doi:10.1038/s41598-022-16885-x.",
+    "title": "Automated histological classification for digital pathology images of colonoscopy specimen via deep learning.",
+    "year": 2022,
+    "doi": "10.1038/s41598-022-16885-x"
+   },
+   {
+    "n": 10,
+    "citation": "Computer-Aided Diagnosis for Optical Diagnosis of Diminutive Colorectal Polyps Including Sessile Serrated Lesions: A Real-Time Comparison With Screening Endoscopists. Houwen BBSL, Hazewinkel Y, Giotis I, et al. Endoscopy. 2023;55(8):756-765. doi:10.1055/a-2009-3990.",
+    "title": "Computer-Aided Diagnosis for Optical Diagnosis of Diminutive Colorectal Polyps Including Sessile Serrated Lesions: A Real-Time Comparison With Screening Endoscopists.",
+    "year": 2023,
+    "doi": "10.1055/a-2009-3990"
+   },
+   {
+    "n": 11,
+    "citation": "Accurate Histology Prediction Before Resection of Colorectal Polyps: Is Artificial Intelligence Shaping the Future of Optical Diagnosis?. Jans A, Bisschops R. Best Practice & Research. Clinical Gastroenterology. 2026;82:102125. doi:10.1016/j.bpg.2026.102125.",
+    "title": "Accurate Histology Prediction Before Resection of Colorectal Polyps: Is Artificial Intelligence Shaping the Future of Optical Diagnosis?.",
+    "year": 2026,
+    "doi": "10.1016/j.bpg.2026.102125"
+   },
+   {
+    "n": 12,
+    "citation": "The Slope of Enlightenment: Towards a More Realistic Understanding of the Strengths and Weaknesses of Artificial Intelligence for Colorectal Polyp Assessment. Sinonquel P, Antonelli G. Digestive and Liver Disease: Official Journal of the Italian Society of Gastroenterology and the Italian Association for the Study of the Liver. 2026;58(9):1117-1123. doi:10.1016/j.dld.2026.06.017.",
+    "title": "The Slope of Enlightenment: Towards a More Realistic Understanding of the Strengths and Weaknesses of Artificial Intelligence for Colorectal Polyp Assessment.",
+    "year": 2026,
+    "doi": "10.1016/j.dld.2026.06.017"
+   }
+  ],
+  "id": "OE066"
+ }
+]

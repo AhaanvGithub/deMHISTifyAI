@@ -176,7 +176,17 @@ function handle(ev, d) {
   }
 }
 
-const pct = (label, n, cls = '') => `<span class="call ${cls}">${label} ${n}%</span>`;
+const pct = (label, n, cls = '') => `<span class="call ${cls}">${label} <span class="num" data-to="${Number(n) || 0}">0</span>%</span>`;
+// numbers count up when they appear
+function countUp(root = document) {
+  root.querySelectorAll('.num[data-to]').forEach(el => {
+    const to = +el.dataset.to; el.removeAttribute('data-to');
+    const t0 = performance.now(), dur = 700;
+    const step = t => { const k = Math.min((t - t0) / dur, 1), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(to * e); if (k < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+new MutationObserver(() => countUp()).observe(document.body, { childList: true, subtree: true });
 
 function renderYou(p) {
   parsed = p;
@@ -187,7 +197,8 @@ function renderYou(p) {
 
 function renderConch(r) {
   result = r;
-  $('tissueTag').textContent = `${r.grid.cols} × ${r.grid.rows} tiles · ${r.heat.cols} × ${r.heat.rows} heatmap cells · hover for detail`;
+  const mz = r.magnification || {};
+  $('tissueTag').textContent = `${r.grid.cols} × ${r.grid.rows} tiles${mz.auto ? ` · zoom ×${mz.zoom_vs_training} vs training` : ''} · ${r.heat.cols} × ${r.heat.rows} cells · hover for detail`;
   $('heatControls').classList.remove('hidden');
   drawHeat();
   const pnl = r.panel, agree = parsed?.call && pnl.top === parsed.call;
@@ -234,7 +245,8 @@ function drawHeat() {
   const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
   for (let i = 0; i < H.p_ssa.length; i++) {
     const v = ref === 'SSA' ? H.p_ssa[i] : 1 - H.p_ssa[i];
-    const alpha = H.tissue[i] < 0.25 ? 0 : smooth(0.3, 0.75, v) * 0.85 + (v > 0.2 ? 0.05 : 0);
+    // temperature map like slide-level probability maps: clear when unlikely, then cyan -> green -> yellow -> red
+    const alpha = H.tissue[i] < 0.25 ? 0 : 0.92 * smooth(0.22, 0.6, v);
     im.data.set([...jet(v), Math.round(255 * a * alpha)], i * 4);
   }
   sg.putImageData(im, 0, 0);
@@ -352,8 +364,13 @@ function renderJudge(j) {
     <div class="sub">consistency over ${j.n_samples} runs · model's own estimate ${j.stated_confidence}%</div>`;
   const feats = (j.key_features || []).map(f =>
     `<li><b class="${f.points_to === 'SSA' ? 'ssl' : 'hp'}">${LABEL[f.points_to] || ''}</b> ${esc(f.feature)}: ${esc(f.why)} ${f.cites.map(c => `<sup>${c}</sup>`).join('')}</li>`).join('');
-  const cites = (j.citations || []).map(c =>
-    `<li><sup>${c.ref}</sup> ${esc(c.title)}${c.year ? ` (${c.year})` : ''}${c.doi ? ` · <span class="doi">${esc(c.doi)}</span>` : ''}</li>`).join('');
+  // each cited passage: what it covers, then the primary papers it draws on
+  const cites = (j.citations || []).map(c => {
+    const src = (c.sources || []).slice(0, 3).map(s =>
+      `<div class="src">${esc(s.title)}${s.year ? ` (${s.year})` : ''}${s.doi ? ` · <span class="doi">${esc(s.doi)}</span>` : ''}</div>`).join('');
+    const more = (c.sources || []).length > 3 ? `<div class="src muted">+${c.sources.length - 3} more</div>` : '';
+    return `<li><sup>${c.ref}</sup> <span class="ptitle">${esc(c.title)}</span>${src}${more}</li>`;
+  }).join('');
   $('litBody').innerHTML = `<p class="reason">${esc(j.reasoning).replace(/\[(P\d+)\]/g, '<sup>$1</sup>')}</p>
     ${feats ? `<ul class="feats">${feats}</ul>` : ''}${cites ? `<ul class="cites">${cites}</ul>` : '<div class="sub">No papers in the library yet.</div>'}`;
 }

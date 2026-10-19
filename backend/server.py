@@ -78,6 +78,9 @@ def trust_flags(researcher: dict, conch: dict, judge: dict) -> list:
         flags.append("Outside validated scope (colon serrated polyps): results are not validated.")
     if not conch.get("calibrated"):
         flags.append("Feature scores are relative to this snip only (not yet calibrated on MHIST).")
+    mag = conch.get("magnification", {})
+    if mag.get("auto") and mag.get("clamped"):
+        flags.append(f"Snip zoom is far from the training images (x{mag['zoom_vs_training']}); results may be less reliable.")
     if conch.get("judge_mode") == "zero-shot":
         flags.append("Image judges are untrained (prompt-only); expect near-chance accuracy on this task.")
     panel = conch["panel"]
@@ -125,7 +128,7 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...)):
         judge_future = POOL.submit(llm.research_judge, conch["criteria"], papers)
         # while Lumen thinks, sharpen the heatmap on the GPU (stride 1/8 tile instead of 1/4)
         try:
-            yield _sse("heat", engine.refine_heat(img, sub=8))
+            yield _sse("heat", engine.refine_heat(img, conch["magnification"]["tile_px"], sub=8))
         except Exception as e:
             yield _sse("heat_error", {"message": str(e)})
         judge = judge_future.result()
