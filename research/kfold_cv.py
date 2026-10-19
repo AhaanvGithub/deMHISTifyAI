@@ -122,6 +122,35 @@ class MuskFT(nn.Module):
         return self.cls(nn.functional.normalize(z.float(), dim=-1)).squeeze(-1) * 10.0
 
 
+class LoRALinear(nn.Module):
+    """Frozen linear layer plus a trainable low-rank correction: y = W x + (alpha / r) * B(A(x)).
+    B starts at zero, so training starts from the original model."""
+    def __init__(self, base, r=8, alpha=16):
+        super().__init__()
+        self.base, self.scale = base, alpha / r
+        self.lora_a = nn.Linear(base.in_features, r, bias=False)
+        self.lora_b = nn.Linear(r, base.out_features, bias=False)
+        nn.init.kaiming_uniform_(self.lora_a.weight, a=5 ** 0.5)
+        nn.init.zeros_(self.lora_b.weight)
+
+    def forward(self, x):
+        return self.base(x) + self.lora_b(self.lora_a(x.to(self.lora_a.weight.dtype))).to(x.dtype) * self.scale
+
+
+class MuskLoRAFT(MuskFT):
+    """MUSK with LoRA (rank 8) on the image-expert attention projections (q, k, v, out) of all 24
+    layers; the original weights stay frozen (stored in bf16 to fit 8 GB). `blocks` is ignored."""
+    def __init__(self, blocks):
+        super().__init__(0)
+        for p in self.m.parameters():
+            p.requires_grad = False
+        self.m.to(torch.bfloat16)
+        for layer in self.m.beit3.encoder.layers:
+            for name in ("q_proj", "k_proj", "v_proj", "out_proj"):
+                wrap = getattr(layer.self_attn, name)
+                wrap.A = LoRALinear(wrap.A)  # LoRA weights are created after the cast, so they stay fp32
+
+
 class ConvNextFT(nn.Module):
     """ConvNeXt pretrained on ImageNet-22k (timm, not gated); `blocks` < 0 trains every layer,
     otherwise the last `blocks` stages."""
@@ -152,7 +181,8 @@ class ConvNextBaseFT(ConvNextFT):
     ARCH = "convnext_base.fb_in22k_ft_in1k"
 
 
-BACKBONES = {"conch": ConchFT, "plip": PlipFT, "musk": MuskFT, "convnext": ConvNextFT, "convnext_base": ConvNextBaseFT}
+BACKBONES = {"conch": ConchFT, "plip": PlipFT, "musk": MuskFT, "musk_lora": MuskLoRAFT, "convnext": ConvNextFT,
+             "convnext_base": ConvNextBaseFT}
 
 
 def weighted_bce(logit, y_soft, w_ssa):
