@@ -22,6 +22,7 @@ Output: docs/results/app_pipeline_eval.json
 
 import io
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -39,7 +40,7 @@ from finetune_conch import alignment  # noqa: E402
 from select_prompts import load_labels  # noqa: E402
 from train_judges import ece  # noqa: E402
 
-OUT = ROOT / "docs" / "results" / "app_pipeline_eval.json"
+OUT = Path(os.environ.get("APP_EVAL_OUT", ROOT / "docs" / "results" / "app_pipeline_eval.json"))
 
 
 def up(img, f):
@@ -106,7 +107,7 @@ def main():
     for view in views:
         fn = VIEWS[view]
         p_panel, p_raw, t0 = [], [], time.time()
-        for name in names:
+        for i, name in enumerate(names):
             img = fn(Image.open(ROOT / "data/mhist/images" / name).convert("RGB"))
             res = eng.analyze(img)
             if "error" in res:  # no tissue found: app shows no answer; score as undecided
@@ -115,6 +116,12 @@ def main():
                 pp, pr = panel_p_ssa(res), raw_judges_p_ssa(res)
             p_panel.append(pp)
             p_raw.append(pr)
+            if os.environ.get("APP_EVAL_VERBOSE"):  # live per-image line: truth, raw-judge and panel calls, running accuracy
+                ok = lambda q: "ok " if (q > .5) == y[i] else "XX "
+                ar = np.mean([(q > .5) == t for q, t in zip(p_raw, y)])
+                ap = np.mean([(q > .5) == t for q, t in zip(p_panel, y)])
+                print(f"{view} {i + 1:4d}/{n} {name}  truth {'SSA' if y[i] else 'HP '} ({int(votes[i])}/7)  "
+                      f"raw {pr:.2f} {ok(pr)} panel {pp:.2f} {ok(pp)}  running acc raw {ar:.3f} panel {ap:.3f}", flush=True)
             mag = res.get("magnification", {})
             rows[view].append({"image": name, "p_panel": round(pp, 4), "p_raw_judges": round(pr, 4),
                                "size": list(img.size), "tile_px": mag.get("tile_px"),
