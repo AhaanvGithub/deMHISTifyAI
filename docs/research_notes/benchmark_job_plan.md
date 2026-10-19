@@ -71,4 +71,14 @@ fold. The overnight runner (scratchpad `queue_runner.py`) handled the allowed ho
       every layer within the same memory; THUNDER reports +2 to +8 F1 points from LoRA on MHIST over frozen
       features. Needs the `peft` library; ~2 h for 5 folds + final retrain. Keep it only if its out-of-fold
       AUC beats the 2-layer version.
+- [ ] **Deploy the winning panel into the app** (`backend/engine.py` loaders for the chosen members' final
+      models, decision cut-off + displayed-percentage calibration from `docs/results/panel.json`, show "calls SSL
+      above X%"); then re-run `research/eval_app_pipeline.py`. Top priority Tuesday.
+- [ ] **Scale-aware snip square** (after deployment): when the snip screen opens, read the viewer's scale bar
+      (local vision model for the label, bar detection for its pixel length; manual "drag along the scale bar and
+      type its label" as fallback), size a draggable square to one MHIST field (~0.45 mm, confirm MHIST's
+      um/pixel first), and prompt "zoom out" if it does not fit on screen or "zoom in" if it is under 224 screen
+      px. Score the square's contents resized to 224 px. Handles any magnification; does not fix stain
+      differences between labs.
+- [ ] **"Unlike training data" warning**: flag snips whose colour/features are far from MHIST.
 
