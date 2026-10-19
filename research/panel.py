@@ -1,21 +1,26 @@
 #!/usr/bin/env python3
-"""Build the best panel from the cross-validated members, choosing ONLY on training data, then score
-the chosen panel once on the MHIST test split.
+"""Choose the final panel from the cross-validated members using ONLY the training images, then score
+it once on the MHIST test split.
 
-Members: every data/models/cv/<tag>/ with out-of-fold logits on train (oof_logits.npy) and test
-logits (fold*_test_logits.npy averaged over folds, or test_logits.npy for frozen heads). All use the
-same 5 folds (research/kfold_cv.py, research/frozen_cv_heads.py).
+Members: data/models/cv/<tag>/ for each --members tag, with out-of-fold logits on train
+(oof_logits.npy, research/kfold_cv.py; all members share the same 5 folds) and test logits: the final
+model retrained on all of train (final_test_logits.npy, the version the app will run) if it exists,
+else the mean of the 5 fold models.
 
-Candidate panels (each scored by AUC on out-of-fold predictions; the ones with fitted weights are
-scored with an extra cross-validation over the training images so the weights never see the images
-they are scored on):
-  best single member | equal-weight mean of standardised logits (all members, or the top-k by OOF
-  AUC) | greedy forward selection with replacement (Caruana) | L2 logistic stacking.
-The winner is refit on all out-of-fold predictions, calibrated (Platt on OOF, 50/50 class prior as in
-training), and only then applied to test. Other members/baselines are reported on test as context.
-Writes docs/results/panel.json.
+1. Every group of members (all 2^n - 1) gets one learned weight per member: a logistic regression on
+   the members' standardised out-of-fold logits (soft labels, SSA and HP equal total weight). Each
+   group is scored by AUC with a second 5-fold split over the training images, so a group's weights
+   never see the images it is scored on.
+2. Luck check: among groups within --tolerance AUC of the best, keep the one with the fewest members
+   (the simpler, faster panel); the per-fold wins are reported.
+3. Calibrate the chosen group's score (Platt scaling on its out-of-fold scores, equal class weight)
+   and set the SSL/HP cut-off that maximises balanced accuracy on the training images.
+4. Only then score the test split: the chosen panel, plus each member alone and the app's current
+   models for context. Writes docs/results/panel.json.
 """
 
+import argparse
+import itertools
 import json
 import sys
 from pathlib import Path
@@ -34,137 +39,102 @@ from train_judges import ece  # noqa: E402
 OUT = ROOT / "docs" / "results" / "panel.json"
 
 
-def load_members(n):
-    mem = {}
-    for d in sorted((ROOT / "data/models/cv").iterdir()):
-        oof_p = d / "oof_logits.npy"
-        tests = sorted(d.glob("fold*_test_logits.npy")) or ([d / "test_logits.npy"] if (d / "test_logits.npy").exists() else [])
-        if not oof_p.exists() or not tests:
-            continue
-        oof = np.load(oof_p)
-        if len(tests) > 1 and len(tests) < 5:
-            print(f"skip {d.name}: only {len(tests)}/5 folds finished"); continue
-        mem[d.name] = (oof, np.mean([np.load(t) for t in tests], axis=0))
-    return mem
+def balanced_lr(X, ys):
+    """logistic regression on soft labels, SSA and HP carrying equal total weight"""
+    hard = ys > .5
+    w_ssa = (~hard).sum() / max(hard.sum(), 1)
+    w = np.r_[ys * w_ssa, 1 - ys]
+    return LogisticRegression(C=1.0, max_iter=5000).fit(np.vstack([X, X]), np.r_[np.ones(len(X)), np.zeros(len(X))],
+                                                        sample_weight=w)
 
 
-def balanced_lr(X, ys, C=1.0):
-    """logistic regression on soft labels with a 50/50 class prior (same as training)"""
-    prev = ys.mean()
-    w = np.r_[ys * .5 / prev, (1 - ys) * .5 / (1 - prev)]
-    return LogisticRegression(C=C, max_iter=5000).fit(np.vstack([X, X]), np.r_[np.ones(len(X)), np.zeros(len(X))], sample_weight=w)
-
-
-def metrics(p, y, votes):
+def metrics(p, y, votes, cut=0.5):
     split = (votes == 3) | (votes == 4)
-    return {"auc": round(float(roc_auc_score(y, p)), 4), "bal_acc": round(float(balanced_accuracy_score(y, p > .5)), 4),
-            "acc_vs_majority": round(float(((p > .5) == y).mean()), 4),
-            "ssl_caught": round(float((p[y == 1] > .5).mean()), 4), "hp_caught": round(float((p[y == 0] <= .5).mean()), 4),
+    return {"bal_acc": round(float(balanced_accuracy_score(y, p > cut)), 4), "auc": round(float(roc_auc_score(y, p)), 4),
+            "acc_vs_majority": round(float(((p > cut) == y).mean()), 4),
+            "ssl_caught": round(float((p[y == 1] > cut).mean()), 4), "hp_caught": round(float((p[y == 0] <= cut).mean()), 4),
             "ece": round(ece(p, y), 4), "spearman_vs_votes": round(float(spearmanr(p, votes)[0]), 4),
-            "acc_on_4v3": round(float(((p > .5) == y)[split].mean()), 4)}
-
-
-def greedy(Z, y, rounds=25):
-    """Caruana forward selection with replacement on AUC; returns member weights"""
-    w = np.zeros(Z.shape[1]); cur = None
-    for _ in range(rounds):
-        best = None
-        for j in range(Z.shape[1]):
-            w2 = w.copy(); w2[j] += 1
-            a = roc_auc_score(y, Z @ (w2 / w2.sum()))
-            if best is None or a > best[0]:
-                best = (a, j)
-        if cur is not None and best[0] <= cur + 1e-5:
-            break
-        cur = best[0]; w[best[1]] += 1
-    return w / w.sum()
+            "acc_on_4v3": round(float(((p > cut) == y)[split].mean()), 4)}
 
 
 def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--members", nargs="+", required=True, help="tags under data/models/cv/")
+    ap.add_argument("--tolerance", type=float, default=0.003, help="AUC margin within which the smaller group wins")
+    a = ap.parse_args()
+
     lab = load_labels(ROOT / "data/mhist/annotations.csv")
     names = np.array(sorted(lab["image"]))
     lab = lab.set_index("image").loc[names]
     y = (lab["label"] == "SSA").to_numpy().astype(int)
     votes = lab["ssa_votes"].to_numpy(float)
-    ys = votes / 7
     tr = np.flatnonzero((lab["split"] == "train").to_numpy())
     ts = np.flatnonzero((lab["split"] == "test").to_numpy())
+    ytr, ystr = y[tr], votes[tr] / 7
 
-    mem = load_members(len(names))
-    keys = list(mem)
-    O = np.stack([mem[k][0][tr] for k in keys], 1)   # out-of-fold logits on train
-    T = np.stack([mem[k][1] for k in keys], 1)       # test logits
+    O, T, source = [], [], {}
+    for tag in a.members:
+        d = ROOT / "data/models/cv" / tag
+        oof = np.load(d / "oof_logits.npy")[tr]
+        assert not np.isnan(oof).any(), f"{tag}: cross-validation not finished"
+        if (d / "final_test_logits.npy").exists():
+            t, source[tag] = np.load(d / "final_test_logits.npy"), "final model (all of train)"
+        else:
+            t, source[tag] = np.mean([np.load(d / f"fold{k}_test_logits.npy") for k in range(5)], axis=0), "mean of 5 fold models"
+        O.append(oof); T.append(t)
+    O, T = np.stack(O, 1), np.stack(T, 1)
     mu, sd = O.mean(0), O.std(0) + 1e-9
-    Oz, Tz = (O - mu) / sd, (T - mu) / sd            # standardise with TRAIN statistics only
-    ytr, ystr = y[tr], ys[tr]
-    member_auc = {k: round(float(roc_auc_score(ytr, O[:, j])), 4) for j, k in enumerate(keys)}
-    order = sorted(range(len(keys)), key=lambda j: -member_auc[keys[j]])
-    print("members (OOF AUC on train):", json.dumps(dict(sorted(member_auc.items(), key=lambda kv: -kv[1])), indent=1))
+    Oz, Tz = (O - mu) / sd, (T - mu) / sd  # standardised with training statistics only
 
-    # ---- candidate panels, each with a weight vector over members (or a stacker) ----
+    # 1. every group, scored with a second split over the training images
     outer = list(StratifiedKFold(5, shuffle=True, random_state=7).split(tr, ytr))
-    cands = {}
-    cands[f"single: {keys[order[0]]}"] = ("weights", np.eye(len(keys))[order[0]], None)
-    for k in range(2, len(keys) + 1):
-        w = np.zeros(len(keys)); w[order[:k]] = 1 / k
-        cands[f"mean of top-{k}"] = ("weights", w, None)
+    groups = [g for r in range(1, len(a.members) + 1) for g in itertools.combinations(range(len(a.members)), r)]
+    res_groups, cv_pred = {}, {}
+    for g in groups:
+        pred, fold_auc = np.zeros(len(tr)), []
+        for i, j in outer:
+            m = balanced_lr(Oz[i][:, g], ystr[i])
+            pred[j] = m.decision_function(Oz[j][:, g])
+            fold_auc.append(roc_auc_score(ytr[j], pred[j]))
+        name = " + ".join(a.members[k] for k in g)
+        res_groups[name] = {"members": len(g), "cv_auc": round(float(roc_auc_score(ytr, pred)), 4),
+                            "fold_aucs": [round(float(x), 4) for x in fold_auc]}
+        cv_pred[name] = (g, pred)
+    ranked = sorted(res_groups, key=lambda n: -res_groups[n]["cv_auc"])
+    best = ranked[0]
 
-    def cv_auc(fit_fn):
-        """AUC of a fitted panel, scored on held-out parts of train (weights refit per part)"""
-        pred = np.zeros(len(tr))
-        for a, b in outer:
-            pred[b] = fit_fn(a)(Oz[b])
-        return roc_auc_score(ytr, pred)
+    # 2. luck check: the smallest group within tolerance of the best
+    close = [n for n in ranked if res_groups[n]["cv_auc"] >= res_groups[best]["cv_auc"] - a.tolerance]
+    pick = min(close, key=lambda n: (res_groups[n]["members"], -res_groups[n]["cv_auc"]))
+    wins = sum(fa >= fb for fa, fb in zip(res_groups[pick]["fold_aucs"], res_groups[ranked[1] if pick == best else best]["fold_aucs"]))
+    print("groups by AUC on training images (second 5-fold split):")
+    for n in ranked:
+        print(f"  {res_groups[n]['cv_auc']:.4f}  {n}")
+    print(f"chosen: {pick}  (best was {best}; chosen wins {wins}/5 folds vs the runner-up)")
 
-    cv_score = {name: roc_auc_score(ytr, Oz @ w) for name, (_, w, _) in cands.items()}
-    # top-k ordering itself was chosen on all of train; re-check the best mean-of-top-k honestly
-    best_k_name = max([c for c in cands if c.startswith("mean of top")], key=cv_score.get)
-    k_best = int(best_k_name.split("-")[1])
+    # 3. weights on all training images, calibration and cut-off from out-of-fold scores
+    g, pred = cv_pred[pick]
+    stack = balanced_lr(Oz[:, g], ystr)
+    cal = balanced_lr(pred[:, None], ystr)
+    p_tr = cal.predict_proba(pred[:, None])[:, 1]
+    cuts = np.linspace(0.2, 0.8, 121)
+    cut = float(cuts[np.argmax([balanced_accuracy_score(ytr, p_tr > c) for c in cuts])])
 
-    def fit_topk(a):
-        o = sorted(range(len(keys)), key=lambda j: -roc_auc_score(ytr[a], Oz[a, j]))[:k_best]
-        w = np.zeros(len(keys)); w[o] = 1 / k_best
-        return lambda Z: Z @ w
-    cv_score[best_k_name] = cv_auc(fit_topk)
-
-    def fit_greedy(a):
-        w = greedy(Oz[a], ytr[a]); return lambda Z: Z @ w
-    cv_score["greedy selection"] = cv_auc(fit_greedy)
-    cands["greedy selection"] = ("weights", greedy(Oz, ytr), None)
-
-    for C in (0.01, 0.1, 1.0):
-        def fit_stack(a, C=C):
-            m = balanced_lr(Oz[a], ystr[a], C); return lambda Z: m.decision_function(Z)
-        name = f"logistic stacking C={C}"
-        cv_score[name] = cv_auc(fit_stack)
-        cands[name] = ("stack", None, balanced_lr(Oz, ystr, C))
-
-    ranked = sorted(cv_score, key=lambda c: -cv_score[c])
-    for c in ranked:
-        print(f"  {c:32} train-CV AUC {cv_score[c]:.4f}")
-    pick = ranked[0]
-    kind, w, stack = cands[pick]
-    score_tr = Oz @ w if kind == "weights" else stack.decision_function(Oz)
-    score_ts = Tz @ w if kind == "weights" else stack.decision_function(Tz)
-    cal = balanced_lr(score_tr[:, None], ystr)        # Platt scaling on out-of-fold scores, 50/50 prior
-    p_tr, p_ts = cal.predict_proba(score_tr[:, None])[:, 1], cal.predict_proba(score_ts[:, None])[:, 1]
-
-    # ---- the one test evaluation of the chosen panel, plus context ----
-    res = {"members_oof_auc": member_auc, "panels_train_cv_auc": {c: round(float(cv_score[c]), 4) for c in ranked},
-           "chosen": pick, "weights": dict(zip(keys, map(float, w))) if kind == "weights" else
-           dict(zip(keys, map(float, stack.coef_[0]))), "chosen_train_oof": metrics(p_tr, ytr, votes[tr]),
-           "TEST_chosen_panel": metrics(p_ts, y[ts], votes[ts])}
+    # 4. the one test evaluation of the chosen panel, plus context
+    p_ts = cal.predict_proba(stack.decision_function(Tz[:, g])[:, None])[:, 1]
+    out = {"members": a.members, "test_logits_from": source, "groups": res_groups, "best_group": best, "chosen": pick,
+           "weights": dict(zip([a.members[k] for k in g], map(float, stack.coef_[0]))), "cut_off": round(cut, 3),
+           "train_oof": metrics(p_tr, ytr, votes[tr], cut), "TEST_chosen_panel": metrics(p_ts, y[ts], votes[ts], cut)}
     ctx = {}
-    for j, k in enumerate(keys):  # each member alone on test, Platt-calibrated on its own OOF
-        c = balanced_lr(O[:, [j]], ystr)
-        ctx[k] = metrics(c.predict_proba(T[:, [j]])[:, 1], y[ts], votes[ts])
-    app_now = np.mean([np.load(f) for f in sorted((ROOT / "data/models").glob("conch_ft_seed*_testpred.npy"))], axis=0)
-    ctx["APP NOW (4 fine-tuned CONCH seeds)"] = metrics(app_now, y[ts], votes[ts])
-    res["test_context"] = ctx
-    OUT.write_text(json.dumps(res, indent=2))
-    print("\nchosen panel:", pick)
-    print("TEST:", json.dumps(res["TEST_chosen_panel"]))
-    print("APP NOW:", json.dumps(ctx["APP NOW (4 fine-tuned CONCH seeds)"]))
+    for k, tag in enumerate(a.members):  # each member alone, calibrated on its own out-of-fold logits
+        c = balanced_lr(O[:, [k]], ystr)
+        ctx[tag] = metrics(c.predict_proba(T[:, [k]])[:, 1], y[ts], votes[ts])
+    app = np.mean([np.load(f) for f in sorted((ROOT / "data/models").glob("conch_ft_seed*_testpred.npy"))], axis=0)
+    ctx["app now (4 partly fine-tuned CONCH)"] = metrics(app, y[ts], votes[ts])
+    out["test_context"] = ctx
+    OUT.write_text(json.dumps(out, indent=2))
+    print("TEST chosen panel:", json.dumps(out["TEST_chosen_panel"]))
+    print("TEST app now:     ", json.dumps(ctx["app now (4 partly fine-tuned CONCH)"]))
     print("wrote", OUT)
 
 
