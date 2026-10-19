@@ -62,6 +62,9 @@ def main():
     ap.add_argument("--members", nargs="+", required=True, help="tags under data/models/cv/")
     ap.add_argument("--tolerance", type=float, default=0.003, help="AUC margin within which the smaller group wins")
     a = ap.parse_args()
+    hold = ROOT / "data/models/cv/HOLD_PANEL"
+    if hold.exists():  # the member line-up is still being decided; the test split must be scored only once
+        sys.exit(f"panel on hold: {hold.read_text().strip()}")
 
     lab = load_labels(ROOT / "data/mhist/annotations.csv")
     names = np.array(sorted(lab["image"]))

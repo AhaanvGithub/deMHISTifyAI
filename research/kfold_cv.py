@@ -123,12 +123,14 @@ class MuskFT(nn.Module):
 
 
 class ConvNextFT(nn.Module):
-    """ConvNeXt-Tiny pretrained on ImageNet (timm, not gated); `blocks` < 0 trains every layer,
+    """ConvNeXt pretrained on ImageNet-22k (timm, not gated); `blocks` < 0 trains every layer,
     otherwise the last `blocks` stages."""
+    ARCH = "convnext_tiny.fb_in22k_ft_in1k"
+
     def __init__(self, blocks):
         super().__init__()
         import timm
-        self.m = timm.create_model("convnext_tiny.fb_in22k_ft_in1k", pretrained=True, num_classes=0)
+        self.m = timm.create_model(self.ARCH, pretrained=True, num_classes=0)
         for p in self.m.parameters():
             p.requires_grad = blocks < 0
         if blocks >= 0:
@@ -145,7 +147,12 @@ class ConvNextFT(nn.Module):
         return self.cls(nn.functional.normalize(z.float(), dim=-1)).squeeze(-1) * 10.0
 
 
-BACKBONES = {"conch": ConchFT, "plip": PlipFT, "musk": MuskFT, "convnext": ConvNextFT}
+class ConvNextBaseFT(ConvNextFT):
+    """ConvNeXt-Base (89M parameters) vs Tiny (28M): same family and pretraining, larger."""
+    ARCH = "convnext_base.fb_in22k_ft_in1k"
+
+
+BACKBONES = {"conch": ConchFT, "plip": PlipFT, "musk": MuskFT, "convnext": ConvNextFT, "convnext_base": ConvNextBaseFT}
 
 
 def weighted_bce(logit, y_soft, w_ssa):
