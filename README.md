@@ -152,6 +152,10 @@ sorted by balanced accuracy; rows that do not report it follow. Blank = not repo
 | Virchow | Frozen + linear | 0.830 | 0.834 | | 0.835 | | Not stated | Virchow paper [4] |
 | ImageNet ViT (natural images) | Frozen + linear | 0.821 | 0.826 | | 0.827 | | Not stated | Virchow paper [4] |
 | CTransPath | Frozen + linear | 0.801 | 0.817 | | 0.816 | | Not stated | Virchow paper [4] |
+| PolarHE (self-supervised) | Frozen + linear |  | 0.891 | 0.941 | 0.890 |  | Not stated | PolarHE [5] |
+| UNI (as reported by [5]) | Frozen + linear |  | 0.856 | 0.920 | 0.856 |  | Not stated | PolarHE [5] |
+| DiRL (as reported by [5]) | Not stated |  | 0.836 | 0.950 |  |  | Not stated | PolarHE [5] |
+| DINO (as reported by [5]) | Frozen + linear |  | 0.831 | 0.898 | 0.816 |  | Not stated | PolarHE [5] |
 | ResNet-18, ImageNet-pretrained | Fully fine-tuned | | | 0.927 | | | All 977 (best epochs kept) | MHIST paper [1] |
 | ResNet-18, from scratch | Fully trained | | | 0.845 | | | All 977 (best epochs kept) | MHIST paper [1] |
 
@@ -162,6 +166,14 @@ How the protocols differ:
   all of train come later); weights, calibration and the cut-off were fit on training images only, and the
   final group is still chosen by the training-data rule. Across all member groups the range is 0.862-0.882
   balanced accuracy and 0.938-0.961 AUC (`docs/results/preliminary_test_check.json`).
+- **Plain accuracy**: CLIK's cut-off is tuned for balanced accuracy, which costs plain accuracy. Tuned instead
+  for plain accuracy (also on training images only), CLIK reaches accuracy 0.892, weighted F1 0.892 and
+  balanced accuracy 0.890 on test, matching PolarHE [5]. This was observed after the cut-off rule was fixed,
+  so the app keeps the balanced-accuracy rule.
+- **[5] PolarHE**: frozen features with a linear classifier; reports the official split sizes (2,175 / 977) but
+  not how the model was selected.
+- **Not comparable**: a 2026 preprint reporting 90.2% accuracy and 0.955 AUC with vision transformers (CaiT) used
+  5-fold cross-validation over all 3,152 images instead of the official test split [6].
 - **[1] MHIST paper**: AUC is the mean of each run's 5 best test-set epochs over 10 seeds, so the epoch is
   chosen on the test split. It reports AUC only.
 - **[2] THUNDER** (NeurIPS 2025, 23 models): frozen features with a linear classifier, 95% confidence
@@ -176,6 +188,8 @@ Sources:
 [2] *THUNDER: Tile-level Histopathology image UNDERstanding benchmark*, NeurIPS 2025, tables S38, S39, S52 and table 3 ([arXiv 2507.07860](https://arxiv.org/abs/2507.07860)).
 [3] *MINT: Molecularly Informed Training with Spatial Transcriptomics Supervision for Pathology Foundation Models*, table 2 ([arXiv 2603.07895](https://arxiv.org/abs/2603.07895)); protocol: [kaiko.ai eva](https://kaiko-ai.github.io/eva/main/leaderboards/).
 [4] Vorontsov et al., *Virchow: A Million-Slide Digital Pathology Foundation Model*, table A4 ([arXiv 2309.07778](https://arxiv.org/abs/2309.07778)).
+[5] *Beyond H&E: Unlocking Pathological Insights with Polarization via Self-supervised Learning* (PolarHE), 2025 ([arXiv 2503.05933](https://arxiv.org/abs/2503.05933)).
+[6] *Vision Transformers Based AI Models For Predicting Colorectal Cancer from Digital Pathology WSI: Use Case Of MHIST dataset*, medRxiv 2026 ([link](https://www.medrxiv.org/content/10.64898/2026.02.03.26345516v1.full)).
 
 Supporting analyses:
 
