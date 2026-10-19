@@ -24,6 +24,16 @@ ECE 0.034, Spearman vs SSA votes 0.774. The in-app pipeline now reproduces this 
 | Fully trained small CNN beats partial CONCH fine-tune | original MHIST paper: ImageNet ResNet-18 AUC 0.927 (their setup) vs our 0.908 | Wei et al. 2021 |
 | HunCRC is not useful | 1 sessile serrated slide out of 200 (24 hyperplastic) | `slide_level_annotations.csv` |
 
+## Panel members (decided 2026-10-19)
+
+MUSK, CONCH, PLIP, and an ImageNet CNN (ConvNeXt-Tiny) as the 4th member (different architecture,
+so less correlated mistakes; the MHIST paper's fully trained ResNet-18 reached AUC 0.927).
+QuiltNet dropped (weakest, overlaps PLIP).
+
+Design space per member: frozen + linear/MLP head | partial fine-tune | full fine-tune | LoRA |
+linear-probe-then-fine-tune. Combination: feature join | weighted average | stacking | greedy selection.
+Training: soft labels, seeds, CV ensemble vs retrain on 100%. Decision: calibration + cut-off on OOF.
+
 ## Jobs (not yet run unless marked)
 
 | # | Job | Command | Est. time | Why |
