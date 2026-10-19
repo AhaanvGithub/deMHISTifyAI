@@ -193,6 +193,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--backbone", choices=list(BACKBONES), required=True)
     ap.add_argument("--batch", type=int, default=16)
+    ap.add_argument("--accum", type=int, default=1, help="gradient accumulation steps (effective batch = batch x accum)")
     ap.add_argument("--blocks", type=int, default=-1, help="-1 = every layer trainable")
     ap.add_argument("--lr", type=float, default=1e-5)
     ap.add_argument("--epochs", type=int, default=8, help="fine-tune epochs (after the head-only epochs)")
@@ -239,13 +240,17 @@ def main():
                                         weight_decay=1e-2)
             for ep in range(n_ep):
                 model.train()
-                for x, yb in dl:
-                    loss = weighted_bce(model(x.to(DEV)), yb.to(DEV), w_ssa)
-                    opt.zero_grad(); loss.backward(); opt.step()
+                opt.zero_grad()
+                for i, (x, yb) in enumerate(dl):
+                    loss = weighted_bce(model(x.to(DEV)), yb.to(DEV), w_ssa) / a.accum
+                    loss.backward()
+                    if (i + 1) % a.accum == 0 or i + 1 == len(dl):
+                        opt.step(); opt.zero_grad()
                 if stage == "head" or va is None:
                     print(f"[{a.tag}] {where} {stage} epoch {ep + 1} done ({time.time() - t0:.0f}s)", flush=True)
                     continue
                 lv = logits(model, names[va], model.pre)
+                torch.cuda.empty_cache()  # free validation buffers before the next training epoch
                 auc = roc_auc_score(y[va], lv)
                 curve.append(round(float(auc), 4))
                 print(f"[{a.tag}] {where} fine-tune epoch {ep + 1}: val AUC {auc:.4f} ({time.time() - t0:.0f}s)", flush=True)
