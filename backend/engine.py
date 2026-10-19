@@ -9,6 +9,12 @@ the first 4 prompt ids for each class.
 import json
 import os
 import sys
+
+# _POOL runs Macenko (numpy linalg) on many tiles at once while OpenBLAS spawns its own threads per
+# call; on Windows that crashes with an access violation once tiles reach ~444 px. The pool is the
+# parallelism, so keep OpenBLAS single-threaded. Must be set before numpy loads (threadpoolctl at
+# runtime did not stop the crash).
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -265,9 +271,14 @@ class Engine:
 
     def analyze(self, snip: Image.Image, tile_px: Optional[int] = None) -> dict:
         snip = snip.convert("RGB")
-        if tile_px is None:  # match the judges' training field of view (see scale.py)
-            from scale import tile_px_for
-            tile_px, mag = tile_px_for(snip)
+        if tile_px is None:
+            # The researcher snips one field, framed like an MHIST image: score the whole snip as one
+            # image (CONCH resizes it to 224). A long snip is split into squares along its long side,
+            # because CONCH's preprocessing centre-crops and would silently drop the ends.
+            # (Nucleus-size auto zoom, scale.py, is no longer used: it read anything up to ~1.5x as 1x
+            # and multi-tile snips as up to 3x too zoomed.)
+            tile_px = min(snip.size)
+            mag = {"auto": False, "mode": "whole snip = one field", "tile_px": tile_px}
         else:
             mag = {"auto": False, "tile_px": tile_px}
         tiles = self.make_grid(snip, tile_px)
@@ -285,19 +296,26 @@ class Engine:
             return {"error": "no_tissue", "tiles": [t.__dict__ for t in tiles]}
 
         judge_results, tile_probs = [], []
+        # The fine-tuned versions only ever saw raw images. Fed Macenko-normalised tiles they drift to HP
+        # (977 MHIST test images: panel SSA sensitivity 54% with them vs 79% raw-only, which also exactly
+        # matches training-time scores; docs/results/app_pipeline_eval_full_native.json). So only the raw
+        # judges vote; the normalised ones are still reported as a colour-robustness check.
+        votes_on = lambda j: j["condition"] == "raw" or not self.ft
         for n, j in enumerate(self.judges):
             if self.ft:
                 ps = emb[j["condition"]][1][:, j["version"] - 1]
                 p = np.stack([ps, 1 - ps], axis=1)  # [N, C]
             else:
                 p = self._judge_probs(n, emb[j["condition"]][0], j["prompts"])  # [N, C]
-            tile_probs.append(p)
+            if votes_on(j):
+                tile_probs.append(p)
             snip_p = p[mask].mean(0)
             order = np.argsort(-snip_p)
             judge_results.append(
                 {
                     "id": j["id"],
                     "condition": j["condition"],
+                    "votes": votes_on(j),
                     "prompts": ({c: self.prompts[j["prompts"][c]] for c in CLASSES} if "prompts" in j
                                 else {"SSA": f"fine-tuned CONCH v{j['version']}", "HP": f"seed {j['seed']}"}),
                     "top": CLASSES[order[0]],
@@ -314,7 +332,8 @@ class Engine:
 
         heat = self._dense_heat(snip, tiles)
 
-        votes = {c: sum(r["top"] == c for r in judge_results) for c in CLASSES}
+        voters = [r for r in judge_results if r["votes"]]
+        votes = {c: sum(r["top"] == c for r in voters) for c in CLASSES}
         panel_p = mean_tile[mask].mean(0)
         order = np.argsort(-panel_p)
         snip_crit = crit[mask].mean(0)
@@ -329,7 +348,8 @@ class Engine:
                 "top_conf": round(100 * float(panel_p[order[0]])),
                 "alt": CLASSES[order[1]],
                 "alt_conf": round(100 * float(panel_p[order[1]])),
-                "agreement": max(votes.values()) / len(judge_results),
+                "agreement": max(votes.values()) / len(voters),
+                "n_voters": len(voters),
             },
             "criteria": {
                 k.split(":", 1)[1]: {"text": self.prompts[k], "score": round(float(snip_crit[n]), 3),

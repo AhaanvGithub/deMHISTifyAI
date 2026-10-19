@@ -6,6 +6,10 @@ POST /analyze        image (already cropped to the confirmed box) + researcher t
                      -> Server-Sent Events: parsed, conch, flags, judge, verdict, done
 """
 
+import os
+
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")  # before numpy loads: see engine.py (threaded Macenko crash)
+
 import io
 import json
 import threading
