@@ -108,6 +108,7 @@ On the 977 MHIST test images, through the app's own pipeline (`docs/results/app_
 | Model | Balanced accuracy | AUC | Plain accuracy | Calibration error | Correlation with vote count |
 |---|---|---|---|---|---|
 | Fine-tuned CONCH (current release) | 0.819 | 0.908 | 0.826 | 0.034 | 0.774 |
+| Panel "CLIK" (ConvNeXt + PLIP + MUSK), preliminary | 0.877 | 0.959 | 0.863 | 0.047 | 0.860 |
 
 Accuracy holds when the snip comes from a scaled screenshot (150% display: balanced accuracy 0.825,
 AUC 0.910). About 1 in 6 test tiles is a 4-3 split among the pathologists, which caps any model:
@@ -125,6 +126,7 @@ sorted by balanced accuracy; rows that do not report it follow. Blank = not repo
 
 | Method | How the model is adapted | Balanced acc. | Accuracy | AUC | F1 | ECE | Test images used to choose the model | Source |
 |---|---|---|---|---|---|---|---|---|
+| **deMHISTifyAI panel "CLIK"** (ConvNeXt + PLIP + MUSK), preliminary | Fine-tuned (section above); 5-fold model average | **0.877** | **0.863** | **0.959** | **0.865** | **4.7%** | None | this repo [p] |
 | Virchow2 | Frozen + linear | 0.848 | | | 0.836 | 0.6% | None (validation carved from train) | THUNDER [2] |
 | H-optimus-0 | Frozen + linear | 0.837 | | | 0.828 | 1.6% | None (validation carved from train) | THUNDER [2] |
 | Virchow | Frozen + linear | 0.827 | | | 0.823 | 3.5% | None (validation carved from train) | THUNDER [2] |
@@ -135,7 +137,7 @@ sorted by balanced accuracy; rows that do not report it follow. Blank = not repo
 | MUSK | Frozen + linear | 0.792 | | | 0.800 | 7.0% | None (validation carved from train) | THUNDER [2] |
 | PLIP | Frozen + linear | 0.790 | | | 0.785 | 1.7% | None (validation carved from train) | THUNDER [2] |
 | QuiltNet | Frozen + linear | 0.735 | | | 0.735 | 1.8% | None (validation carved from train) | THUNDER [2] |
-| **deMHISTifyAI, full panel** | Section above | to be added after the final test run | | | | | None | this repo |
+| **deMHISTifyAI, final panel** | Final retrained models, group chosen on training data | to be added after the final test run | | | | | None | this repo |
 | Virchow2, LoRA fine-tuned | LoRA | | | | ~0.875 (derived) | | None (validation carved from train) | THUNDER [2] |
 | CONCH, LoRA fine-tuned | LoRA | | | | ~0.851 (derived) | | None (validation carved from train) | THUNDER [2] |
 | UNI, LoRA fine-tuned | LoRA | | | | ~0.847 (derived) | | None (validation carved from train) | THUNDER [2] |
@@ -156,6 +158,10 @@ sorted by balanced accuracy; rows that do not report it follow. Blank = not repo
 How the protocols differ:
 - **deMHISTifyAI**: every choice (epochs, weights, cut-off) is made on training images; the test split is
   scored once.
+- **[p] Preliminary**: test logits averaged over the 5 cross-validation models (the final models retrained on
+  all of train come later); weights, calibration and the cut-off were fit on training images only, and the
+  final group is still chosen by the training-data rule. Across all member groups the range is 0.862-0.882
+  balanced accuracy and 0.938-0.961 AUC (`docs/results/preliminary_test_check.json`).
 - **[1] MHIST paper**: AUC is the mean of each run's 5 best test-set epochs over 10 seeds, so the epoch is
   chosen on the test split. It reports AUC only.
 - **[2] THUNDER** (NeurIPS 2025, 23 models): frozen features with a linear classifier, 95% confidence
