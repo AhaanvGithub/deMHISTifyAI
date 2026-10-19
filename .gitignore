@@ -17,3 +17,4 @@ out/
 .env
 app/node_modules/
 papers/openevidence/
+papers/library.json

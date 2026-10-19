@@ -1,0 +1,31 @@
+deMHISTifyAI Research and Hackathon License
+
+Copyright (c) 2026 the deMHISTifyAI team
+
+This project was built for a hackathon and for research. It is shared so others can see how it works,
+learn from it and reproduce the results. It is not part of a publication.
+
+1. Permission. You may use, copy, modify and share this software and its documentation (the
+   "Software") free of charge for non-commercial purposes only: personal study, teaching, academic or
+   non-profit research, and hackathon judging or demonstration.
+
+2. Attribution. Copies or substantial portions of the Software, and work that builds on it, must keep
+   this license and credit "deMHISTifyAI" with a link to the original repository.
+
+3. No commercial use. Selling the Software, using it in a commercial product or service, or using it to
+   provide paid services requires written permission from the copyright holders.
+
+4. Not for clinical use. The Software is a research tool. It is not a medical device, has not been
+   clinically validated, and must not be used to diagnose, treat or make decisions about any patient.
+
+5. Third-party components. Models, datasets and other materials the Software uses are NOT covered by this
+   license and are not included in this repository. This includes, among others, CONCH, MUSK, PLIP,
+   ConvNeXt weights, the MHIST dataset and OpenEvidence content. Each remains under its own terms (several
+   forbid commercial use and sharing derivatives), and you must obtain access to and comply with each
+   yourself.
+
+6. No warranty. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+   OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

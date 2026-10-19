@@ -18,7 +18,7 @@ Research tool only, not for diagnosis.
 | `research/` | Training, evaluation and analysis scripts |
 | `docs/results/` | Every result file referenced below |
 | `docs/research_notes/` | Planning notes, including `benchmark_job_plan.md` |
-| `papers/` | Curated paper library for the literature judge (abstracts / open access only) |
+| `papers/` | Literature library for the literature judge. `papers/library.json` (OpenEvidence passages) is not in git; rebuild it from your own OpenEvidence answers with `research/build_library.py` |
 
 Data (MHIST) and model weights are not included; each user must obtain access themselves.
 
@@ -186,3 +186,10 @@ Cross-validation outputs go to `data/models/cv/` (never `data/models/`, which th
   members alike, so choices stay fair, but fold scores are never reported as results.
 - The literature judge's claims about features can overstate the (weak) feature scores; a guard rail is
   planned but untested.
+
+## License
+
+Built for a hackathon and for research; not part of a publication. Free for non-commercial study,
+teaching, research and hackathon use with attribution; not for clinical use. Third-party models and data
+(CONCH, MUSK, PLIP, ConvNeXt weights, MHIST, OpenEvidence content) keep their own terms and are not
+included. See [LICENSE](LICENSE).
