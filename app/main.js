@@ -3,11 +3,13 @@
 const { app, BrowserWindow, globalShortcut, desktopCapturer, screen, ipcMain, Tray, Menu, nativeImage } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
+const capture = require('./capture');
 
 const HOTKEY = 'CommandOrControl+Shift+Space';
 const REPO = path.resolve(__dirname, '..');
 let launcher, overlay, backend, tray;
 let researcherText = '';
+let quitting = false;
 
 function startBackend() {
   const py = process.env.DEMHIST_PYTHON || path.join(REPO, '.venv', 'Scripts', 'python.exe');
@@ -20,16 +22,32 @@ function startBackend() {
 function createLauncher() {
   const { width } = screen.getPrimaryDisplay().workAreaSize;
   launcher = new BrowserWindow({
-    width: 680, height: 92, x: Math.round((width - 680) / 2), y: 180,
+    width: 860, height: 124, x: Math.round((width - 860) / 2), y: 160, // pill + 28px margin for its glow
+    // no OS frame/shadow behind the frameless transparent window (it shows up as a square outline)
+    hasShadow: false, thickFrame: false, backgroundColor: '#00000000',
     frame: false, transparent: true, resizable: false, alwaysOnTop: true, show: false, skipTaskbar: true,
     webPreferences: { preload: path.join(__dirname, 'preload.js') },
   });
   launcher.loadFile('launcher.html');
   launcher.on('blur', () => launcher.hide());
+  // Esc in the launcher calls window.close(): hide instead, or the hotkey later hits a destroyed window
+  launcher.on('close', e => { if (!quitting) { e.preventDefault(); launcher.hide(); } });
+}
+
+const alive = w => w && !w.isDestroyed();
+
+function showLauncher() {
+  if (!alive(launcher)) createLauncher();
+  launcher.show();
+  launcher.focus();
+  launcher.webContents.send('focus');
 }
 
 async function captureScreen() {
   const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+  // true-colour capture first (see capture.js); desktopCapturer only as a fallback
+  const file = await capture.grab(screen.dipToScreenRect(null, display.bounds));
+  if (file) return { display, dataUrl: nativeImage.createFromPath(file).toDataURL() };
   const { width, height } = display.size;
   const sf = display.scaleFactor;
   const sources = await desktopCapturer.getSources({
@@ -40,41 +58,52 @@ async function captureScreen() {
 }
 
 async function openOverlay() {
+  if (alive(overlay)) return focusOverlay();
   const { display, dataUrl } = await captureScreen();
-  overlay = new BrowserWindow({
+  // keep a local handle: callbacks must never touch a newer overlay or one that is already closed
+  const win = new BrowserWindow({
     ...display.bounds, frame: false, alwaysOnTop: true, skipTaskbar: true, fullscreen: true,
-    backgroundColor: '#0b0d12', webPreferences: { preload: path.join(__dirname, 'preload.js') },
+    backgroundColor: '#170a25', webPreferences: { preload: path.join(__dirname, 'preload.js') },
   });
-  overlay.loadFile('overlay.html');
-  overlay.webContents.once('did-finish-load', () =>
-    overlay.webContents.send('init', { screenshot: dataUrl, researcher: researcherText }));
-  overlay.on('closed', () => (overlay = null));
+  overlay = win;
+  win.loadFile('overlay.html');
+  win.webContents.once('did-finish-load', () => {
+    if (alive(win)) win.webContents.send('init', { screenshot: dataUrl, researcher: researcherText });
+  });
+  win.on('closed', () => { if (overlay === win) overlay = null; });
+}
+
+// e.g. after Alt+Tab away from an open snip: bring it back instead of ignoring the hotkey
+function focusOverlay() {
+  if (overlay.isMinimized()) overlay.restore();
+  overlay.show();
+  overlay.focus();
 }
 
 ipcMain.on('launcher-submit', async (_e, text) => {
   researcherText = text;
-  launcher.hide();
+  if (alive(launcher)) launcher.hide();
   setTimeout(openOverlay, 180); // let the launcher fade before the screenshot
 });
-ipcMain.on('overlay-close', () => overlay && overlay.close());
+ipcMain.on('overlay-close', () => { if (alive(overlay)) overlay.close(); });
 
 app.whenReady().then(() => {
   startBackend();
+  capture.start();  // warm up the capture helper so the first snip is fast
   createLauncher();
   globalShortcut.register(HOTKEY, () => {
-    if (overlay) return;
-    launcher.show();
-    launcher.focus();
-    launcher.webContents.send('focus');
+    if (alive(overlay)) return focusOverlay();
+    showLauncher();
   });
   tray = new Tray(nativeImage.createEmpty());
   tray.setToolTip(`deMHISTifyAI — ${HOTKEY.replace('CommandOrControl', 'Ctrl')}`);
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: 'Open (Ctrl+Shift+Space)', click: () => { launcher.show(); launcher.focus(); } },
+    { label: 'Open (Ctrl+Shift+Space)', click: () => showLauncher() },
     { label: 'Quit', click: () => app.quit() },
   ]));
-  launcher.show();
+  launcher.webContents.once('did-finish-load', showLauncher);
 });
 
 app.on('window-all-closed', e => e.preventDefault()); // stay in the tray
-app.on('will-quit', () => { globalShortcut.unregisterAll(); if (backend) backend.kill(); });
+app.on('before-quit', () => { quitting = true; });
+app.on('will-quit', () => { globalShortcut.unregisterAll(); capture.stop(); if (backend) backend.kill(); });

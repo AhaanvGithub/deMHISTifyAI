@@ -9,7 +9,7 @@ let img, scale = 1, researcherText = '';
 let selRect = null;         // selection in CSS px (screen)
 let tissueBox = null;       // tissue box in CSS px, relative to selection
 let state = 'select';       // select | region | results
-let result = null, parsed = null, heatRef = 'researcher';
+let result = null, parsed = null, heatRef = 'ai';  // AI's map first, then compare with your call
 
 window.demhist.onInit(({ screenshot, researcher }) => {
   researcherText = researcher;
@@ -20,11 +20,18 @@ window.demhist.onInit(({ screenshot, researcher }) => {
 });
 
 function fit(c) { c.width = window.innerWidth; c.height = window.innerHeight; }
-function drawShot() { fit(shot); shot.getContext('2d').drawImage(img, 0, 0, shot.width, shot.height); }
+// draw the screenshot at full device resolution (not CSS px) so the tissue keeps its native detail
+function drawShot() {
+  const dpr = window.devicePixelRatio || 1;
+  shot.width = Math.round(window.innerWidth * dpr); shot.height = Math.round(window.innerHeight * dpr);
+  const g = shot.getContext('2d');
+  g.imageSmoothingQuality = 'high';
+  g.drawImage(img, 0, 0, shot.width, shot.height);
+}
 function drawDim(r) {
   fit(dim);
   const g = dim.getContext('2d');
-  g.fillStyle = 'rgba(8,10,16,0.62)';
+  g.fillStyle = 'rgba(22,8,32,0.62)';  // plum dim (sunset theme)
   g.fillRect(0, 0, dim.width, dim.height);
   if (r) g.clearRect(r.x, r.y, r.w, r.h);
 }
@@ -80,6 +87,7 @@ function setTissue(boxPx, label) {
 }
 async function startRegion() {
   state = 'region';
+  sel.classList.add('snap');  // flash when the selection lands
   $('hint').textContent = 'Adjust the tissue box if needed, then press Enter';
   $('sizeTag').classList.add('hidden');
   showActions();
@@ -158,9 +166,26 @@ function layoutPanel() {
   p.style.width = W + 'px';
   if (right >= left) { p.style.left = Math.min(selRect.x + selRect.w + gap, window.innerWidth - W - 12) + 'px'; }
   else { p.style.left = Math.max(selRect.x - W - gap, 12) + 'px'; }
+  p.style.transformOrigin = right >= left ? 'top left' : 'top right';  // grow out from the selection side
+  growPanel();
   const hc = $('heatControls');
   hc.style.left = (selRect.x + tissueBox.x) + 'px';
   hc.style.top = Math.min(selRect.y + selRect.h + 36, window.innerHeight - 52) + 'px';
+}
+
+// the panel starts compact and its height eases to fit its content as each section fills in
+let panelRO = null;
+function growPanel() {
+  if (panelRO) return;
+  const p = $('panel'), inner = $('panelInner');
+  const fitH = () => {
+    const max = window.innerHeight - 88, want = inner.scrollHeight + 34;  // 2 x 16px padding + border
+    p.style.height = Math.min(want, max) + 'px';
+    p.style.overflowY = want > max ? 'auto' : 'hidden';
+  };
+  panelRO = new ResizeObserver(fitH);
+  panelRO.observe(inner);
+  fitH();
 }
 
 function handle(ev, d) {
@@ -173,6 +198,7 @@ function handle(ev, d) {
   if (ev === 'error') {
     $('panelSummary').innerHTML = `<span class="bad">${d.message === 'no_tissue' ? 'No tissue found in the box.' : 'Error: ' + d.message}</span>`;
     $('litSummary').textContent = '—'; $('verdict').textContent = '—';
+    $('litCard').classList.remove('pending'); $('verdictCard').classList.remove('pending');
   }
 }
 
@@ -197,6 +223,8 @@ function renderYou(p) {
 
 function renderConch(r) {
   result = r;
+  heat.classList.add('reveal');
+  $('litCard').classList.remove('pending');  // panel grows one section at a time as results arrive  // heatmap opens out from the centre the first time
   const mz = r.magnification || {};
   $('tissueTag').textContent = `${r.grid.cols} × ${r.grid.rows} tiles${mz.auto ? ` · zoom ×${mz.zoom_vs_training} vs training` : ''} · ${r.heat.cols} × ${r.heat.rows} cells · hover for detail`;
   $('heatControls').classList.remove('hidden');
@@ -206,17 +234,19 @@ function renderConch(r) {
   $('panelSummary').innerHTML =
     `${pct(LABEL[pnl.top], pnl.top_conf, agree || !parsed?.call ? 'good' : 'bad')}
      <div class="alt">- alt: ${LABEL[pnl.alt]} ${pnl.alt_conf}%</div>
-     <div class="votes">${Object.entries(pnl.votes).map(([c, n]) => `${LABEL[c]} ${n}/8`).join(' · ')}</div>`;
+     <div class="votes">${Object.entries(pnl.votes).map(([c, n]) => `${LABEL[c]} ${n}/${pnl.n_voters || r.judges.length}`).join(' · ')}</div>`;
   const box = $('judges'); box.innerHTML = '';
   r.judges.forEach((j, i) => setTimeout(() => {
     const el = document.createElement('div');
-    el.className = 'judge pop';
-    el.title = `${j.prompts.SSA}\nvs\n${j.prompts.HP}`;
+    el.className = 'judge pop' + (j.votes === false ? ' nonvoting' : '');
+    el.title = `${j.prompts.SSA}\nvs\n${j.prompts.HP}` + (j.votes === false ? '\n\ncolour check only: does not vote (these versions were trained on raw images)' : '');
     el.innerHTML = `<span class="jid">${j.id}</span><span class="cond">${j.condition === 'raw' ? 'raw' : 'norm'}</span>
                     <b class="${j.top === 'SSA' ? 'ssl' : 'hp'}">${LABEL[j.top]} ${j.top_conf}</b>
-                    <span class="jalt">${LABEL[j.alt]} ${j.alt_conf}</span>`;
+                    <span class="jalt">${LABEL[j.alt]} ${j.alt_conf}</span>
+                    <span class="jbar ${j.top === 'SSA' ? 'ssl' : 'hp'}"></span>`;
     box.appendChild(el);
-  }, 120 * i));
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.querySelector('.jbar').style.width = j.top_conf + '%'; }));
+  }, 90 * i));
 }
 
 // jet-style colour scale like pathology probability maps: blue -> cyan -> green -> yellow -> red
@@ -229,7 +259,7 @@ function jet(v) {
   return JET[JET.length - 1][1];
 }
 const smooth = (e0, e1, x) => { const t = Math.min(Math.max((x - e0) / (e1 - e0), 0), 1); return t * t * (3 - 2 * t); };
-const refClass = () => heatRef === 'ai' ? result.panel.top : (parsed?.call || result.panel.top);
+const refClass = () => heatRef === 'ai' ? 'SSA' : (parsed?.call || result.panel.top);
 
 function drawHeat() {
   if (!result) return;
@@ -243,10 +273,14 @@ function drawHeat() {
   const small = document.createElement('canvas');
   small.width = H.cols; small.height = H.rows;
   const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
+  const ai = heatRef === 'ai';
   for (let i = 0; i < H.p_ssa.length; i++) {
-    const v = ref === 'SSA' ? H.p_ssa[i] : 1 - H.p_ssa[i];
-    // temperature map like slide-level probability maps: clear when unlikely, then cyan -> green -> yellow -> red
-    const alpha = H.tissue[i] < 0.25 ? 0 : 0.92 * smooth(0.22, 0.6, v);
+    const p = H.p_ssa[i];
+    // AI view: fixed P(SSL) scale, HP-leaning tissue blue, SSL-leaning red, undecided (~0.5) fades out.
+    // Your-call view: support for your call, clear when unlikely, then cyan -> green -> yellow -> red.
+    const v = ai ? p : (ref === 'SSA' ? p : 1 - p);
+    const k = ai ? smooth(0.06, 0.34, Math.abs(p - 0.5)) : smooth(0.22, 0.6, v);
+    const alpha = H.tissue[i] < 0.25 ? 0 : 0.8 * k;  // never fully opaque: tissue must stay readable
     im.data.set([...jet(v), Math.round(255 * a * alpha)], i * 4);
   }
   sg.putImageData(im, 0, 0);
@@ -277,12 +311,14 @@ function drawHeat() {
   $('rowLabels').innerHTML = show ? Array.from({ length: result.grid.rows }, (_, i) => `<span style="height:${th}px">${String.fromCharCode(65 + (i % 26))}</span>`).join('') : '';
 
   $('colorbar').classList.remove('hidden');
-  $('cbLabel').textContent = `P(${LABEL[ref]})`;
+  $('colorbar').classList.toggle('diverging', ai);
+  $('cbLabel').textContent = ai ? 'P(SSL)' : `P(${LABEL[ref]}) · your call`;
+  $('cbTop').textContent = ai ? '1.0 SSL' : '1.0'; $('cbBottom').textContent = ai ? '0 HP' : '0';
   drawFeatures();
 }
 
 // ---------- feature outlines from the literature judge ----------
-const FEAT_COLORS = ['#7cc4ff', '#c79bff', '#ffffff', '#5eead4'];
+const FEAT_COLORS = ['#ffc857', '#c79bff', '#ffffff', '#5eead4'];  // outlines must stand out on tissue and on the jet heatmap
 let keyFeatures = [];
 function drawFeatures() {
   const fc = $('feat'), g = fc.getContext('2d');
@@ -334,7 +370,7 @@ tissue.addEventListener('mousemove', e => {
   const r = tissue.getBoundingClientRect(), H = result.heat;
   const fc = Math.min(H.cols - 1, Math.floor((e.clientX - r.left) / r.width * H.cols));
   const fr = Math.min(H.rows - 1, Math.floor((e.clientY - r.top) / r.height * H.rows));
-  const ref = heatRef === 'ai' ? result.panel.top : (parsed?.call || result.panel.top);
+  const ref = heatRef === 'ai' ? 'SSA' : (parsed?.call || result.panel.top);  // AI view always reads P(SSL)
   const p = H.p_ssa[fr * H.cols + fc], s = ref === 'SSA' ? p : 1 - p;
   const feats = Object.entries(H.features || {}).sort((x, y) => y[1][fr * H.cols + fc] - x[1][fr * H.cols + fc]).slice(0, 2).map(([k]) => k.replace(/_/g, ' '));
   const tile = `${String.fromCharCode(65 + Math.floor(fr / H.sub))}${Math.floor(fc / H.sub) + 1}`;
@@ -351,9 +387,37 @@ document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
   heatRef = b.dataset.ref; drawHeat();
 });
 
+// stream text in word by word (and list items one by one) so LLM output feels like it's being written
+function reveal(root, perWord = 14, maxDelay = 1600) {
+  let i = 0;
+  const walk = node => {
+    for (const n of [...node.childNodes]) {
+      if (n.nodeType === 3 && n.textContent.trim()) {
+        const frag = document.createDocumentFragment();
+        n.textContent.split(/(\s+)/).forEach(t => {
+          if (!t) return;
+          if (/^\s+$/.test(t)) return frag.appendChild(document.createTextNode(t));
+          const w = document.createElement('span');
+          w.className = 'w'; w.textContent = t; w.style.animationDelay = Math.min(i++ * perWord, maxDelay) + 'ms';
+          frag.appendChild(w);
+        });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1 && n.tagName === 'SUP') {
+        n.classList.add('w'); n.style.animationDelay = Math.min(i * perWord, maxDelay) + 'ms';
+      } else if (n.nodeType === 1 && n.tagName === 'LI') {
+        n.classList.add('rv'); n.style.animationDelay = Math.min(i++ * perWord * 3, maxDelay) + 'ms';
+      } else if (n.nodeType === 1) walk(n);
+    }
+  };
+  walk(root);
+}
+
+// LLM citations come as [P1], [P1, P4], [P1; P2] or bare P8: render every P# as a superscript
+const cite = s => esc(s).replace(/\[\s*P\d+(?:\s*[,;&]\s*P\d+)*\s*\]|\bP\d+\b/g, m => m.match(/P\d+/g).map(r => `<sup>${r}</sup>`).join(''));
 function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
 function renderJudge(j) {
+  $('verdictCard').classList.remove('pending');
   keyFeatures = (j.key_features || []).filter(f => f.feature_id && result?.criteria?.[f.feature_id]?.usable).slice(0, 3);
   drawFeatures();
   const el = $('litSummary'); el.classList.remove('muted');
@@ -371,15 +435,17 @@ function renderJudge(j) {
     const more = (c.sources || []).length > 3 ? `<div class="src muted">+${c.sources.length - 3} more</div>` : '';
     return `<li><sup>${c.ref}</sup> <span class="ptitle">${esc(c.title)}</span>${src}${more}</li>`;
   }).join('');
-  $('litBody').innerHTML = `<p class="reason">${esc(j.reasoning).replace(/\[(P\d+)\]/g, '<sup>$1</sup>')}</p>
+  $('litBody').innerHTML = `<p class="reason">${cite(j.reasoning)}</p>
     ${feats ? `<ul class="feats">${feats}</ul>` : ''}
-    ${(j.check_by_eye || []).length ? `<div class="sub"><b>Check by eye:</b></div><ul class="feats">${j.check_by_eye.map(c => `<li>${esc(c).replace(/\[(P\d+)\]/g, '<sup>$1</sup>')}</li>`).join('')}</ul>` : ''}${cites ? `<ul class="cites">${cites}</ul>` : '<div class="sub">No papers in the library yet.</div>'}`;
+    ${(j.check_by_eye || []).length ? `<div class="sub"><b>Check by eye:</b></div><ul class="feats">${j.check_by_eye.map(c => `<li>${cite(c)}</li>`).join('')}</ul>` : ''}${cites ? `<ul class="cites">${cites}</ul>` : '<div class="sub">No papers in the library yet.</div>'}`;
+  reveal($('litBody'));
 }
 
 function renderFlags(flags) {
   if (!flags.length) return;
   const c = $('flagsCard'); c.classList.remove('hidden');
   c.innerHTML = `<h3>Trust flags</h3><ul>${flags.map(f => `<li>${esc(f)}</li>`).join('')}</ul>`;
+  reveal(c.querySelector('ul'));
 }
 
 function renderVerdict(v) {
@@ -389,6 +455,7 @@ function renderVerdict(v) {
   el.innerHTML = `<div class="headline ${cls}">${esc(v.headline)}</div><p>${esc(v.conclusion)}</p>
     ${v.look_again_at ? `<p class="sub"><b>Look again at:</b> ${esc(v.look_again_at)}</p>` : ''}
     <p class="sub">${esc(v.certainty_note)}</p>`;
+  el.querySelectorAll('p').forEach(p => reveal(p, 16, 1200));
 }
 
 window.addEventListener('resize', () => { if (img) { drawShot(); drawDim(selRect); drawHeat(); } });

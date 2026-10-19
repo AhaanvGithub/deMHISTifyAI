@@ -11,10 +11,13 @@
     <kbd>⏎ then snip</kbd>
   </form>
 <script>
-  const q = document.getElementById('q');
+  const q = document.getElementById('q'), bar = document.getElementById('f');
   document.getElementById('f').addEventListener('submit', e => {
     e.preventDefault();
-    if (q.value.trim()) { window.demhist.submit(q.value.trim()); q.value = ''; }
+    const text = q.value.trim();
+    if (!text) return;
+    bar.classList.add('leaving');  // pill shrinks away, then the snip opens
+    setTimeout(() => { window.demhist.submit(text); q.value = ''; bar.classList.remove('leaving'); }, 170);
   });
   window.demhist.onFocus(() => q.focus());
   document.addEventListener('keydown', e => { if (e.key === 'Escape') window.close?.(); });

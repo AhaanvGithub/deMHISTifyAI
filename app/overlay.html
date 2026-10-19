@@ -17,7 +17,7 @@
     <div id="tissue" class="tissue hidden">
       <canvas id="heat"></canvas>
       <canvas id="feat"></canvas>
-      <div id="colorbar" class="colorbar hidden"><div class="cb-grad"></div><div class="cb-ticks"><span>1.0</span><span>0.5</span><span>0</span></div><div id="cbLabel" class="cb-label">P(SSL)</div></div>
+      <div id="colorbar" class="colorbar hidden"><div class="cb-grad"></div><div class="cb-ticks"><span id="cbTop">1.0 SSL</span><span>0.5</span><span id="cbBottom">0 HP</span></div><div id="cbLabel" class="cb-label">P(SSL)</div></div>
       <div id="colLabels" class="axis cols"></div>
       <div id="rowLabels" class="axis rows"></div>
       <span class="handle nw"></span><span class="handle ne"></span><span class="handle sw"></span><span class="handle se"></span>
@@ -32,15 +32,16 @@
 
   <div id="heatControls" class="heat-controls hidden">
     <div class="seg">
-      <button data-ref="researcher" class="on">Your call</button>
-      <button data-ref="ai">AI's call</button>
+      <button data-ref="ai" class="on">AI's call</button>
+      <button data-ref="researcher">Your call</button>
     </div>
-    <label>Opacity <input id="opacity" type="range" min="0" max="100" value="85"></label>
+    <label>Opacity <input id="opacity" type="range" min="0" max="100" value="45"></label>
     <label class="chk"><input id="showGrid" type="checkbox" checked> Grid</label>
     <label class="chk"><input id="showFeat" type="checkbox" checked> Features</label>
   </div>
 
   <aside id="panel" class="panel hidden">
+   <div id="panelInner" class="panel-inner">
     <header>
       <span class="logo">de<b>MHIST</b>ify</span>
       <span class="scope">Validated for: colon serrated polyps</span>
@@ -49,12 +50,12 @@
     <section id="youCard" class="card"></section>
 
     <section class="card">
-      <h3>Image judges <small>8 × CONCH</small></h3>
+      <h3>Image judges <small>4 vote · 4 colour checks</small></h3>
       <div id="panelSummary" class="summary muted">waiting…</div>
       <div id="judges" class="judges"></div>
     </section>
 
-    <section class="card">
+    <section id="litCard" class="card pending">
       <h3>Literature judge <small id="judgeModel">Lumen</small></h3>
       <div id="litSummary" class="summary muted"><span class="spinner"></span> reading the papers…</div>
       <div id="litBody"></div>
@@ -62,12 +63,13 @@
 
     <section id="flagsCard" class="card flags hidden"></section>
 
-    <section class="card verdict">
+    <section id="verdictCard" class="card verdict pending">
       <h3>Verdict</h3>
       <div id="verdict" class="muted"><span class="spinner"></span> weighing everything…</div>
     </section>
 
     <footer>Research tool, not for diagnosis.</footer>
+   </div>
   </aside>
 
 <script src="overlay.js"></script>
