@@ -85,13 +85,16 @@ def parse_researcher(text: str) -> dict:
 # ---------- research LLM judge ----------
 JUDGE_SYSTEM = """You are a gastrointestinal pathology research assistant comparing two diagnoses for a colon polyp image:
 SSA = sessile serrated lesion (sessile serrated adenoma/polyp); HP = hyperplastic polyp.
-You CANNOT see the image. An image model measured how strongly each histologic feature appears (0 = much weaker than typical, 0.5 = typical, 1 = much stronger than typical, relative to a reference set of colon polyp images). These measurements are noisy.
-You also get numbered literature excerpts [P1], [P2], ... (evidence syntheses that cite primary papers with their own [n] markers; cite an excerpt as [P#]).
-Reason about THIS case: decide which features matter most here and why, the way a pathologist weighs evidence; the field is contested, so do not apply a fixed checklist.
+You CANNOT see the image. You get three kinds of evidence, with different strengths:
+1. IMAGE JUDGES: 8 image models trained on 2,175 expert-labelled polyp images (held-out AUC ~0.91, calibrated). Their probability is the strongest evidence about this specific image.
+2. MEASURABLE FEATURES: only features the image model can read with measured reliability (0 = no signal, 1 = perfect) are given, scored 0-1 relative to typical polyps (0.5 = typical). They are WEAK hints, never proof. Features listed as "not measurable" were NOT observed: do not assume they are present or absent.
+3. Numbered literature excerpts [P1], [P2], ... (evidence syntheses citing primary papers; cite an excerpt as [P#]).
+Reason about THIS case: is the image judges' call consistent with what the literature says about the measurable features? What should a pathologist verify by eye (features the model cannot measure)? How confident should one be? The field is contested; do not apply a fixed checklist.
 Cite only the provided excerpts, by their [P#] labels. Never invent citations. If the excerpts do not support a claim, say so.
 Respond with JSON only:
 {"call": "SSA" or "HP", "confidence": 0-100, "alt": the other class, "alt_confidence": 0-100,
- "key_features": [{"feature_id": "the [bracketed id] from the measurements", "feature": "short readable name", "points_to": "SSA" or "HP", "why": str, "cites": ["P#"]}]  (2-4 items),
+ "key_features": [{"feature_id": "the [bracketed id] of a measurable feature", "feature": "short readable name", "points_to": "SSA" or "HP", "why": str, "cites": ["P#"]}]  (0-3 items, measurable features only),
+ "check_by_eye": ["a feature the pathologist should verify that the model cannot measure, with [P#]"],
  "reasoning": "at most 120 words, with [P#] citations",
  "caveats": "one sentence"}"""
 
@@ -108,10 +111,18 @@ def _judge_once(cli: OpenAI, payload: str, temperature: float) -> Optional[dict]
         return None
 
 
-def research_judge(criteria: dict, papers: List[dict]) -> dict:
-    feats = "\n".join(f"- [{k}] {v['text']}: {v['score']:.2f}" for k, v in criteria.items())
+def research_judge(criteria: dict, papers: List[dict], panel: Optional[dict] = None) -> dict:
+    usable = {k: v for k, v in criteria.items() if v.get("usable")}
+    feats = "\n".join(f"- [{k}] {v['text']}: score {v['score']:.2f} (reliability {v['reliability']:.2f})"
+                      for k, v in usable.items()) or "(none)"
+    not_measurable = ", ".join(v["text"] for v in criteria.values() if not v.get("usable"))
+    judges = "(not available)"
+    if panel:
+        p_ssa = panel["top_conf"] if panel["top"] == "SSA" else panel["alt_conf"]
+        judges = f"P(SSA) = {p_ssa}%, votes {panel['votes']}, agreement {panel['agreement']:.0%}"
     refs = "\n\n".join(f"[{p['ref']}] {p['title']}\n{p['excerpt']}" for p in papers) or "(no excerpts available)"
-    payload = f"Feature measurements:\n{feats}\n\nLiterature excerpts:\n{refs}"
+    payload = (f"Image judges: {judges}\n\nMeasurable features:\n{feats}\n\n"
+               f"Not measurable by the image model: {not_measurable}\n\nLiterature excerpts:\n{refs}")
 
     cli = client()
     with ThreadPoolExecutor(N_SAMPLES) as ex:
@@ -136,6 +147,7 @@ def research_judge(criteria: dict, papers: List[dict]) -> dict:
         "alt_stated_confidence": int(rep.get("alt_confidence", 0)),
         "n_samples": len(samples),
         "key_features": rep.get("key_features", []),
+        "check_by_eye": rep.get("check_by_eye", []),
         "reasoning": rep.get("reasoning", ""),
         "caveats": rep.get("caveats", ""),
         "citations": [p for p in papers if p["ref"] in set(re.findall(r"P\d+", json.dumps(rep)))],

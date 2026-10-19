@@ -1,58 +1,128 @@
 {
   "crit:serration_to_base": {
     "mu": 0.3421367406845093,
-    "sd": 0.08239814639091492
+    "sd": 0.08239814639091492,
+    "auc_train": 0.607,
+    "points_to": "SSA",
+    "reliability": 0.214,
+    "literature_points_to": "SSA",
+    "usable": true
   },
   "crit:serration_upper_only": {
     "mu": 0.05674485117197037,
-    "sd": 0.08375628292560577
+    "sd": 0.08375628292560577,
+    "auc_train": 0.437,
+    "points_to": "HP",
+    "reliability": 0.127,
+    "literature_points_to": "HP",
+    "usable": true
   },
   "crit:dilated_crypt_base": {
     "mu": 0.3721185028553009,
-    "sd": 0.08162879198789597
+    "sd": 0.08162879198789597,
+    "auc_train": 0.483,
+    "points_to": "HP",
+    "reliability": 0.035,
+    "literature_points_to": "SSA",
+    "usable": false
   },
   "crit:boot_shaped_crypts": {
     "mu": 0.3985995054244995,
-    "sd": 0.06794781237840652
+    "sd": 0.06794781237840652,
+    "auc_train": 0.488,
+    "points_to": "HP",
+    "reliability": 0.025,
+    "literature_points_to": "SSA",
+    "usable": false
   },
   "crit:horizontal_growth": {
     "mu": 0.08847144991159439,
-    "sd": 0.06722861528396606
+    "sd": 0.06722861528396606,
+    "auc_train": 0.512,
+    "points_to": "SSA",
+    "reliability": 0.025,
+    "literature_points_to": "SSA",
+    "usable": false
   },
   "crit:inverted_t_crypts": {
     "mu": 0.3075788617134094,
-    "sd": 0.08176442980766296
+    "sd": 0.08176442980766296,
+    "auc_train": 0.542,
+    "points_to": "SSA",
+    "reliability": 0.083,
+    "literature_points_to": "SSA",
+    "usable": false
   },
   "crit:narrow_crypt_base": {
     "mu": 0.33740776777267456,
-    "sd": 0.08813489228487015
+    "sd": 0.08813489228487015,
+    "auc_train": 0.419,
+    "points_to": "HP",
+    "reliability": 0.161,
+    "literature_points_to": "HP",
+    "usable": true
   },
   "crit:mucin_at_base": {
     "mu": 0.19634434580802917,
-    "sd": 0.07267633080482483
+    "sd": 0.07267633080482483,
+    "auc_train": 0.515,
+    "points_to": "SSA",
+    "reliability": 0.03,
+    "literature_points_to": "SSA",
+    "usable": false
   },
   "crit:goblet_cells": {
     "mu": 0.2339293211698532,
-    "sd": 0.08693256229162216
+    "sd": 0.08693256229162216,
+    "auc_train": 0.629,
+    "points_to": "SSA",
+    "reliability": 0.259,
+    "literature_points_to": "HP",
+    "usable": false
   },
   "crit:microvesicular_mucin": {
     "mu": 0.0855412557721138,
-    "sd": 0.07241081446409225
+    "sd": 0.07241081446409225,
+    "auc_train": 0.559,
+    "points_to": "SSA",
+    "reliability": 0.117,
+    "literature_points_to": "HP",
+    "usable": false
   },
   "crit:crypt_branching": {
     "mu": 0.41920897364616394,
-    "sd": 0.06846854090690613
+    "sd": 0.06846854090690613,
+    "auc_train": 0.544,
+    "points_to": "SSA",
+    "reliability": 0.088,
+    "literature_points_to": "SSA",
+    "usable": false
   },
   "crit:architectural_distortion": {
     "mu": 0.26392316818237305,
-    "sd": 0.06841343641281128
+    "sd": 0.06841343641281128,
+    "auc_train": 0.44,
+    "points_to": "HP",
+    "reliability": 0.12,
+    "literature_points_to": "SSA",
+    "usable": false
   },
   "crit:normal_proliferative_zone": {
     "mu": 0.3429623544216156,
-    "sd": 0.0633598193526268
+    "sd": 0.0633598193526268,
+    "auc_train": 0.547,
+    "points_to": "SSA",
+    "reliability": 0.094,
+    "literature_points_to": "HP",
+    "usable": false
   },
   "crit:dysplasia": {
     "mu": 0.12967298924922943,
-    "sd": 0.07416535168886185
+    "sd": 0.07416535168886185,
+    "auc_train": 0.479,
+    "points_to": "HP",
+    "reliability": 0.042,
+    "literature_points_to": "SSA",
+    "usable": false
   }
 }

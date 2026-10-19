@@ -122,10 +122,11 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...)):
         yield _sse("conch", conch)
 
         # literature judge (Lumen) runs while the UI animates the image judges
-        top_feats = sorted(conch["criteria"].values(), key=lambda v: -abs(v["score"] - 0.5))[:5]
-        query = "sessile serrated lesion hyperplastic polyp " + " ".join(v["text"] for v in top_feats)
+        top_feats = [v for v in conch["criteria"].values() if v.get("usable")]
+        query = ("sessile serrated lesion hyperplastic polyp diagnostic criteria crypt architecture distortion "
+                 + " ".join(v["text"] for v in top_feats))
         papers = LIBRARY.search(query)
-        judge_future = POOL.submit(llm.research_judge, conch["criteria"], papers)
+        judge_future = POOL.submit(llm.research_judge, conch["criteria"], papers, conch["panel"])
         # while Lumen thinks, sharpen the heatmap on the GPU (stride 1/8 tile instead of 1/4)
         try:
             yield _sse("heat", engine.refine_heat(img, conch["magnification"]["tile_px"], sub=8))

@@ -354,7 +354,7 @@ document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
 function esc(s) { return String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
 function renderJudge(j) {
-  keyFeatures = (j.key_features || []).filter(f => f.feature_id).slice(0, 4);
+  keyFeatures = (j.key_features || []).filter(f => f.feature_id && result?.criteria?.[f.feature_id]?.usable).slice(0, 3);
   drawFeatures();
   const el = $('litSummary'); el.classList.remove('muted');
   if (j.error) { el.innerHTML = '<span class="warn">Literature judge unavailable (Lumen).</span>'; return; }
@@ -372,7 +372,8 @@ function renderJudge(j) {
     return `<li><sup>${c.ref}</sup> <span class="ptitle">${esc(c.title)}</span>${src}${more}</li>`;
   }).join('');
   $('litBody').innerHTML = `<p class="reason">${esc(j.reasoning).replace(/\[(P\d+)\]/g, '<sup>$1</sup>')}</p>
-    ${feats ? `<ul class="feats">${feats}</ul>` : ''}${cites ? `<ul class="cites">${cites}</ul>` : '<div class="sub">No papers in the library yet.</div>'}`;
+    ${feats ? `<ul class="feats">${feats}</ul>` : ''}
+    ${(j.check_by_eye || []).length ? `<div class="sub"><b>Check by eye:</b></div><ul class="feats">${j.check_by_eye.map(c => `<li>${esc(c).replace(/\[(P\d+)\]/g, '<sup>$1</sup>')}</li>`).join('')}</ul>` : ''}${cites ? `<ul class="cites">${cites}</ul>` : '<div class="sub">No papers in the library yet.</div>'}`;
 }
 
 function renderFlags(flags) {

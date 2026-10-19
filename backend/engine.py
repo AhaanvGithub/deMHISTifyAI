@@ -332,7 +332,11 @@ class Engine:
                 "agreement": max(votes.values()) / len(judge_results),
             },
             "criteria": {
-                k.split(":", 1)[1]: {"text": self.prompts[k], "score": round(float(snip_crit[n]), 3)}
+                k.split(":", 1)[1]: {"text": self.prompts[k], "score": round(float(snip_crit[n]), 3),
+                                     # measured on MHIST train: can CONCH actually read this feature? (research/ calibration)
+                                     "reliability": self.calib.get(k, {}).get("reliability"),
+                                     "usable": self.calib.get(k, {}).get("usable", False),
+                                     "points_to": self.calib.get(k, {}).get("points_to")}
                 for n, k in enumerate(self.criteria_keys)
             },
             "magnification": {**mag, "tile_px": tile_px},
