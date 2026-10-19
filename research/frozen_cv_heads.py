@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """Frozen-feature members for the panel: a logistic head (soft labels, 50/50 class weight) on each
-cached embedding, cross-validated on the SAME 5 folds as research/kfold_cv.py.
+cached embedding, and on a few joins of embeddings side by side (CONCH 512 + PLIP 512 -> 1024
+features beat either alone: test AUC 0.889 vs 0.873/0.872). Joins only pay off between strong,
+different models; each extra block of features is more to fit from ~1,700 images (adding QuiltNet,
+the weakest and most PLIP-like, made CONCH+PLIP worse: 0.886), so only CONCH/PLIP/MUSK joins are
+tried. Cross-validated on the SAME 5 folds as research/kfold_cv.py.
 
 For each backbone it writes data/models/cv/frozen_<name>/oof_logits.npy (out-of-fold logits on
 train) and test_logits.npy (mean of the 5 fold heads), so research/panel.py can treat frozen and
@@ -43,13 +47,19 @@ def main():
     ts = np.flatnonzero((lab["split"] == "test").to_numpy())
     folds = list(StratifiedKFold(5, shuffle=True, random_state=0).split(tr_all, y[tr_all]))  # = kfold_cv.py
 
+    feats = {}
     for name, f in EMB.items():
         path = ROOT / f"data/emb/mhist/{f}.npz"
         if not path.exists():
             print("skip", name, "(no embeddings)"); continue
         z = np.load(path)
         assert (z["names"] == names).all()
-        x = z["img_emb"][list(z["views"]).index("orig")].astype(np.float64)
+        feats[name] = z["img_emb"][list(z["views"]).index("orig")].astype(np.float64)
+    joins = [("conch", "plip"), ("conch", "musk"), ("plip", "musk"), ("conch", "plip", "musk")]
+    combos = [(k,) for k in feats] + [j for j in joins if all(k in feats for k in j)]
+    for combo in combos:
+        name = "+".join(combo)
+        x = np.hstack([feats[c] for c in combo])  # each part is standardised per fold below
         oof, test, chosen = np.full(len(names), np.nan), [], []
         for fi_tr, fi_va in folds:
             tr, va = tr_all[fi_tr], tr_all[fi_va]
