@@ -108,10 +108,58 @@ On the 977 MHIST test images, through the app's own pipeline (`docs/results/app_
 | Model | Balanced accuracy | AUC | Plain accuracy | Calibration error | Correlation with vote count |
 |---|---|---|---|---|---|
 | Fine-tuned CONCH (current release) | 0.819 | 0.908 | 0.826 | 0.034 | 0.774 |
-| Full panel | to be added after the final test run | | | | |
 
 Accuracy holds when the snip comes from a scaled screenshot (150% display: balanced accuracy 0.825,
-AUC 0.910). About 1 in 6 test tiles is a 4-3 split among the pathologists, which caps any model.
+AUC 0.910). About 1 in 6 test tiles is a 4-3 split among the pathologists, which caps any model:
+even a perfect model would agree with a fresh 7-pathologist majority only about 89-92% of the time.
+
+### Compared with published results on MHIST
+
+All rows use the official MHIST test split (977 tiles). Metrics are as reported; blank = not reported.
+F1 is weighted F1 where the source says so; ECE is calibration error (lower is better).
+
+| Method | How the model is adapted | Balanced acc. | Accuracy | AUC | F1 | ECE | Source |
+|---|---|---|---|---|---|---|---|
+| **deMHISTifyAI, current release** (fine-tuned CONCH x4) | Last 2 blocks fine-tuned, soft labels, calibrated | **0.819** | **0.826** | **0.908** | **0.827** | **3.4%** | this repo |
+| **deMHISTifyAI, full panel** | Section above | to be added after the final test run | | | | | this repo |
+| Virchow2, LoRA fine-tuned | LoRA | | | | ~0.875 (derived) | | THUNDER [2] |
+| CONCH, LoRA fine-tuned | LoRA | | | | ~0.851 (derived) | | THUNDER [2] |
+| UNI, LoRA fine-tuned | LoRA | | | | ~0.847 (derived) | | THUNDER [2] |
+| Virchow2 | Frozen + linear | 0.848 | | | 0.836 | 0.6% | THUNDER [2] |
+| H-optimus-0 | Frozen + linear | 0.837 | | | 0.828 | 1.6% | THUNDER [2] |
+| Virchow | Frozen + linear | 0.827 | | | 0.823 | 3.5% | THUNDER [2] |
+| UNI | Frozen + linear | 0.825 | | | 0.824 | 3.1% | THUNDER [2] |
+| DINOv2-B (natural images) | Frozen + linear | 0.819 | | | 0.826 | 0.6% | THUNDER [2] |
+| CONCH | Frozen + linear | 0.800 | | | 0.797 | 3.2% | THUNDER [2] |
+| MUSK | Frozen + linear | 0.792 | | | 0.800 | 7.0% | THUNDER [2] |
+| PLIP | Frozen + linear | 0.790 | | | 0.785 | 1.7% | THUNDER [2] |
+| QuiltNet | Frozen + linear | 0.735 | | | 0.735 | 1.8% | THUNDER [2] |
+| Virchow2 | Frozen + MLP head | 0.861 | | | | | EVA protocol [3] |
+| UNI / H-optimus-0 | Frozen + MLP head | 0.843 | | | | | EVA protocol [3] |
+| CONCH | Frozen + MLP head | 0.832 | | | | | EVA protocol [3] |
+| Virchow | Frozen + linear | 0.830 | 0.834 | | 0.835 | | Virchow paper [4] |
+| ImageNet ViT (natural images) | Frozen + linear | 0.821 | 0.826 | | 0.827 | | Virchow paper [4] |
+| CTransPath | Frozen + linear | 0.801 | 0.817 | | 0.816 | | Virchow paper [4] |
+| ResNet-18, ImageNet-pretrained | Fully fine-tuned | | | 0.927 | | | MHIST paper [1] |
+| ResNet-18, from scratch | Fully trained | | | 0.845 | | | MHIST paper [1] |
+
+How the protocols differ:
+- **deMHISTifyAI**: every choice (epochs, weights, cut-off) is made on training images; the test split is
+  scored once.
+- **[1] MHIST paper**: AUC is the mean of each run's 5 best test-set epochs over 10 seeds, so the epoch is
+  chosen on the test split. It reports AUC only.
+- **[2] THUNDER** (NeurIPS 2025, 23 models): frozen features with a linear classifier, 95% confidence
+  intervals of about +-2.5 points on MHIST. LoRA rows are derived as THUNDER's frozen F1 plus its reported
+  LoRA gain on MHIST (Virchow2 +3.9, CONCH +5.4, UNI +2.3 points).
+- **[3] EVA** (kaiko.ai protocol, values from the MINT paper): frozen features with an MLP head, 5 runs;
+  EVA uses the MHIST test split for early stopping and checkpoint selection.
+- **[4] Virchow paper**: frozen features with a linear classifier (appendix table A4).
+
+Sources:
+[1] Wei et al., *A Petri Dish for Histopathology Image Analysis*, 2021 ([arXiv 2101.12355](https://arxiv.org/abs/2101.12355)).
+[2] *THUNDER: Tile-level Histopathology image UNDERstanding benchmark*, NeurIPS 2025, tables S38, S39, S52 and table 3 ([arXiv 2507.07860](https://arxiv.org/abs/2507.07860)).
+[3] *MINT: Molecularly Informed Training with Spatial Transcriptomics Supervision for Pathology Foundation Models*, table 2 ([arXiv 2603.07895](https://arxiv.org/abs/2603.07895)); protocol: [kaiko.ai eva](https://kaiko-ai.github.io/eva/main/leaderboards/).
+[4] Vorontsov et al., *Virchow: A Million-Slide Digital Pathology Foundation Model*, table A4 ([arXiv 2309.07778](https://arxiv.org/abs/2309.07778)).
 
 Supporting analyses:
 
