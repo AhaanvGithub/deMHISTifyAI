@@ -63,3 +63,12 @@ fold. The overnight runner (scratchpad `queue_runner.py`) handled the allowed ho
 - `research/finetune_conch.run()` saves to `data/models/conch_ft_seed{N}.pt`, which the app loads as
   judges; scripts that reuse it must block that save (see `research/finetune_learning_curve.py`).
 - Report AUC, plain accuracy and balanced accuracy; headline metric still to be decided.
+
+## To do
+
+- [ ] **MUSK + LoRA** (Tuesday, only if MUSK earns a place in the panel): MUSK is too large to fine-tune
+      fully on 8 GB, so tonight it trains only its last 2 of 24 layers. LoRA adds small trainable pieces to
+      every layer within the same memory; THUNDER reports +2 to +8 F1 points from LoRA on MHIST over frozen
+      features. Needs the `peft` library; ~2 h for 5 folds + final retrain. Keep it only if its out-of-fold
+      AUC beats the 2-layer version.
+
