@@ -115,31 +115,32 @@ even a perfect model would agree with a fresh 7-pathologist majority only about 
 
 ### Compared with published results on MHIST
 
-All rows use the official MHIST test split (977 tiles). Metrics are as reported; blank = not reported.
+All rows use the official MHIST test split (977 tiles), sorted by balanced accuracy; rows that do not
+report it follow. Metrics are as reported; blank = not reported.
 F1 is weighted F1 where the source says so; ECE is calibration error (lower is better).
 
 | Method | How the model is adapted | Balanced acc. | Accuracy | AUC | F1 | ECE | Source |
 |---|---|---|---|---|---|---|---|
-| **deMHISTifyAI, current release** (fine-tuned CONCH x4) | Last 2 blocks fine-tuned, soft labels, calibrated | **0.819** | **0.826** | **0.908** | **0.827** | **3.4%** | this repo |
-| **deMHISTifyAI, full panel** | Section above | to be added after the final test run | | | | | this repo |
-| Virchow2, LoRA fine-tuned | LoRA | | | | ~0.875 (derived) | | THUNDER [2] |
-| CONCH, LoRA fine-tuned | LoRA | | | | ~0.851 (derived) | | THUNDER [2] |
-| UNI, LoRA fine-tuned | LoRA | | | | ~0.847 (derived) | | THUNDER [2] |
+| Virchow2 | Frozen + MLP head | 0.861 | | | | | EVA protocol [3] |
 | Virchow2 | Frozen + linear | 0.848 | | | 0.836 | 0.6% | THUNDER [2] |
+| UNI / H-optimus-0 | Frozen + MLP head | 0.843 | | | | | EVA protocol [3] |
 | H-optimus-0 | Frozen + linear | 0.837 | | | 0.828 | 1.6% | THUNDER [2] |
+| CONCH | Frozen + MLP head | 0.832 | | | | | EVA protocol [3] |
+| Virchow | Frozen + linear | 0.830 | 0.834 | | 0.835 | | Virchow paper [4] |
 | Virchow | Frozen + linear | 0.827 | | | 0.823 | 3.5% | THUNDER [2] |
 | UNI | Frozen + linear | 0.825 | | | 0.824 | 3.1% | THUNDER [2] |
+| ImageNet ViT (natural images) | Frozen + linear | 0.821 | 0.826 | | 0.827 | | Virchow paper [4] |
+| **deMHISTifyAI, current release** (fine-tuned CONCH x4) | Last 2 blocks fine-tuned, soft labels, calibrated | **0.819** | **0.826** | **0.908** | **0.827** | **3.4%** | this repo |
 | DINOv2-B (natural images) | Frozen + linear | 0.819 | | | 0.826 | 0.6% | THUNDER [2] |
+| CTransPath | Frozen + linear | 0.801 | 0.817 | | 0.816 | | Virchow paper [4] |
 | CONCH | Frozen + linear | 0.800 | | | 0.797 | 3.2% | THUNDER [2] |
 | MUSK | Frozen + linear | 0.792 | | | 0.800 | 7.0% | THUNDER [2] |
 | PLIP | Frozen + linear | 0.790 | | | 0.785 | 1.7% | THUNDER [2] |
 | QuiltNet | Frozen + linear | 0.735 | | | 0.735 | 1.8% | THUNDER [2] |
-| Virchow2 | Frozen + MLP head | 0.861 | | | | | EVA protocol [3] |
-| UNI / H-optimus-0 | Frozen + MLP head | 0.843 | | | | | EVA protocol [3] |
-| CONCH | Frozen + MLP head | 0.832 | | | | | EVA protocol [3] |
-| Virchow | Frozen + linear | 0.830 | 0.834 | | 0.835 | | Virchow paper [4] |
-| ImageNet ViT (natural images) | Frozen + linear | 0.821 | 0.826 | | 0.827 | | Virchow paper [4] |
-| CTransPath | Frozen + linear | 0.801 | 0.817 | | 0.816 | | Virchow paper [4] |
+| **deMHISTifyAI, full panel** | Section above | to be added after the final test run | | | | | this repo |
+| Virchow2, LoRA fine-tuned | LoRA | | | | ~0.875 (derived) | | THUNDER [2] |
+| CONCH, LoRA fine-tuned | LoRA | | | | ~0.851 (derived) | | THUNDER [2] |
+| UNI, LoRA fine-tuned | LoRA | | | | ~0.847 (derived) | | THUNDER [2] |
 | ResNet-18, ImageNet-pretrained | Fully fine-tuned | | | 0.927 | | | MHIST paper [1] |
 | ResNet-18, from scratch | Fully trained | | | 0.845 | | | MHIST paper [1] |
 
