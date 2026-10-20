@@ -47,9 +47,9 @@ Models and data are not included; each user obtains access themselves (see Repro
 | Capture | The screen is captured in true colour (Windows GDI, through the backend) when the snip screen opens |
 | Field | The scale bar is read with Windows' built-in OCR to size a 448 µm square; without one, tissue is separated from glass and viewer chrome by colour |
 | Image panel | ConvNeXt-Base and MUSK each score the field; their weighted, calibrated combination gives P(SSL) and the call |
-| Unlike-training-data check | The field's ConvNeXt features are compared with the 2,175 training images; beyond what 99% of training images reach, the panel warns that its call may not apply |
+| Unlike-training-data check | The field's ConvNeXt features are compared with the 2,175 training images; beyond what 99% of training images reach, the panel warns that its call may not apply. Far beyond anything real tissue reached (photos, noise, screen content), the crypt measurements and the literature judge are skipped and the verdict says the selection isn't colon tissue |
 | Evidence map | Each region of the field is blurred out in turn and the change in ConvNeXt's score is recorded: 16 x 16 regions first, then 32, 64 and 128 while the literature judge runs |
-| Crypts | Crypts are found by their pale interior and ring of nuclei, outlined to the edge of the nuclear band, and measured: width (dilated), lumen edge roughness (serrated), shape (round and regular) |
+| Crypts | Crypts are found by their pale interior and ring of nuclei, outlined to the edge of the nuclear band, and measured: width (dilated: wider than the field's other crypts), lumen edge roughness (serrated), shape (round and regular). Each crypt also carries the evidence map's value over its outline |
 | Feature scores | CONCH compares the field with text descriptions of WHO-2019 features; only features whose direction on training images matches the literature are passed on |
 | Literature judge | An LLM (Lumen) checks whether the panel's call is consistent with what was measured on this field (the crypts, with their positions and known strength, and the usable feature scores) and with passages retrieved from a curated library for what this field shows plus the WHO 2019 criteria. It answers 5 times; the shown answer is the cleanest of the majority: no invented citations, no overclaiming, evidence only from what was measured, and nothing unmeasured described as seen. It says what to check by eye and where. It never sees the image, and is skipped for selections that aren't colon tissue |
 | Verdict | Compares your call and stated certainty with the panel's calibrated percentage, the measurements and the literature judge |
@@ -69,7 +69,7 @@ Models and data are not included; each user obtains access themselves (see Repro
 | Crypts measured, not matched to text | Matching image regions to WHO phrases located features poorly; measured outlines follow real glands, and their thresholds come from MHIST training crypts |
 | Warn on unfamiliar input | Trained on two classes only, the panel would otherwise call anything (glass, photos, other stains) HP |
 | Literature judge checks, it doesn't decide | It can't see the image; its job is to say whether the image evidence fits the literature, what is weak, and what to look at |
-| Every number from training data; test scored once | So the reported results show what to expect on new slides |
+| Every number from training data (or, for the unfamiliar-input limits, outside data); the test split scored once | So the reported results show what to expect on new slides |
 
 ---
 
@@ -239,7 +239,7 @@ Supporting analyses:
 | Do the map and the crypt measurements agree? | In SSL fields, yes: dilated crypts sit on SSL-pushing evidence about 3x more than round regular crypts (+0.25 vs +0.08). In HP fields the model treats even wide crypts as HP-typical, which is why pooling all fields hides the agreement | `docs/results/evidence_vs_crypts.json` |
 | Does stain normalisation help? | No: Reinhard, Macenko, Vahadane and a derived method all score slightly below no normalisation, on MHIST and on four simulated labs (ConvNeXt-Base, held-out training folds). The app uses images as they are | `docs/results/stain_compare.json` |
 | Does it hold up on another hospital's slides? | UniToPatho (Turin; different scanner and stain), each patch's centre 448 µm through the app: the panel calls 99.6% of 545 hyperplastic polyps (41 slides) HP, and also every adenoma and normal-colon field (neither class exists in MHIST). Median P(SSL) falls from HP (0.023) to adenoma (0.015) to normal (0.007), and the crypt measurements follow the biology: serrated crypts are 27% of labelled crypts in HP but 6% in adenoma and 3% in normal colon. 11-21% of these fields are flagged as unlike the training data. UniToPatho has no SSLs, so outside SSL detection is untested | `docs/results/unitopatho_panel_check.json` |
-| Does the unlike-training-data check work? | It flags all 16 non-tissue and wrong-stain test images (photos, noise, a brown immunostain, a photo recoloured in H&E colours) and 1% of MHIST training images by design. In the app it flags about 1% of MHIST test fields and, on UniToPatho, 19% of HP, 11% of adenoma and 21% of normal colon fields. Frozen CONCH features flagged 51% of the outside HP and were not used | `research/export_panel.py` |
+| Does the unlike-training-data check work? | It flags all 16 non-tissue and wrong-stain test images (photos, noise, a brown immunostain, a photo recoloured in H&E colours) and 1% of MHIST training images by design. In the app it flags about 1% of MHIST test fields and, on UniToPatho, 19% of HP, 11% of adenoma and 21% of normal colon fields. Frozen CONCH features flagged 51% of the outside HP and were not used. Real colon tissue from another lab reached a distance of 0.57 at most, photos and noise 0.71 or more, so above 0.65 the selection is treated as not tissue (a brown immunostain, 0.55, only gets the caution) | `research/export_panel.py` |
 
 Scope: trained on MHIST (one lab, about 5x). Slides that look very different, e.g. much higher power or a
 very different stain, are outside what the models have learned; the unlike-training-data check warns about
@@ -280,6 +280,15 @@ python research/feature_calibration.py
 
 # demo image opened at start-up (needs the UniToPatho HP patches in data/unitopatho/)
 python research/make_demo_image.py
+
+# checks of the app as built (nothing is chosen from these)
+python research/eval_app_panel.py            # test tiles through the app's own path
+python research/unitopatho_panel_check.py    # another hospital's slides
+python research/scale_stress.py 0            # scale-bar reading on generated viewer screens (seeds 0, 1, 2)
+python research/map_faithfulness.py          # deletion test for the evidence map
+python research/evidence_vs_crypts.py        # evidence map vs crypt measurements
+python research/judge_eval.py <old llm.py>   # literature judge rule checks (uses Lumen)
+python research/stability_check.py           # repeated and overlapping analyses against a running backend
 ```
 
 ---
