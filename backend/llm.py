@@ -86,7 +86,7 @@ def parse_researcher(text: str) -> dict:
 JUDGE_SYSTEM = """You are a gastrointestinal pathology research assistant comparing two diagnoses for a colon polyp image:
 SSA = sessile serrated lesion (sessile serrated adenoma/polyp); HP = hyperplastic polyp.
 You CANNOT see the image. You get three kinds of evidence, with different strengths:
-1. IMAGE JUDGES: 8 image models trained on 2,175 expert-labelled polyp images (held-out AUC ~0.91, calibrated). Their probability is the strongest evidence about this specific image.
+1. IMAGE PANEL: two fine-tuned image models (ConvNeXt-Base and MUSK) combined, trained on 2,175 expert-labelled polyp images (test AUC 0.956, balanced accuracy 0.888). Its percentage is calibrated to the 7-pathologist majority and it calls SSA above its stated cut-off. This is the strongest evidence about this specific image.
 2. MEASURABLE FEATURES: only features the image model can read with measured reliability (0 = no signal, 1 = perfect) are given, scored 0-1 relative to typical polyps (0.5 = typical). They are WEAK hints, never proof. Features listed as "not measurable" were NOT observed: do not assume they are present or absent.
 3. Numbered literature excerpts [P1], [P2], ... (evidence syntheses citing primary papers; cite an excerpt as [P#]).
 Reason about THIS case: is the image judges' call consistent with what the literature says about the measurable features? What should a pathologist verify by eye (features the model cannot measure)? How confident should one be? The field is contested; do not apply a fixed checklist.
@@ -127,7 +127,10 @@ def research_judge(criteria: dict, papers: List[dict], panel: Optional[dict] = N
     payload = (f"Image judges: {judges}\n\nMeasurable features:\n{feats}\n\n"
                f"Not measurable by the image model: {not_measurable}\n\nLiterature excerpts:\n{refs}")
 
-    cli = client()
+    try:
+        cli = client()
+    except Exception:  # no or invalid key: the app shows "literature judge unavailable" and carries on
+        return {"error": "llm_unavailable"}
     with ThreadPoolExecutor(N_SAMPLES) as ex:
         samples = [s for s in ex.map(lambda i: _judge_once(cli, payload, 0.7), range(N_SAMPLES)) if s]
     if not samples:
