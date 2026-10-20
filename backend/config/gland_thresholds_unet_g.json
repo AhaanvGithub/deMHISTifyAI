@@ -1,9 +1,9 @@
 {
   "basis": "gland",
   "dilated_width_um": 76.9,
-  "serrated_roughness": 1.508,
+  "serrated_roughness": 1.51,
   "round_solidity": 0.965,
   "round_eccentricity": 0.75,
-  "round_max_um": 57.3,
-  "source": "unet_g finder: 9832 crypts in 600 MHIST training images (research/gland_thresholds.py)"
+  "round_max_um": 56.7,
+  "source": "unet_g finder: 9832 crypts in 598 MHIST training images (research/gland_thresholds.py)"
 }

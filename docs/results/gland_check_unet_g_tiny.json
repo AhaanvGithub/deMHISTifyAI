@@ -1,0 +1,23 @@
+{
+  "finder": "unet_g",
+  "images": 1575,
+  "images_with_labelled_crypts": 1405,
+  "dilated": {
+    "spearman_vs_ssl_votes": 0.447,
+    "auc_ssl_vs_hp": 0.679,
+    "mean_share_hp": 0.438,
+    "mean_share_ssl": 0.69
+  },
+  "round": {
+    "spearman_vs_ssl_votes": -0.447,
+    "auc_ssl_vs_hp": 0.321,
+    "mean_share_hp": 0.562,
+    "mean_share_ssl": 0.31
+  },
+  "serrated": {
+    "spearman_vs_ssl_votes": NaN,
+    "auc_ssl_vs_hp": 0.5,
+    "mean_share_hp": 0.0,
+    "mean_share_ssl": 0.0
+  }
+}

@@ -35,10 +35,30 @@ trained on the other half. The app uses a model trained on all 165 images.
   0.88 -> 0.85). On MHIST this mainly hides two touching crypts merged into one U or W shape. Fewer, right outlines
   beat many shaky ones.
 
-U-Net details: ConvNeXt-Tiny encoder (ImageNet), U-Net decoder, three classes (stroma / gland / gland border, so
+U-Net details: ConvNeXt encoder (ImageNet), U-Net decoder, three classes (stroma / gland / gland border, so
 touching glands come apart). Training images are shrunk to 2 um/px and enlarged 2x, so the network sees what an
 MHIST tile shows. Random scale 0.85-1.18 (MHIST is ~1.8-2.2 um/px), flips, rotations, stain jitter. 80 epochs.
-Inference averages 8 flips/rotations. `research/train_gland_net.py`, weights `data/models/gland_net.pt`.
+Inference averages 8 flips/rotations in one batch. `research/train_gland_net.py`.
+
+**Bigger encoder.** ConvNeXt-Base (88M parameters) vs Tiny (28M), both trained on the same patient half and scored
+on the other half's images (`research/compare_gland_nets.py`, `docs/results/gland_net_tiny_vs_base.json`):
+
+| GlaS, unseen patients | Tiny F1 | Base F1 |
+|---|---|---|
+| All benign glands (282) | 0.889 | **0.908** |
+| Healthy colon (36) | 0.909 | **0.957** |
+| Adenoma (246) | 0.887 | **0.901** |
+| Benign glands not cut by the edge (87) | 0.908 | 0.904 |
+| Cancer, all (354) | 0.728 | **0.768** |
+
+The gain is mostly on glands cut by the field edge. It's modest and from one patient half, but in the same direction
+in every group. The app uses Base (`data/models/gland_net_base.pt`) and falls back to Tiny (`gland_net.pt`), then to
+the classical finder. More expert-outlined data (CRAG, Warwick) would be the next step, but it's behind a login.
+
+**Speed.** Per field on an RTX 5060 laptop GPU: the network (8 views, Tiny) takes 0.14 s, and 1 view 0.04 s. Most of
+the time was the measuring on the CPU, which now skips what labels from the outline don't use (nuclear-ring share,
+lumen roughness): same labels on 30/30 fields, 2.4x faster. So fewer views would save almost nothing, and a bigger
+network is cheap.
 
 ## 2. Same field, same crypts: raw tile vs screen snip (100 MHIST training fields)
 
@@ -50,7 +70,7 @@ two crypt sets (1.0 = identical):
 | Zoom 1.5x | 0.77 | **0.94** |
 | Zoom 2.37x | 0.77 | **0.94** |
 | Zoom 3.3x | 0.78 | **0.94** |
-| Zoom 2.37x, box shifted 4% | 0.66 | **0.90** |
+| Zoom 2.37x, box shifted 4% | 0.66 | **0.92** (Tiny 0.90) |
 
 Matched outlines overlap at IoU 0.94 (classical 0.83). The U-Net first brings any field to MHIST's own 224 px, so a
 snip and a tile carry the same detail. Matched crypts keep the same label 91-92% of the time when zoomed
@@ -66,12 +86,13 @@ it SSL (`research/gland_check.py`; none of the 600 images that set the threshold
 |---|---|---|---|---|
 | Classical | 0.18 | 0.58 | -0.27 | 1,222 |
 | U-Net outlines, labels from the pale interior | 0.32 | 0.61 | -0.32 | 1,170 |
-| **U-Net outlines, labels from the crypt outline** | **0.45** | **0.68** | **-0.45** | **1,405** |
+| U-Net (Tiny) outlines, labels from the crypt outline | 0.45 | 0.68 | -0.45 | 1,405 |
+| **U-Net (Base) outlines, labels from the crypt outline (shipped)** | **0.47** | **0.69** | **-0.47** | **1,414** |
 
-Labels from the outline use the same rules as before, recomputed on the U-Net's crypts in the same 600 training
-images (`backend/config/gland_thresholds_unet_g.json`): dilated = outline width at or above the 90th percentile
-(76.9 um) and >= 1.5x the field's median; round regular = solidity >= 60th percentile (0.965), eccentricity <= 0.75,
-no larger than the median crypt (57.3 um). Measuring the pale interior made sense when the outlines were unreliable.
+Labels from the outline use the same rules as before, recomputed on the shipped finder's crypts in the same 600
+training images (`backend/config/gland_thresholds_unet_g.json`): dilated = outline width at or above the 90th
+percentile (76.9 um) and >= 1.5x the field's median; round regular = solidity >= 60th percentile (0.965),
+eccentricity <= 0.75, no larger than the median crypt (56.7 um). Measuring the pale interior made sense when the outlines were unreliable.
 Now that they're reliable, the crypt itself is the better thing to measure.
 
 ## 4. Can "serrated" be seen at ~2 um/px? No. Dropped.

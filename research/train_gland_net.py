@@ -2,7 +2,7 @@
 """Train the gland outliner (backend/gland_net.py) on GlaS (165 H&E colon images, 0.62 um/px, expert gland outlines;
 data/glas/Warwick_QU_Dataset), shrunk to MHIST's ~2 um/px so the network sees what an MHIST tile shows.
 
-    python research/train_gland_net.py fold0 | fold1 | final
+    python research/train_gland_net.py fold0 | fold1 | final  [--enc base]
 
 fold0 / fold1: trained on half of the GlaS patients, so every GlaS image can be scored by a model that never saw
 its patient (research/score_crypt_finders.py). final: all 165 images -> data/models/gland_net.pt (used on MHIST).
@@ -104,17 +104,21 @@ def stain_jitter(a, rng):
     return np.clip(out, 0, 1).astype(np.float32)
 
 
-def train(which: str):
+ENCODERS = {"tiny": "convnext_tiny.fb_in22k_ft_in1k", "base": "convnext_base.fb_in22k_ft_in1k"}
+
+
+def train(which: str, enc: str = "tiny"):
     import torch
     import torch.nn.functional as F
     g = glas_table()
     tr = g if which == "final" else g[g.fold != int(which[-1])]
     data = [load(n) for n in tr.name]
-    out = GN.WEIGHTS if which == "final" else GN.WEIGHTS.with_name(f"gland_net_{which}.pt")
+    tag = "" if enc == "tiny" else f"_{enc}"
+    out = GN.WEIGHTS.with_name(f"gland_net{tag}.pt" if which == "final" else f"gland_net{tag}_{which}.pt")
     out.parent.mkdir(parents=True, exist_ok=True)
     torch.manual_seed(0)
     rng = np.random.default_rng(0)
-    net = GN.build(pretrained=True).cuda()
+    net = GN.build(pretrained=True, encoder=ENCODERS[enc]).cuda()
     enc = [p for n, p in net.named_parameters() if n.startswith("enc.")]
     dec = [p for n, p in net.named_parameters() if not n.startswith("enc.")]
     opt = torch.optim.AdamW([{"params": enc, "lr": 1e-4}, {"params": dec, "lr": 5e-4}], weight_decay=1e-4)
@@ -153,5 +157,7 @@ def train(which: str):
 
 
 if __name__ == "__main__":
-    for w in sys.argv[1:]:
-        train(w)
+    args = sys.argv[1:]
+    enc = args[args.index("--enc") + 1] if "--enc" in args else "tiny"
+    for w in [a for a in args if a.startswith(("fold", "final"))]:
+        train(w, enc)

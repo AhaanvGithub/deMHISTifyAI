@@ -142,7 +142,8 @@ def measure(field: Image.Image) -> List[dict]:
     return out
 
 
-def _describe(gland: np.ndarray, interior: np.ndarray, p, whiteish: np.ndarray, ring: float) -> Optional[dict]:
+def _describe(gland: np.ndarray, interior: np.ndarray, p, whiteish: np.ndarray, ring: Optional[float],
+              rough_too: bool = True) -> Optional[dict]:
     """Outline and measurements of one crypt: its gland mask, its pale interior (regionprops `p`), its ring share."""
     from skimage import measure as M
     cs = M.find_contours(np.pad(gland, 1).astype(float), 0.5)
@@ -151,7 +152,8 @@ def _describe(gland: np.ndarray, interior: np.ndarray, p, whiteish: np.ndarray, 
     c = M.approximate_polygon(max(cs, key=len) - 1, tolerance=0.7)
     lum = M.label(whiteish & interior)
     lp = max(M.regionprops(lum), key=lambda q: q.area) if lum.max() else None
-    rough = float(M.perimeter(lp.image) / max(M.perimeter(lp.image_convex), 1e-6)) if lp is not None and lp.area >= 12 else None
+    rough = (float(M.perimeter(lp.image) / max(M.perimeter(lp.image_convex), 1e-6))
+             if rough_too and lp is not None and lp.area >= 12 else None)
     return {
         "outline": [[round(float(x) / S, 4), round(float(y) / S, 4)] for y, x in c],
         "center": [round(float(p.centroid[1]) / S, 4), round(float(p.centroid[0]) / S, 4)],
@@ -161,14 +163,15 @@ def _describe(gland: np.ndarray, interior: np.ndarray, p, whiteish: np.ndarray, 
         "roughness": round(rough, 3) if rough is not None else None,
         "solidity": round(float(p.solidity), 3),
         "eccentricity": round(float(p.eccentricity), 3),
-        "ring": round(float(ring), 2),
+        "ring": round(float(ring), 2) if ring is not None else None,
     }
 
 
-def measure_masks(field: Image.Image, masks: List[np.ndarray]) -> List[dict]:
+def measure_masks(field: Image.Image, masks: List[np.ndarray], fast: bool = False) -> List[dict]:
     """Same measurements for crypts outlined by another finder (boolean gland masks, any square size). The crypt
     interior is the pale part inside each gland, found exactly as in measure(); a gland with no pale interior
-    (a collapsed, slit-like crypt) keeps its outline but gets no measurements and so no label."""
+    (a collapsed, slit-like crypt) keeps its outline but gets no measurements and so no label.
+    fast: skip what labels from the outline don't use (the nuclear-ring share and lumen roughness), ~2x faster."""
     from skimage import measure as M, morphology
     from skimage.transform import resize
 
@@ -189,16 +192,16 @@ def measure_masks(field: Image.Image, masks: List[np.ndarray]) -> List[dict]:
             keep[(lab == p.label) & (keep == 0)] = len(props) + 1
             props.append(p)
             idx.append(k)
-    _, ring_share = _grow_to_gland_edge(keep, len(props), hema, tissue) if props else (None, {})
+    _, ring_share = _grow_to_gland_edge(keep, len(props), hema, tissue) if props and not fast else (None, {})
     out = []
     for k, m in enumerate(gl):
         if k in idx:
             i = idx.index(k) + 1
-            g = _describe(m, keep == i, props[i - 1], whiteish, ring_share.get(i, 0))
+            g = _describe(m, keep == i, props[i - 1], whiteish, None if fast else ring_share.get(i, 0), not fast)
         else:
             cy, cx = np.argwhere(m).mean(0) if m.any() else (0, 0)
             g = _describe(m, np.zeros_like(m), SimpleNamespace(centroid=(cy, cx), area=0, axis_minor_length=0,
-                                                               solidity=0, eccentricity=0), whiteish, 0)
+                                                               solidity=0, eccentricity=0), whiteish, None if fast else 0, not fast)
             if g:
                 g.update(crypt_um=None, width_um=None, solidity=None, eccentricity=None)
         if g:
@@ -218,7 +221,7 @@ SHOW_SERRATED = False   # lumen roughness barely tells serrated from smooth cryp
 
 def finder() -> str:
     import gland_net
-    return "unet" if gland_net.WEIGHTS.exists() else "classical"
+    return "unet" if gland_net.available() else "classical"
 
 
 def find(field: Image.Image) -> List[dict]:
@@ -230,7 +233,7 @@ def find(field: Image.Image) -> List[dict]:
             masks = gland_net.outlines(field)
         # labels from the crypt's own outline: on 1,575 held-out MHIST training images "dilated" tracks the
         # pathologists' SSL votes at Spearman 0.45 (0.32 from the pale interior, 0.18 with the classical finder)
-        return label(measure_masks(field, masks), thresholds("unet_g"))
+        return label(measure_masks(field, masks, fast=True), thresholds("unet_g"))
     return label(measure(field))
 
 

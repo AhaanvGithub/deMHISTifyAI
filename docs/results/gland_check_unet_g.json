@@ -1,18 +1,18 @@
 {
   "finder": "unet_g",
   "images": 1575,
-  "images_with_labelled_crypts": 1405,
+  "images_with_labelled_crypts": 1414,
   "dilated": {
-    "spearman_vs_ssl_votes": 0.447,
-    "auc_ssl_vs_hp": 0.679,
-    "mean_share_hp": 0.438,
-    "mean_share_ssl": 0.69
+    "spearman_vs_ssl_votes": 0.466,
+    "auc_ssl_vs_hp": 0.692,
+    "mean_share_hp": 0.433,
+    "mean_share_ssl": 0.71
   },
   "round": {
-    "spearman_vs_ssl_votes": -0.447,
-    "auc_ssl_vs_hp": 0.321,
-    "mean_share_hp": 0.562,
-    "mean_share_ssl": 0.31
+    "spearman_vs_ssl_votes": -0.466,
+    "auc_ssl_vs_hp": 0.308,
+    "mean_share_hp": 0.567,
+    "mean_share_ssl": 0.29
   },
   "serrated": {
     "spearman_vs_ssl_votes": NaN,

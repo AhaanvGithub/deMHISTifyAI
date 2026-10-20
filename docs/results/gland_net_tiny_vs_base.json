@@ -1,0 +1,120 @@
+{
+  "what": "Tiny vs Base encoder for the gland outliner, on the same unseen GlaS patients: both trained on one patient half",
+  "images": 87,
+  "tiny": {
+    "interior / benign": {
+      "gt_crypts": 87,
+      "precision": 0.857,
+      "recall": 0.966,
+      "f1": 0.908,
+      "mean_iou_matched": 0.909
+    },
+    "interior / healthy": {
+      "gt_crypts": 10,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "mean_iou_matched": 0.926
+    },
+    "interior / adenomatous": {
+      "gt_crypts": 77,
+      "precision": 0.841,
+      "recall": 0.961,
+      "f1": 0.897,
+      "mean_iou_matched": 0.907
+    },
+    "interior / cancer": {
+      "gt_crypts": 58,
+      "precision": 0.4,
+      "recall": 0.828,
+      "f1": 0.539,
+      "mean_iou_matched": 0.854
+    },
+    "all / benign": {
+      "gt_crypts": 282,
+      "precision": 0.944,
+      "recall": 0.84,
+      "f1": 0.889,
+      "mean_iou_matched": 0.886
+    },
+    "all / healthy": {
+      "gt_crypts": 36,
+      "precision": 1.0,
+      "recall": 0.833,
+      "f1": 0.909,
+      "mean_iou_matched": 0.891
+    },
+    "all / adenomatous": {
+      "gt_crypts": 246,
+      "precision": 0.937,
+      "recall": 0.841,
+      "f1": 0.887,
+      "mean_iou_matched": 0.885
+    },
+    "all / cancer": {
+      "gt_crypts": 354,
+      "precision": 0.772,
+      "recall": 0.689,
+      "f1": 0.728,
+      "mean_iou_matched": 0.839
+    }
+  },
+  "base": {
+    "interior / benign": {
+      "gt_crypts": 87,
+      "precision": 0.842,
+      "recall": 0.977,
+      "f1": 0.904,
+      "mean_iou_matched": 0.908
+    },
+    "interior / healthy": {
+      "gt_crypts": 10,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "mean_iou_matched": 0.926
+    },
+    "interior / adenomatous": {
+      "gt_crypts": 77,
+      "precision": 0.824,
+      "recall": 0.974,
+      "f1": 0.893,
+      "mean_iou_matched": 0.905
+    },
+    "interior / cancer": {
+      "gt_crypts": 58,
+      "precision": 0.392,
+      "recall": 0.845,
+      "f1": 0.536,
+      "mean_iou_matched": 0.864
+    },
+    "all / benign": {
+      "gt_crypts": 282,
+      "precision": 0.939,
+      "recall": 0.879,
+      "f1": 0.908,
+      "mean_iou_matched": 0.887
+    },
+    "all / healthy": {
+      "gt_crypts": 36,
+      "precision": 1.0,
+      "recall": 0.917,
+      "f1": 0.957,
+      "mean_iou_matched": 0.908
+    },
+    "all / adenomatous": {
+      "gt_crypts": 246,
+      "precision": 0.931,
+      "recall": 0.874,
+      "f1": 0.901,
+      "mean_iou_matched": 0.884
+    },
+    "all / cancer": {
+      "gt_crypts": 354,
+      "precision": 0.779,
+      "recall": 0.757,
+      "f1": 0.768,
+      "mean_iou_matched": 0.86
+    }
+  }
+}
