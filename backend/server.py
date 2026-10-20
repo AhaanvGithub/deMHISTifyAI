@@ -175,11 +175,9 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
         _free_gpu()
 
         # literature judge (Lumen) runs while the UI animates the image judges
-        top_feats = [v for v in conch["criteria"].values() if v.get("usable")]
-        query = ("sessile serrated lesion hyperplastic polyp diagnostic criteria crypt architecture distortion "
-                 + " ".join(v["text"] for v in top_feats))
+        query = llm.judge_query(conch)  # from what this field shows (measured crypts) plus the WHO criteria
         papers = LIBRARY.search(query)
-        judge_future = POOL.submit(llm.research_judge, conch["criteria"], papers, conch["panel"])
+        judge_future = POOL.submit(llm.research_judge, conch, papers)
         # While Lumen thinks, sharpen the heatmap on the GPU in the background: the panel's cover-up map refines
         # 16 -> 32 -> 64 -> 128 cells per field (older judges: one denser pass). Whichever is ready first is sent
         # first, so the literature judge and verdict never wait for the last heatmap pass.
@@ -204,7 +202,7 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
                 yield _sse("judge", judge)
                 flags = trust_flags(parsed, conch, judge)
                 yield _sse("flags", flags)
-                yield _sse("verdict", llm.final_verdict(parsed, conch["panel"], judge, flags))
+                yield _sse("verdict", llm.final_verdict(parsed, conch["panel"], judge, flags, conch))
         yield _sse("done", {})
 
     return StreamingResponse(stream(), media_type="text/event-stream")

@@ -308,3 +308,6 @@ body.overlay #dim { animation: fadein .5s ease; }
 
 /* fixed-size field (scale bar read): move only */
 .tissue.fixed .handle { display: none; }
+
+/* literature judge evidence: where it came from and how strong it is */
+.feats .strength { font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; margin-left: 4px; }
