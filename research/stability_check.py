@@ -1,10 +1,11 @@
-"""Stability: 25 sequential /analyze requests (varied fields) + 2 overlapping ones; time and GPU memory each."""
+"""Stability: 25 sequential /analyze requests (varied fields) + 2 overlapping ones against a running backend
+(port 8765); time to the image result and GPU memory after each. Writes docs/results/stability_check.json."""
 import io, json, random, subprocess, threading, time
 from pathlib import Path
 import requests
 from PIL import Image
 
-R = Path("C:/Users/Ahaan/Desktop/deMHISTifyAI")
+R = Path(__file__).resolve().parent.parent
 API = "http://127.0.0.1:8765"
 ims = sorted((R / "data/mhist/images").glob("*.png"))
 random.seed(0)
