@@ -110,5 +110,5 @@ res = {"screens": len(rows),
        "square_mostly_on_tissue (>=95% inside)": sum(r["square_inside_tissue"] >= 0.95 for r in rows),
        "square_median_side_vs_tissue": float(np.median([r["square_vs_tissue_side"] for r in rows])),
        "rows": rows}
-(ROOT / f"docs/results/scale_stress{'_seed' + sys.argv[1] if len(sys.argv) > 1 else ''}.json").write_text(json.dumps(res, indent=2))
+(ROOT / f"docs/results/scale_stress{'_seed' + sys.argv[1] if len(sys.argv) > 1 and sys.argv[1] != '0' else ''}.json").write_text(json.dumps(res, indent=2))
 print(json.dumps({k: v for k, v in res.items() if k != "rows"}, indent=2))
