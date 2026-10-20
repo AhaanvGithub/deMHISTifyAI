@@ -210,10 +210,4 @@ the test split to choose the model" vs "used it or did not say")
   time before the Wed 00:00 training deadline. Good "future work" line: more institutions and stains, checked
   for patient overlap.
 
-### Pathologist input (family friend, willing to help)
-
-- Keep the endorsement genuine; disclose the relationship if asked.
-- Plan: blind test on 15-20 MHIST test tiles including some 4-3 splits (choosing tiles involves no model
-  scoring). They call each tile, then use the app. Record agreement and whether the heatmap matched where they
-  looked. Ask: where would you use it, what would make you distrust it, what's missing. Quote only what they
-  actually saw or said, with role and institution if they agree to be named.
+No pathologist study is planned (decided by the user, 2026-10-19).
