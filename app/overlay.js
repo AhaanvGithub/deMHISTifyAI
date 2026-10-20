@@ -259,7 +259,7 @@ new MutationObserver(() => countUp()).observe(document.body, { childList: true, 
 function renderYou(p) {
   parsed = p;
   $('youCard').innerHTML = `<h3>You</h3>` + (p.call
-    ? `<div class="summary">${pct(LABEL[p.call], p.certainty ?? '–', 'you')}<div class="sub">${FULL[p.call]}</div></div>`
+    ? `<div class="summary">${pct(LABEL[p.call], p.certainty ?? '–', clsOf(p.call))}<div class="sub">${FULL[p.call]}</div></div>`
     : `<div class="summary"><span class="warn">“${p.text}”: outside the validated scope</span></div>`);
 }
 
@@ -294,7 +294,7 @@ function renderPanelSummary() {
   const agree = parsed?.call && pnl.top === parsed.call;
   $('panelSummary').classList.remove('muted');
   $('panelSummary').innerHTML =
-    `${pct(LABEL[pnl.top], pnl.top_conf, agree || !parsed?.call ? 'good' : 'bad')}
+    `${pct(LABEL[pnl.top], pnl.top_conf, clsOf(pnl.top))}${mine(agree)}
      <div class="alt">- alt: ${LABEL[pnl.alt]} ${pnl.alt_conf}%</div>
      <div class="votes">${Object.entries(pnl.votes).map(([c, n]) => `${LABEL[c]} ${n}/${pnl.n_voters || r.judges.length}`).join(' · ')}</div>
      ${panelMode ? `<div class="sub">${Math.round(100 * pnl.p_ssl)}% chance a 7-pathologist majority says SSL · calls SSL above ${Math.round(100 * Cutoff.state().cut)}%</div>` : ''}`;
@@ -315,15 +315,14 @@ function judgeEl(j0, still = false) {
   return el;
 }
 
-// jet-style colour scale like pathology probability maps: blue -> cyan -> green -> yellow -> red
-const JET = [[0, [40, 60, 220]], [0.3, [40, 200, 240]], [0.5, [70, 220, 120]], [0.7, [250, 225, 60]], [0.85, [250, 130, 40]], [1, [220, 30, 40]]];
-function jet(v) {
-  for (let i = 1; i < JET.length; i++) if (v <= JET[i][0]) {
-    const [a, ca] = JET[i - 1], [b, cb] = JET[i], t = (v - a) / (b - a);
-    return ca.map((x, k) => Math.round(x + (cb[k] - x) * t));
-  }
-  return JET[JET.length - 1][1];
-}
+// the app's only meaning-carrying colours: HP teal, SSL orange (styles.css --hp / --ssl)
+const cssVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const rgbOf = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+const CLASS_RGB = () => ({ SSA: rgbOf(cssVar('--ssl')), HP: rgbOf(cssVar('--hp')) });
+const classCss = c => (c === 'SSA' ? 'var(--ssl)' : 'var(--hp)');
+const clsOf = c => (c === 'SSA' ? 'ssl' : 'hp');
+// agreement with the researcher's own call: white text and a symbol, not a colour
+const mine = agree => (parsed?.call ? `<div class="mine">${agree ? '\u2713 matches your call' : '\u2717 differs from your call'}</div>` : '');
 const smooth = (e0, e1, x) => { const t = Math.min(Math.max((x - e0) / (e1 - e0), 0), 1); return t * t * (3 - 2 * t); };
 const refClass = () => heatRef === 'ai' ? 'SSA' : (parsed?.call || result.panel.top);
 
@@ -340,6 +339,7 @@ function drawHeat() {
   small.width = H.cols; small.height = H.rows;
   const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
   const ai = heatRef === 'ai';
+  const rgb = CLASS_RGB();
   const ev = H.kind === 'evidence';  // cover-up map: 0.5 = no effect, above = pushed toward SSL, below = toward HP
   const c0 = result.judge_mode === 'panel' && !ev ? Cutoff.state().cut : 0.5;
   const centre = p => (p <= c0 ? 0.5 * p / c0 : 0.5 + 0.5 * (p - c0) / (1 - c0));  // cut-off -> middle of the scale
@@ -349,13 +349,13 @@ function drawHeat() {
   const flat = tv.length && Math.max(...tv) - Math.min(...tv) < 0.03;
   for (let i = 0; i < H.p_ssa.length; i++) {
     const p = ai ? centre(H.p_ssa[i]) : H.p_ssa[i];
-    // AI view: fixed P(SSL) scale, HP-leaning tissue blue, SSL-leaning red, undecided (~0.5) fades out.
-    // Your-call view: support for your call, clear when unlikely, then cyan -> green -> yellow -> red.
+    // AI view: fixed P(SSL) scale, HP-leaning tissue teal, SSL-leaning orange, undecided (~0.5) fades out.
+    // Your-call view: support for your call, in that call's colour, clear when unlikely.
     const v = ai ? p : (ref === 'SSA' ? p : 1 - p);
     // soft fade from 'no effect' (transparent) to strong evidence, so empty cells don't cut hard edges
     const k = ai ? smooth(0.0, 0.4, Math.abs(p - 0.5)) : ev ? smooth(0.0, 0.4, v - 0.5) : smooth(0.22, 0.6, v);
     const alpha = H.tissue[i] < 0.25 || flat ? 0 : (ai ? 0.55 : 0.8) * k;  // never opaque: tissue must stay readable
-    im.data.set([...jet(v), Math.round(255 * a * alpha)], i * 4);
+    im.data.set([...(ai ? (p >= 0.5 ? rgb.SSA : rgb.HP) : rgb[ref]), Math.round(255 * a * alpha)], i * 4);
   }
   sg.putImageData(im, 0, 0);
   // two-step upscale + blur gives soft blob edges like slide-level probability maps
@@ -389,6 +389,7 @@ function drawHeat() {
 
   $('colorbar').classList.remove('hidden');
   $('colorbar').classList.toggle('diverging', ai);
+  $('colorbar').style.setProperty('--cb-col', classCss(ref));
   if (ev) {
     $('cbLabel').textContent = ai ? 'what drives the call' : `support for ${LABEL[ref]} · your call`;
     $('cbTop').textContent = ai ? '→ SSL' : 'strong'; $('cbBottom').textContent = ai ? '→ HP' : '';
@@ -402,10 +403,12 @@ function drawHeat() {
 }
 
 // ---------- feature outlines from the literature judge ----------
-const FEAT_COLORS = ['#ffc857', '#c79bff', '#ffffff', '#5eead4'];  // outlines must stand out on tissue and on the jet heatmap
+// literature-judge feature outlines in the colour of the class they point to (white = either)
+const featColor = f => (f.points_to === 'SSA' ? cssVar('--ssl') : f.points_to === 'HP' ? cssVar('--hp') : '#ffffff');
 let keyFeatures = [];
 // ---------- measured crypts (backend/glands.py): outlines follow real glands, labels come from measurements ----------
-const GLAND_COLORS = { 'dilated crypt': '#ffc857', 'serrated lumen': '#c79bff', 'round regular crypt': '#5eead4' };
+// dilated crypts lean SSL, round regular crypts lean HP: drawn in those classes' colours
+const GLAND_COLORS = new Proxy({}, { get: (_, k) => ({ 'dilated crypt': cssVar('--ssl'), 'round regular crypt': cssVar('--hp') })[k] });
 function drawGlands(fc, g) {
   const W = fc.width, Hh = fc.height, dpr = window.devicePixelRatio || 1, rect = tissue.getBoundingClientRect();
   const placed = [];
@@ -413,10 +416,14 @@ function drawGlands(fc, g) {
   // strongest evidence first, so the glands that drove the call get their labels before any collision
   [...result.glands].sort((a, b) => !!b.label - !!a.label || Math.abs(b.evidence) - Math.abs(a.evidence)).forEach(gl => {
     const col = GLAND_COLORS[gl.label];
-    if (!col) return;  // only crypts with a clear ring and a clear measurement are drawn
     g.beginPath();
     gl.outline.forEach(([x, y], i) => (i ? g.lineTo(x * W, y * Hh) : g.moveTo(x * W, y * Hh)));
     g.closePath();
+    if (!col) {  // a crypt with nothing clear to say: a faint outline only, no label
+      g.lineJoin = 'round'; g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.2 * dpr;
+      g.stroke();
+      return;
+    }
     g.lineJoin = 'round'; g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 3 * dpr;
     g.strokeStyle = col; g.lineWidth = 2 * dpr;
     g.stroke(); g.shadowBlur = 0;
@@ -459,7 +466,7 @@ function drawFeatures() {
     if (!vals.length) return;
     const thr = Math.max(0.7, vals[Math.floor(vals.length * 0.9)]);  // strongest ~10% of tissue, and clearly above typical
     const on = (r, c) => r >= 0 && c >= 0 && r < H.rows && c < H.cols && m[r * H.cols + c] >= thr && H.tissue[r * H.cols + c] >= 0.25;
-    g.strokeStyle = FEAT_COLORS[k % FEAT_COLORS.length]; g.lineWidth = 2 * dpr; g.lineJoin = g.lineCap = 'round';
+    g.strokeStyle = featColor(f); g.lineWidth = 2 * dpr; g.lineJoin = g.lineCap = 'round';
     g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 3 * dpr;
     let best = null;
     g.beginPath();
@@ -476,7 +483,7 @@ function drawFeatures() {
     if (best) {
       const lab = document.createElement('div');
       lab.className = 'feat-label';
-      lab.style.borderColor = FEAT_COLORS[k % FEAT_COLORS.length];
+      lab.style.borderColor = featColor(f);
       lab.style.left = ((best.c + 0.5) * cw / dpr) + 'px';
       lab.style.top = ((best.r + 0.5) * ch / dpr) + 'px';
       lab.innerHTML = `${esc(f.feature)} <span class="${f.points_to === 'SSA' ? 'ssl' : 'hp'}">→ ${LABEL[f.points_to] || ''}</span>${(f.cites || []).map(c => `<sup>${c}</sup>`).join('')}`;
@@ -500,14 +507,14 @@ tissue.addEventListener('mousemove', e => {
   const p = H.p_ssa[fr * H.cols + fc], s = ref === 'SSA' ? p : 1 - p;
   const feats = Object.entries(H.features || {}).sort((x, y) => y[1][fr * H.cols + fc] - x[1][fr * H.cols + fc]).slice(0, 2).map(([k]) => k.replace(/_/g, ' '));
   const gl = glandAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
-  const glandLine = gl ? `<div><b style="color:${GLAND_COLORS[gl.label] || 'var(--text)'}">${gl.label || 'crypt'}</b> · ${gl.crypt_um} µm across` +
-    `${gl.roughness != null ? ` · lumen edge roughness ${gl.roughness}` : ''}</div>` : '';
+  const glandLine = gl ? `<div><b style="color:${GLAND_COLORS[gl.label] || 'var(--text)'}">${gl.label || 'crypt'}</b>${gl.crypt_um != null ? ` · ${gl.crypt_um} µm across` : ''}` +
+    `</div>` : '';
   const tile = `${String.fromCharCode(65 + Math.floor(fr / H.sub))}${Math.floor(fc / H.sub) + 1}`;
   const subc = `${(fr % H.sub) + 1}-${(fc % H.sub) + 1}`;  // row-column inside the field
   tip.innerHTML = H.tissue[fr * H.cols + fc] < 0.25 ? `${tile}·${subc} <span class="muted">no tissue</span>`
     : `${tile}·${subc} ${H.kind === 'evidence'
-        ? `<b style="color:rgb(${jet(p)})">${Math.abs(p - 0.5) < 0.06 ? 'little effect on the call' : `pushes toward ${p > 0.5 ? 'SSL' : 'HP'}`}</b>`
-        : `<b style="color:rgb(${jet(s)})">P(${LABEL[ref]}) ${Math.round(s * 100)}%</b>`}${result.glands ? glandLine : `<div class="muted">strongest here: ${feats.join(', ')}</div>`}`;
+        ? `<b style="color:${Math.abs(p - 0.5) < 0.06 ? 'var(--text)' : classCss(p > 0.5 ? 'SSA' : 'HP')}">${Math.abs(p - 0.5) < 0.06 ? 'little effect on the call' : `pushes toward ${p > 0.5 ? 'SSL' : 'HP'}`}</b>`
+        : `<b style="color:${classCss(ref)}">P(${LABEL[ref]}) ${Math.round(s * 100)}%</b>`}${result.glands ? glandLine : `<div class="muted">strongest here: ${feats.join(', ')}</div>`}`;
   tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
   tip.classList.remove('hidden');
 });
@@ -559,7 +566,7 @@ function renderJudge(j) {
     return;
   }
   const agree = !parsed?.call || j.call === parsed.call;
-  el.innerHTML = `${pct(LABEL[j.call], j.consistency, agree ? 'good' : 'bad')}
+  el.innerHTML = `${pct(LABEL[j.call], j.consistency, clsOf(j.call))}${mine(agree)}
     <div class="alt">- alt: ${LABEL[j.alt]} ${j.alt_consistency}%</div>
     <div class="sub">consistency over ${j.n_samples} runs · model's own estimate ${j.stated_confidence}%${j.agrees_with_panel === false ? ' · <span class="warn">disagrees with the image panel</span>' : j.agrees_with_panel ? ' · agrees with the image panel' : ''}</div>`;
   const feats = (j.key_features || []).map(f =>
@@ -588,8 +595,8 @@ function renderVerdict(v) {
   const el = $('verdict'); el.classList.remove('muted');
   finishPanel();
   if (v.error) { el.innerHTML = '<span class="warn">Verdict unavailable.</span>'; return; }
-  const cls = { agrees: 'good', 'partly agrees': 'warn', disagrees: 'bad' }[v.alignment] || '';
-  el.innerHTML = `<div class="headline ${cls}">${esc(v.headline)}</div><p>${esc(v.conclusion)}</p>
+  const mark = { agrees: '\u2713 ', 'partly agrees': '\u2248 ', disagrees: '\u2717 ' }[v.alignment] || '';
+  el.innerHTML = `<div class="headline">${mark}${esc(v.headline)}</div><p>${esc(v.conclusion)}</p>
     ${v.look_again_at ? `<p class="sub"><b>Look again at:</b> ${esc(v.look_again_at)}</p>` : ''}
     <p class="sub">${esc(v.certainty_note)}</p>`;
   el.querySelectorAll('p').forEach(p => reveal(p, 16, 1200));

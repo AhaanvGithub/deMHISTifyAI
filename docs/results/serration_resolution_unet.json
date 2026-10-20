@@ -1,0 +1,35 @@
+{
+  "what": "Can \"serrated lumen\" be seen at MHIST's ~2 um/px? Test on UniToPatho (Turin; 0.44 um/px): hyperplastic polyps\n(HP: serrated, saw-tooth crypt lumens) vs normal colon (NORM: smooth lumens), same lab and scanner.",
+  "finder": "unet",
+  "patches": {
+    "HP": 537,
+    "NORM": 97
+  },
+  "scales": {
+    "0.44 um/px (native)": {
+      "crypts_with_lumen": 2007,
+      "auc_hp_vs_norm_per_crypt": 0.595,
+      "auc_hp_vs_norm_per_field": 0.62,
+      "median_roughness_hp": 2.405,
+      "median_roughness_norm": 2.063
+    },
+    "1.0 um/px": {
+      "crypts_with_lumen": 2020,
+      "auc_hp_vs_norm_per_crypt": 0.595,
+      "auc_hp_vs_norm_per_field": 0.585,
+      "median_roughness_hp": 1.632,
+      "median_roughness_norm": 1.347
+    },
+    "2.0 um/px (MHIST)": {
+      "crypts_with_lumen": 2193,
+      "auc_hp_vs_norm_per_crypt": 0.6,
+      "auc_hp_vs_norm_per_field": 0.551,
+      "median_roughness_hp": 1.062,
+      "median_roughness_norm": 0.952
+    }
+  },
+  "same_crypt_rank_agreement_spearman": {
+    "native vs 1.0": 0.919,
+    "native vs 2.0": 0.79
+  }
+}

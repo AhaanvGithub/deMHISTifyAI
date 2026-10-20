@@ -610,7 +610,7 @@ class Engine:
         out = []
         for t in tiles:
             x0, y0, x1, y1 = t.box
-            for g in GL.label(GL.measure(snip.crop(t.box))):
+            for g in GL.find(snip.crop(t.box)):
                 to_snip = lambda x, y: [round((x0 + x * (x1 - x0)) / w, 4), round((y0 + y * (y1 - y0)) / h, 4)]
                 g["outline"] = [to_snip(x, y) for x, y in g["outline"]]
                 g["center"] = to_snip(*g["center"])

@@ -110,7 +110,8 @@ Evidence you get, strongest first:
    Its percentage is calibrated to a 7-pathologist majority; it calls SSA above its stated cut-off, not above 50%.
    This is the strongest evidence about this specific field. Do not overrule it without a specific, cited reason.
 2. MEASURED CRYPTS: crypts outlined and measured on this field (ids like [crypts:dilated]). Each alone is weak evidence
-   (they separate SSA from HP at AUC ~0.6 on held-out images). Serration is common to BOTH HP and SSA.
+   (the share of dilated crypts separates SSA from HP at AUC ~0.68 on held-out images). Serration is common to BOTH
+   HP and SSA and is not measured at this resolution.
 3. FEATURE SCORES: CONCH image-text scores (ids like [crit:...]), 0-1 relative to typical polyps. Weak hints only.
 4. LITERATURE: numbered excerpts [P1], [P2], ... from evidence syntheses. Cite them by label.
 
@@ -195,24 +196,27 @@ def _measured(conch: dict) -> tuple:
     allg = conch.get("glands", [])
     crypt_lines = []
     if allg:
-        n_clear = sum(1 for g in allg if g.get("ring", 0) >= 0.85)
+        # measured with confidence: a learned outline with measurements, or a classical crypt with a clear nuclear ring
+        sure = lambda g: g.get("gland_width_um") is not None or g.get("ring", 0) >= 0.85
+        width = lambda g: g.get("gland_width_um") or g["width_um"]
+        n_clear = sum(1 for g in allg if sure(g))
         for tag, key, what in (("dilated", "crypts:dilated", "dilated (the whole crypt wider than the field's other crypts; "
                                                              "whether the widening is at the BASE is not measured)"),
                                ("serrated", "crypts:serrated", "serrated lumen (saw-toothed border)"),
                                ("round regular", "crypts:round", "round, regular crypt (HP- or normal-like)")):
             n = sum(tag in g.get("tags", []) for g in glands)
             if n:
-                widths = [g["width_um"] for g in glands if tag in g.get("tags", [])]
+                widths = [width(g) for g in glands if tag in g.get("tags", [])]
                 where = sorted({_where(*g["center"]) for g in glands if tag in g.get("tags", [])})
                 size = f"width {widths[0]:.0f} um" if len(widths) == 1 else f"widths {min(widths):.0f}-{max(widths):.0f} um"
                 evs = [g.get("evidence", 0) for g in glands if tag in g.get("tags", [])]
                 push = sum(e > 0.1 for e in evs), sum(e < -0.1 for e in evs)
                 lean = (f"; the image panel's own evidence map pushes toward SSA over {push[0]} and toward HP over {push[1]} of them"
                         if conch.get("heat", {}).get("kind") == "evidence" else "")
-                crypt_lines.append(f"- [{key}] {n} of {n_clear} clearly ringed crypts {what}; {size}; at the {', '.join(where)}{lean}")
+                crypt_lines.append(f"- [{key}] {n} of {n_clear} measured crypts {what}; {size}; at the {', '.join(where)}{lean}")
                 ids[key] = what
         if not crypt_lines:
-            crypt_lines.append(f"- {n_clear} clearly ringed crypts found; none clearly dilated, serrated or round-regular.")
+            crypt_lines.append(f"- {n_clear} measured crypts found; none clearly dilated or round-regular.")
     else:
         crypt_lines.append("- No crypts could be outlined on this field (cut lengthwise, open to the surface, or blurred).")
     crypt_lines += _evidence_regions(conch.get("heat"))

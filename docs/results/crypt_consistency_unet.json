@@ -1,0 +1,42 @@
+{
+  "finder": "unet",
+  "images": 100,
+  "variants": {
+    "zoom 1.5": {
+      "crypts_raw": 1814,
+      "crypts_snip": 1858,
+      "matched": 1718,
+      "f1_same_crypts": 0.936,
+      "label_same_on_matched": 0.913,
+      "mean_iou_matched": 0.944,
+      "images_identical_set": 0.14
+    },
+    "zoom 2.37": {
+      "crypts_raw": 1814,
+      "crypts_snip": 1857,
+      "matched": 1718,
+      "f1_same_crypts": 0.936,
+      "label_same_on_matched": 0.907,
+      "mean_iou_matched": 0.946,
+      "images_identical_set": 0.15
+    },
+    "zoom 3.3": {
+      "crypts_raw": 1814,
+      "crypts_snip": 1855,
+      "matched": 1719,
+      "f1_same_crypts": 0.937,
+      "label_same_on_matched": 0.913,
+      "mean_iou_matched": 0.946,
+      "images_identical_set": 0.14
+    },
+    "zoom 2.37, box shifted 4%": {
+      "crypts_raw": 961,
+      "crypts_snip": 992,
+      "matched": 883,
+      "f1_same_crypts": 0.904,
+      "label_same_on_matched": 0.864,
+      "mean_iou_matched": 0.922,
+      "images_identical_set": 0.26
+    }
+  }
+}

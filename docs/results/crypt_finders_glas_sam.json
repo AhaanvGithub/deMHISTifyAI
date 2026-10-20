@@ -1,0 +1,84 @@
+{
+  "what": "GlaS expert gland outlines at MHIST scale (2.0 um/px, 448 um field); detection at IoU >= 0.5",
+  "groups": {
+    "healthy": "benign, healthy colon",
+    "adenomatous": "benign adenoma",
+    "cancer": "adenocarcinoma"
+  },
+  "finders": {
+    "sam": {
+      "interior / healthy": {
+        "fields": 42,
+        "gt_crypts": 273,
+        "found": 228,
+        "precision": 0.307,
+        "recall": 0.256,
+        "f1": 0.279,
+        "mean_iou_matched": 0.727
+      },
+      "interior / adenomatous": {
+        "fields": 32,
+        "gt_crypts": 90,
+        "found": 101,
+        "precision": 0.267,
+        "recall": 0.3,
+        "f1": 0.283,
+        "mean_iou_matched": 0.726
+      },
+      "interior / cancer": {
+        "fields": 91,
+        "gt_crypts": 108,
+        "found": 337,
+        "precision": 0.021,
+        "recall": 0.065,
+        "f1": 0.031,
+        "mean_iou_matched": 0.707
+      },
+      "interior / benign (healthy + adenoma)": {
+        "fields": 74,
+        "gt_crypts": 363,
+        "found": 329,
+        "precision": 0.295,
+        "recall": 0.267,
+        "f1": 0.28,
+        "mean_iou_matched": 0.727
+      },
+      "all / healthy": {
+        "fields": 42,
+        "gt_crypts": 624,
+        "found": 263,
+        "precision": 0.399,
+        "recall": 0.168,
+        "f1": 0.237,
+        "mean_iou_matched": 0.727
+      },
+      "all / adenomatous": {
+        "fields": 32,
+        "gt_crypts": 285,
+        "found": 109,
+        "precision": 0.321,
+        "recall": 0.123,
+        "f1": 0.178,
+        "mean_iou_matched": 0.716
+      },
+      "all / cancer": {
+        "fields": 91,
+        "gt_crypts": 568,
+        "found": 357,
+        "precision": 0.076,
+        "recall": 0.048,
+        "f1": 0.058,
+        "mean_iou_matched": 0.68
+      },
+      "all / benign (healthy + adenoma)": {
+        "fields": 74,
+        "gt_crypts": 909,
+        "found": 372,
+        "precision": 0.376,
+        "recall": 0.154,
+        "f1": 0.219,
+        "mean_iou_matched": 0.724
+      }
+    }
+  }
+}

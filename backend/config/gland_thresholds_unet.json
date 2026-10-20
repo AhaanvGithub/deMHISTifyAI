@@ -1,0 +1,8 @@
+{
+  "dilated_width_um": 41.4,
+  "serrated_roughness": 1.487,
+  "round_solidity": 0.84,
+  "round_eccentricity": 0.75,
+  "round_max_um": 21.9,
+  "source": "unet finder: 7441 crypts in 597 MHIST training images (research/gland_thresholds.py)"
+}
