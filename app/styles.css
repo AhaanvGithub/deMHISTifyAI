@@ -85,15 +85,17 @@ body.overlay { overflow: hidden; background: var(--bg-solid); cursor: crosshair;
 }
 .tissue {
   position: absolute; pointer-events: auto; cursor: move;
-  border: 1.5px dashed rgba(255,255,255,.85); border-radius: 3px;
+  /* clearly visible on white glass, pink tissue and dark viewers: gold line with a dark halo and a soft glow */
+  border: 3px solid var(--accent2); border-radius: 4px;
+  box-shadow: 0 0 0 1.5px rgba(10,4,16,.75), inset 0 0 0 1.5px rgba(10,4,16,.45), 0 0 22px rgba(255,200,87,.55);
 }
 .tissue.anim { transition: left .35s ease, top .35s ease, width .35s ease, height .35s ease; }
 .tissue.locked { cursor: default; border-style: solid; border-color: rgba(255,255,255,.35); }
 .tissue.locked .handle { display: none; }
 .tissue canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.handle { position: absolute; width: 11px; height: 11px; background: #fff; border-radius: 3px; box-shadow: 0 0 0 2px var(--accent); }
-.handle.nw { left: -6px; top: -6px; cursor: nwse-resize; } .handle.se { right: -6px; bottom: -6px; cursor: nwse-resize; }
-.handle.ne { right: -6px; top: -6px; cursor: nesw-resize; } .handle.sw { left: -6px; bottom: -6px; cursor: nesw-resize; }
+.handle { position: absolute; width: 14px; height: 14px; background: #fff; border-radius: 3px; box-shadow: 0 0 0 2px var(--accent); }
+.handle.nw { left: -8px; top: -8px; cursor: nwse-resize; } .handle.se { right: -8px; bottom: -8px; cursor: nwse-resize; }
+.handle.ne { right: -8px; top: -8px; cursor: nesw-resize; } .handle.sw { left: -8px; bottom: -8px; cursor: nesw-resize; }
 .tissue-tag { position: absolute; top: -26px; left: 0; font-size: 11px; color: var(--text); background: var(--bg); padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
 
 .axis { position: absolute; display: flex; font-size: 10px; color: rgba(255,255,255,.65); pointer-events: none; }

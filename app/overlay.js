@@ -104,11 +104,10 @@ async function startRegion() {
   setTissue([0, 0, selRect.w * scale, selRect.h * scale], 'detecting tissue…');
   try {
     const g = await (await postImage('/region/guess', blob)).json();
-    if (state === 'region') setTissue(g.box, 'quick guess · refining…');
-    const r = await (await postImage('/region/refine', blob)).json();
     if (state === 'region') {
-      if (r.box) { tissue.classList.add('anim'); setTissue(r.box, 'refined by vision model · drag to adjust'); setTimeout(() => tissue.classList.remove('anim'), 400); }
-      else $('tissueTag').textContent = 'quick guess · drag to adjust';
+      tissue.classList.add('anim');
+      setTissue(g.box, 'one field on the tissue · drag or resize · Enter to analyze');
+      setTimeout(() => tissue.classList.remove('anim'), 400);
     }
   } catch { $('tissueTag').textContent = 'backend offline? drag to adjust'; }
 }
@@ -339,17 +338,19 @@ function drawHeat() {
     // AI view: fixed P(SSL) scale, HP-leaning tissue blue, SSL-leaning red, undecided (~0.5) fades out.
     // Your-call view: support for your call, clear when unlikely, then cyan -> green -> yellow -> red.
     const v = ai ? p : (ref === 'SSA' ? p : 1 - p);
-    const k = ai ? smooth(0.06, 0.34, Math.abs(p - 0.5)) : ev ? smooth(0.06, 0.34, v - 0.5) : smooth(0.22, 0.6, v);
+    // soft fade from 'no effect' (transparent) to strong evidence, so empty cells don't cut hard edges
+    const k = ai ? smooth(0.0, 0.4, Math.abs(p - 0.5)) : ev ? smooth(0.0, 0.4, v - 0.5) : smooth(0.22, 0.6, v);
     const alpha = H.tissue[i] < 0.25 || flat ? 0 : (ai ? 0.55 : 0.8) * k;  // never opaque: tissue must stay readable
     im.data.set([...jet(v), Math.round(255 * a * alpha)], i * 4);
   }
   sg.putImageData(im, 0, 0);
   // two-step upscale + blur gives soft blob edges like slide-level probability maps
   const mid = document.createElement('canvas');
-  mid.width = H.cols * 8; mid.height = H.rows * 8;
+  const cp = Math.max(8, Math.round(1024 / Math.max(H.cols, H.rows)));  // px per cell on the blur canvas
+  mid.width = H.cols * cp; mid.height = H.rows * cp;
   const mg = mid.getContext('2d');
   mg.imageSmoothingEnabled = true; mg.imageSmoothingQuality = 'high';
-  mg.filter = 'blur(5px)';
+  mg.filter = `blur(${Math.round(cp * 1.2)}px)`;  // ~1.2 cells at every refinement level
   mg.drawImage(small, 0, 0, mid.width, mid.height);
   g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
   g.drawImage(mid, 0, 0, heat.width, heat.height);

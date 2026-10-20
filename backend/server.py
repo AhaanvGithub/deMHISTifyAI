@@ -1,7 +1,7 @@
 """Local backend for the deMHISTifyAI desktop app (http://127.0.0.1:8765).
 
-POST /region/guess   image -> instant structure-based box
-POST /region/refine  image -> vision-model box (a few seconds)
+POST /capture        x, y, w, h -> true-colour screenshot path
+POST /region/guess   image -> square field on the tissue (tissue vs glass by colour, instant)
 POST /analyze        image (already cropped to the confirmed box) + researcher text
                      -> Server-Sent Events: parsed, conch, flags, judge, verdict, done
 """
@@ -24,13 +24,12 @@ from fastapi.responses import StreamingResponse
 from PIL import Image
 
 import llm
-from region import VisionLocator, structure_guess
+from region import tissue_square
 
 app = FastAPI(title="deMHISTifyAI backend")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 STATE = {"engine": None, "engine_error": None}
-LOCATOR = VisionLocator()
 LIBRARY = llm.Library()
 POOL = ThreadPoolExecutor(4)
 
@@ -48,7 +47,7 @@ threading.Thread(target=_load_engine, daemon=True).start()
 
 
 def _free_gpu():
-    """hand unused GPU memory back between stages: the image panel and the tissue-box model share 8 GB"""
+    """hand unused GPU memory back between analysis stages (the panel shares 8 GB with the display)"""
     try:
         import torch
         torch.cuda.empty_cache()
@@ -65,9 +64,6 @@ def health():
     return {
         "conch_ready": STATE["engine"] is not None,
         "conch_error": STATE["engine_error"],
-        "vlm_ready": LOCATOR.ready,
-        "vlm_error": LOCATOR.error,
-        "vlm_last_answer": LOCATOR.last_answer,
         "papers": len(LIBRARY.papers),
         "judge_model": llm.JUDGE_MODEL,
         "verdict_model": llm.VERDICT_MODEL,
@@ -90,14 +86,7 @@ def capture(x: int = Form(...), y: int = Form(...), w: int = Form(...), h: int =
 @app.post("/region/guess")
 async def region_guess(image: UploadFile = File(...)):
     img = await _read(image)
-    return {"box": structure_guess(img), "size": img.size}
-
-
-@app.post("/region/refine")
-async def region_refine(image: UploadFile = File(...)):
-    img = await _read(image)
-    box = POOL.submit(LOCATOR.locate, img).result()
-    return {"box": box, "size": img.size, "source": "vlm" if box else "unavailable"}
+    return {"box": tissue_square(img), "size": img.size}
 
 
 def trust_flags(researcher: dict, conch: dict, judge: dict) -> list:
