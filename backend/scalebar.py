@@ -83,7 +83,8 @@ def _bars(a: np.ndarray):
 
     gray, sat = a.mean(2), a.max(2) - a.min(2)
     out = []
-    for mask in (gray < 0.25, gray > 0.92, sat > 0.45):            # dark, white or strongly coloured bars
+    # dark, white or strongly coloured bars; the looser thresholds catch thin bars blurred by display scaling
+    for mask in (gray < 0.25, gray > 0.92, sat > 0.45, gray < 0.45, gray > 0.8, sat > 0.3):
         lab, n = ndimage.label(mask)
         for sl in ndimage.find_objects(lab):
             if sl is None:
@@ -94,7 +95,13 @@ def _bars(a: np.ndarray):
             fill = mask[sl].mean()
             if fill < 0.85:                                         # a solid bar, not text or a frame
                 continue
-            out.append((sl[1].start, sl[0].start, w, h))
+            box = (sl[1].start, sl[0].start, w, h)
+            # a looser threshold can merge a bar with its surroundings: if it overlaps a bar already found with a
+            # stricter threshold (same row, overlapping span), keep the stricter one
+            overlaps = any(abs(box[1] - b[1]) <= 4 and min(box[0] + box[2], b[0] + b[2]) - max(box[0], b[0]) > 0.5 * min(box[2], b[2])
+                           for b in out)
+            if not overlaps:
+                out.append(box)
     return out
 
 
@@ -169,7 +176,7 @@ def read_scale(img: Image.Image) -> Optional[dict]:
         # (works for coloured labels, white-on-dark and blurred text); then the general cleaning, plain and inverted
         crop = _text_only(raw)
         tries = (_same_colour(raw, bar_rgb), _same_colour(raw, bar_rgb, 0.7, 2.5), crop, ImageOps.invert(crop))
-        labels = next((r for r in (_labels(c, z) for c in tries for z in (3, 1)) if r), [])
+        labels = next((r for r in (_labels(c, z) for c in tries for z in (3, 5, 1)) if r), [])  # 5x for small fonts
         for um, lx, ly, lw, lh in labels:
             lx, ly = lx + X0, ly + Y0
             lcx, lcy = lx + lw / 2, ly + lh / 2
