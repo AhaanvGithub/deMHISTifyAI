@@ -475,9 +475,9 @@ class Engine:
             t.probs = {"SSA": float(p_tile[i]), "HP": float(1 - p_tile[i])}
             t.criteria = {k.split(":", 1)[1]: float(crit[i, n]) for n, k in enumerate(self.criteria_keys)}
         heat = self._dense_heat(snip, tiles)
-        logits_ood = self._ood(feats[torch.from_numpy(mask).to(feats.device)] if feats is not None else None)
+        ood = self._ood(feats[torch.from_numpy(mask).to(feats.device)] if feats is not None else None)
         # nothing to measure on a photo or noise: crypt outlines there would be shapes in random texture
-        glands = [] if (logits_ood and logits_ood["far"]) else self._glands(snip, tiles, heat)
+        glands = [] if (ood and ood["far"]) else self._glands(snip, tiles, heat)
         votes = {c: sum(r["top"] == c for r in judge_results) for c in CLASSES}
         top = call(p_snip)
         snip_crit = crit[mask].mean(0)
@@ -494,7 +494,7 @@ class Engine:
                 "agreement": max(votes.values()) / len(judge_results), "n_voters": len(judge_results),
                 "p_ssl": round(p_snip, 4), "cut": round(cut, 4), "default_cut": self.panel["shown_cut_off"],
             },
-            "ood": logits_ood,
+            "ood": ood,
             "glands": glands,
             "criteria": {
                 k.split(":", 1)[1]: {"text": self.prompts[k], "score": round(float(snip_crit[n]), 3),

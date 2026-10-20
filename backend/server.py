@@ -203,7 +203,10 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
                     heat_future = None
             if not judge_sent and judge_future in done:
                 judge_sent = True
-                judge = judge_future.result()
+                try:
+                    judge = judge_future.result()
+                except Exception:  # never let the literature side break the stream after the image results
+                    judge = {"error": "llm_unavailable"}
                 yield _sse("judge", judge)
                 flags = trust_flags(parsed, conch, judge)
                 yield _sse("flags", flags)
