@@ -63,6 +63,10 @@ def conch_tokenize(tokenizer, texts: List[str]) -> torch.Tensor:
     return torch.nn.functional.pad(ids, (0, 1), value=tokenizer.pad_token_id)
 
 
+class Superseded(Exception):
+    """A refinement pass for a snip that a newer snip has replaced."""
+
+
 @dataclass
 class Tile:
     row: int
@@ -308,7 +312,7 @@ class Engine:
             out.append(float(stained.mean()))
         return np.array(out)
 
-    def _dense_heat(self, snip: Image.Image, tiles: List[Tile], sub: int = 4) -> dict:
+    def _dense_heat(self, snip: Image.Image, tiles: List[Tile], sub: int = 4, gen: Optional[int] = None) -> dict:
         """Fine heatmap: slide a tile-sized window in steps of 1/sub of a tile, score
         every window with the raw-condition judges, and give each fine cell the mean
         of all windows covering it (up to sub*sub of them). Cells line up exactly
@@ -321,7 +325,7 @@ class Engine:
         starts = [(r, c) for r in range(R - sub + 1) for c in range(C - sub + 1)]
         crops = [snip.crop((int(c * cw), int(r * ch), int(c * cw + tw), int(r * ch + th))) for r, c in starts]
         if self.panel:  # cover-up evidence map (ConvNeXt) + finer CONCH feature map, at the trained field size
-            return self._evidence_heat(snip, tiles, G=sub if sub in self.LEVELS else 16)
+            return self._evidence_heat(snip, tiles, G=sub if sub in self.LEVELS else 16, gen=gen)
         emb, ftp = self.encode(crops)
         if self.ft:  # fine-tuned judges: mean P(SSA) over versions on the raw image
             p_win = ftp.mean(axis=1)
@@ -348,10 +352,12 @@ class Engine:
                 "features": {k.split(":", 1)[1]: np.round(crit_maps[i], 3).ravel().tolist()
                              for i, k in enumerate(self.criteria_keys)}}
 
-    def refine_heat(self, snip: Image.Image, tile_px: int, sub: int = 8) -> dict:
+    current_gen = 0  # the server bumps this for every new analysis; older refinement passes then stop
+
+    def refine_heat(self, snip: Image.Image, tile_px: int, sub: int = 8, gen: Optional[int] = None) -> dict:
         """Denser heatmap on the same major grid (called after the first answer is on screen)."""
         snip = snip.convert("RGB")
-        return self._dense_heat(snip, self.make_grid(snip, tile_px), sub=sub)
+        return self._dense_heat(snip, self.make_grid(snip, tile_px), sub=sub, gen=gen)
 
     def analyze(self, snip: Image.Image, tile_px: Optional[int] = None, cut: Optional[float] = None) -> dict:
         """`cut`: the app's decision cut-off on the displayed P(SSL) scale (default: the balanced one)."""
@@ -516,7 +522,7 @@ class Engine:
     OCC_STEP = {16: 1, 32: 1, 64: 2, 128: 4}  # finer levels skip positions (~4x/16x faster); windows still overlap every cell
 
     @torch.no_grad()
-    def _occlusion(self, field: Image.Image, G: int) -> np.ndarray:
+    def _occlusion(self, field: Image.Image, G: int, gen: Optional[int] = None) -> np.ndarray:
         """[G, G] change in ConvNeXt's logit when each region is blurred out: > 0 = the region pushed the call
         toward SSL, < 0 = toward HP. The field is scored exactly as in training (one field, centre crop)."""
         from PIL import ImageFilter
@@ -535,6 +541,8 @@ class Engine:
             base = float(score(x.unsqueeze(0))[0])
         delta = []
         for i in range(0, len(pos), 64):                                     # build covered copies chunk by chunk
+            if gen is not None and gen != self.current_gen:                  # a newer snip arrived: free the GPU for it
+                raise Superseded()
             chunk = pos[i : i + 64]
             batch = x.unsqueeze(0).repeat(len(chunk), 1, 1, 1)
             for j, (r, q) in enumerate(chunk):
@@ -565,7 +573,7 @@ class Engine:
             cnt[r : r + win, q : q + win] += 1
         return acc / np.maximum(cnt, 1)[None]
 
-    def _evidence_heat(self, snip: Image.Image, tiles: List[Tile], G: int = 16) -> dict:
+    def _evidence_heat(self, snip: Image.Image, tiles: List[Tile], G: int = 16, gen: Optional[int] = None) -> dict:
         """Heatmap for the panel: per field, where covering the tissue changes the call (cover-up / occlusion map
         from ConvNeXt, the panel's main member), plus CONCH feature maps, on a G x G grid per field (16 first,
         then 32 and 64 while the literature judge runs). p_ssa holds 0.5 + evidence (0.5 = no effect,
@@ -577,7 +585,9 @@ class Engine:
         for t in tiles:
             field = snip.crop(t.box)
             r0, c0 = t.row * G, t.col * G
-            ev[r0 : r0 + G, c0 : c0 + G] = self._occlusion(field, G)
+            ev[r0 : r0 + G, c0 : c0 + G] = self._occlusion(field, G, gen)
+            if gen is not None and gen != self.current_gen:                  # superseded before the feature windows
+                raise Superseded()
             feats[:, r0 : r0 + G, c0 : c0 + G] = self._feature_maps(field, G)
         k = max(1, 256 // G)                                                 # px per cell for the tissue check
         a = np.asarray(snip.resize((C * k, R * k)), dtype=np.float32) / 255.0

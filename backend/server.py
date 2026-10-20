@@ -14,6 +14,7 @@ import io
 import json
 from typing import Optional
 import threading
+from pathlib import Path
 import time
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
@@ -34,27 +35,40 @@ FIELD_UM = 448  # one MHIST field: 224 px at ~2.0 um/px
 LIBRARY = llm.Library()
 POOL = ThreadPoolExecutor(4)
 HEAT_POOL = ThreadPoolExecutor(1)  # heatmap passes run one at a time on the GPU, beside the LLM calls
+ENGINE_POOL = ThreadPoolExecutor(1)  # every analysis on one long-lived thread (see _warm_up)
+GEN_LOCK = threading.Lock()  # guards the snip counter that lets a new snip stop older heatmap passes
 
 
 def _load_engine():
     try:
         from engine import Engine
 
-        STATE["engine"] = Engine()
+        engine = Engine()
+        _warm_up(engine)
+        STATE["engine"] = engine
     except Exception as e:
         STATE["engine_error"] = f"{type(e).__name__}: {e}"
+
+
+def _warm_up(engine):
+    """One invisible analysis right after loading, on the SAME threads that serve snips: GPU libraries set up per
+    thread on Windows, so a snip on a fresh thread paid ~13 s; on a warmed thread it takes ~2 s."""
+    try:
+        demo = Path(__file__).resolve().parent.parent / "data" / "demo" / "demo_hp_ssl.png"
+        img = (Image.open(demo).convert("RGB").crop((70, 120, 1088, 1138)) if demo.exists()
+               else Image.new("RGB", (448, 448), (200, 120, 180)))
+        ENGINE_POOL.submit(engine.analyze, img).result()
+        for sub in (32, 64, 128):
+            HEAT_POOL.submit(engine.refine_heat, img, min(img.size), sub).result()
+    except Exception:
+        pass  # warm-up is only an optimisation
 
 
 threading.Thread(target=_load_engine, daemon=True).start()
 
 
-def _free_gpu():
-    """hand unused GPU memory back between analysis stages (the panel shares 8 GB with the display)"""
-    try:
-        import torch
-        torch.cuda.empty_cache()
-    except Exception:
-        pass
+# No torch.cuda.empty_cache() between stages: re-allocating the freed GPU memory on Windows made the next snip
+# ~13 s instead of ~2 s. The panel alone peaks at ~4.3 GB of the 8 GB, so keeping PyTorch's cache is safe.
 
 
 async def _read(file: UploadFile) -> Image.Image:
@@ -167,15 +181,22 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
                 break
             time.sleep(1)
         engine = STATE["engine"]
+        my_gen = None
+        if engine is not None:  # this snip supersedes any earlier one still refining its map in the background
+            with GEN_LOCK:
+                engine.current_gen += 1
+                my_gen = engine.current_gen
         if engine is None:
             yield _sse("error", {"stage": "conch", "message": STATE["engine_error"] or "The image models are still loading; try again in a minute"})
             return
-        conch = engine.analyze(img, cut=cut)
+        t_an = time.time()
+        conch = ENGINE_POOL.submit(engine.analyze, img, None, cut).result()
+        if os.environ.get("DEMHIST_PROFILE"):
+            print(f"[profile] gen {my_gen}: analyze {time.time() - t_an:.2f} s, threads {threading.active_count()}", flush=True)
         if "error" in conch:
             yield _sse("error", {"stage": "conch", "message": conch["error"], "tiles": conch.get("tiles")})
             return
         yield _sse("conch", conch)
-        _free_gpu()
 
         # literature judge (Lumen) runs while the UI animates the image judges
         query = llm.judge_query(conch)  # from what this field shows (measured crypts) plus the WHO criteria
@@ -188,7 +209,14 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
         # first, so the literature judge and verdict never wait for the last heatmap pass.
         passes = [] if far else list((32, 64, 128) if conch.get("judge_mode") == "panel" else (8,))
         tile_px = conch["magnification"]["tile_px"]
-        heat_future = HEAT_POOL.submit(engine.refine_heat, img, tile_px, passes.pop(0)) if passes else None
+        def refine(sub):
+            t_r = time.time()
+            try:
+                return engine.refine_heat(img, tile_px, sub, gen=my_gen)
+            finally:
+                if os.environ.get("DEMHIST_PROFILE"):
+                    print(f"[profile] gen {my_gen}: refine {sub} ended after {time.time() - t_r:.2f} s", flush=True)
+        heat_future = HEAT_POOL.submit(refine, passes.pop(0)) if passes else None
         judge_sent = False
         while heat_future is not None or not judge_sent:
             waiting = [f for f in (heat_future, None if judge_sent else judge_future) if f is not None]
@@ -196,10 +224,11 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
             if heat_future in done:
                 try:
                     yield _sse("heat", heat_future.result())
-                    _free_gpu()
-                    heat_future = HEAT_POOL.submit(engine.refine_heat, img, tile_px, passes.pop(0)) if passes else None
+                    stale = engine.current_gen != my_gen
+                    heat_future = HEAT_POOL.submit(refine, passes.pop(0)) if passes and not stale else None
                 except Exception as e:
-                    yield _sse("heat_error", {"message": str(e)})
+                    if type(e).__name__ != "Superseded":  # superseded: a newer snip took over the GPU; just stop
+                        yield _sse("heat_error", {"message": str(e)})
                     heat_future = None
             if not judge_sent and judge_future in done:
                 judge_sent = True
