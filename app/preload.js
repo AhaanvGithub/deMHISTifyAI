@@ -5,5 +5,6 @@ contextBridge.exposeInMainWorld('demhist', {
   close: () => ipcRenderer.send('overlay-close'),
   onInit: cb => ipcRenderer.on('init', (_e, d) => cb(d)),
   onFocus: cb => ipcRenderer.on('focus', () => cb()),
+  onWarm: cb => ipcRenderer.on('warm', () => cb()),
   backend: 'http://127.0.0.1:8765',
 });

@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="cutoff.css">
 </head>
 <body class="overlay">
   <canvas id="shot"></canvas>
@@ -17,7 +18,7 @@
     <div id="tissue" class="tissue hidden">
       <canvas id="heat"></canvas>
       <canvas id="feat"></canvas>
-      <div id="colorbar" class="colorbar hidden"><div class="cb-grad"></div><div class="cb-ticks"><span id="cbTop">1.0 SSL</span><span>0.5</span><span id="cbBottom">0 HP</span></div><div id="cbLabel" class="cb-label">P(SSL)</div></div>
+      <div id="colorbar" class="colorbar hidden"><div class="cb-grad"></div><div class="cb-ticks"><span id="cbTop">1.0 SSL</span><span id="cbMid">0.5</span><span id="cbBottom">0 HP</span></div><div id="cbLabel" class="cb-label">P(SSL)</div></div>
       <div id="colLabels" class="axis cols"></div>
       <div id="rowLabels" class="axis rows"></div>
       <span class="handle nw"></span><span class="handle ne"></span><span class="handle sw"></span><span class="handle se"></span>
@@ -44,15 +45,16 @@
    <div id="panelInner" class="panel-inner">
     <header>
       <span class="logo">de<b>MHIST</b>ify</span>
-      <span class="scope">Validated for: colon serrated polyps</span>
+      <span class="hdr-right"><span class="scope">Validated for: colon serrated polyps</span><button id="gear" class="gear" title="Decision cut-off">⚙</button></span>
     </header>
 
     <section id="youCard" class="card"></section>
 
     <section class="card">
-      <h3>Image judges <small>4 vote · 4 colour checks</small></h3>
+      <h3>Image judges <small id="judgesNote"></small></h3>
       <div id="panelSummary" class="summary muted">waiting…</div>
       <div id="judges" class="judges"></div>
+      <div id="cutHint" class="cut-hint"></div>
     </section>
 
     <section id="litCard" class="card pending">
@@ -72,6 +74,8 @@
    </div>
   </aside>
 
+<script src="cutoff_data.js"></script>
+<script src="cutoff.js"></script>
 <script src="overlay.js"></script>
 </body>
 </html>

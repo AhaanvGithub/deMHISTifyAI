@@ -85,8 +85,9 @@ class VisionLocator:
             except Exception:
                 pass  # no bitsandbytes: fall back to bf16 (~7.5 GB, tight on 8 GB)
             self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(VLM_ID, **kwargs).eval()
-            # cap resolution: plenty for locating a large region, keeps it fast
-            self.processor = AutoProcessor.from_pretrained(VLM_ID, min_pixels=256 * 28 * 28, max_pixels=768 * 28 * 28)
+            # cap resolution: plenty for locating a large region, keeps it fast, and keeps its attention step small
+            # enough to share the 8 GB GPU with the image panel
+            self.processor = AutoProcessor.from_pretrained(VLM_ID, min_pixels=256 * 28 * 28, max_pixels=512 * 28 * 28)
         except Exception as e:
             self.error = f"{type(e).__name__}: {e}"
         finally:
@@ -105,8 +106,14 @@ class VisionLocator:
         messages = [{"role": "user", "content": [{"type": "image"}, {"type": "text", "text": VLM_PROMPT}]}]
         text = self.processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         inputs = self.processor(text=[text], images=[img], return_tensors="pt").to(self.model.device)
-        with torch.no_grad():
-            out = self.model.generate(**inputs, max_new_tokens=64, do_sample=False)
+        try:
+            with torch.no_grad():
+                out = self.model.generate(**inputs, max_new_tokens=64, do_sample=False)
+        except torch.OutOfMemoryError:  # GPU shared with the image panel: fall back to the structure-based box
+            self.last_answer = "out of GPU memory"
+            return None
+        finally:
+            torch.cuda.empty_cache()
         answer = self.processor.batch_decode(out[:, inputs["input_ids"].shape[1] :], skip_special_tokens=True)[0]
         self.last_answer = answer
 

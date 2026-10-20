@@ -12,7 +12,9 @@ os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")  # before numpy loads: see en
 
 import io
 import json
+from typing import Optional
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 import uvicorn
@@ -45,6 +47,15 @@ def _load_engine():
 threading.Thread(target=_load_engine, daemon=True).start()
 
 
+def _free_gpu():
+    """hand unused GPU memory back between stages: the image panel and the tissue-box model share 8 GB"""
+    try:
+        import torch
+        torch.cuda.empty_cache()
+    except Exception:
+        pass
+
+
 async def _read(file: UploadFile) -> Image.Image:
     return Image.open(io.BytesIO(await file.read())).convert("RGB")
 
@@ -61,6 +72,19 @@ def health():
         "judge_model": llm.JUDGE_MODEL,
         "verdict_model": llm.VERDICT_MODEL,
     }
+
+
+@app.post("/capture")
+def capture(x: int = Form(...), y: int = Form(...), w: int = Form(...), h: int = Form(...)):
+    """True-colour screen capture for the snip screen (GDI via Pillow; physical pixels). Runs here because
+    the app's PowerShell capture helper can be stopped by antivirus, and Electron's own capture
+    contrast-stretches the screen (tissue looks over-exposed)."""
+    import tempfile
+    from PIL import ImageGrab
+
+    path = os.path.join(tempfile.gettempdir(), f"demhist-snip-{os.getpid()}.png")
+    ImageGrab.grab(bbox=(x, y, x + w, y + h), all_screens=True).save(path, compress_level=1)
+    return {"path": path}
 
 
 @app.post("/region/guess")
@@ -85,11 +109,15 @@ def trust_flags(researcher: dict, conch: dict, judge: dict) -> list:
     mag = conch.get("magnification", {})
     if mag.get("auto") and mag.get("clamped"):
         flags.append(f"Snip zoom is far from the training images (x{mag['zoom_vs_training']}); results may be less reliable.")
+    ood = conch.get("ood")
+    if ood and ood.get("flag"):
+        flags.append("This snip looks unlike the MHIST training images (other tissue, stain, zoom or not tissue); "
+                     "treat the image call with caution.")
     if conch.get("judge_mode") == "zero-shot":
         flags.append("Image judges are untrained (prompt-only); expect near-chance accuracy on this task.")
     panel = conch["panel"]
     if panel["agreement"] < 0.75:
-        flags.append(f"Image judges are split ({panel['votes']}).")
+        flags.append("Image judges are split (" + ", ".join(f"{'SSL' if c == 'SSA' else c} {n}" for c, n in panel["votes"].items()) + ").")
     by_set = {}
     for j in conch["judges"]:
         by_set.setdefault(json.dumps(j["prompts"], sort_keys=True), []).append(j["top"])
@@ -108,22 +136,28 @@ def _sse(event: str, data) -> str:
 
 
 @app.post("/analyze")
-async def analyze(image: UploadFile = File(...), researcher: str = Form(...)):
+async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cut: Optional[float] = Form(None)):
     img = await _read(image)
 
     def stream():
         parsed = llm.parse_researcher(researcher)
         yield _sse("parsed", parsed)
 
+        # the image models take about a minute to load after start-up: wait for them rather than fail
+        for _ in range(180):
+            if STATE["engine"] is not None or STATE["engine_error"]:
+                break
+            time.sleep(1)
         engine = STATE["engine"]
         if engine is None:
-            yield _sse("error", {"stage": "conch", "message": STATE["engine_error"] or "CONCH is still loading"})
+            yield _sse("error", {"stage": "conch", "message": STATE["engine_error"] or "The image models are still loading; try again in a minute"})
             return
-        conch = engine.analyze(img)
+        conch = engine.analyze(img, cut=cut)
         if "error" in conch:
             yield _sse("error", {"stage": "conch", "message": conch["error"], "tiles": conch.get("tiles")})
             return
         yield _sse("conch", conch)
+        _free_gpu()
 
         # literature judge (Lumen) runs while the UI animates the image judges
         top_feats = [v for v in conch["criteria"].values() if v.get("usable")]
@@ -134,6 +168,7 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...)):
         # while Lumen thinks, sharpen the heatmap on the GPU (stride 1/8 tile instead of 1/4)
         try:
             yield _sse("heat", engine.refine_heat(img, conch["magnification"]["tile_px"], sub=8))
+            _free_gpu()
         except Exception as e:
             yield _sse("heat_error", {"message": str(e)})
         judge = judge_future.result()

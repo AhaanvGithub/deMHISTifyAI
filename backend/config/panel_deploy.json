@@ -1,0 +1,63 @@
+{
+  "what": "chosen panel for the app; every number from MHIST training images only (test split unused)",
+  "chosen": "convnext_base + musk_lora",
+  "members": {
+    "convnext_base": {
+      "mu": -0.8085611556410447,
+      "sd": 1.9610721139652734,
+      "weight": 1.1297508540268815,
+      "shown": {
+        "coef": 1.9730931286546747,
+        "intercept": -0.359861332906665
+      }
+    },
+    "musk_lora": {
+      "mu": -0.6327785825391097,
+      "sd": 1.7231024242530648,
+      "weight": 0.6407736612034074,
+      "shown": {
+        "coef": 1.7893513707603814,
+        "intercept": -0.7613446132230465
+      }
+    }
+  },
+  "intercept": 0.051746711807435626,
+  "calibration": {
+    "call": {
+      "coef": 1.000012568884454,
+      "intercept": 0.00023704595277354836
+    },
+    "shown": {
+      "coef": 2.2554691111633187,
+      "intercept": -2.186007432211623
+    }
+  },
+  "cut_off": 0.63,
+  "shown_cut_off": 0.272,
+  "train_oof": {
+    "bal_acc": 0.8987,
+    "auc": 0.9655,
+    "acc_vs_majority": 0.8989,
+    "ssl_caught": 0.8984,
+    "hp_caught": 0.899,
+    "ece": 0.017,
+    "spearman_vs_votes": 0.8365,
+    "acc_on_4v3": 0.65
+  },
+  "test": {
+    "bal_acc": 0.8883,
+    "auc": 0.9563,
+    "acc_vs_majority": 0.8874,
+    "ssl_caught": 0.8917,
+    "hp_caught": 0.8849,
+    "ece": 0.0223,
+    "spearman_vs_votes": 0.8582,
+    "acc_on_4v3": 0.6463
+  },
+  "ood": {
+    "features": "convnext_base (fine-tuned)",
+    "k": 5,
+    "limit": 0.39097,
+    "rule": "1 - mean cosine similarity to the 5 nearest MHIST training images; flag above the 99th percentile of the training images' own distances"
+  }
+}

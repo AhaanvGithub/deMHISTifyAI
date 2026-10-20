@@ -1,0 +1,271 @@
+{
+  "members": [
+    "conch_full",
+    "convnext_base",
+    "plip_full",
+    "musk_lora"
+  ],
+  "test_logits_from": {
+    "conch_full": "final model (all of train)",
+    "convnext_base": "final model (all of train)",
+    "plip_full": "final model (all of train)",
+    "musk_lora": "final model (all of train)"
+  },
+  "groups": {
+    "conch_full": {
+      "members": 1,
+      "cv_auc": 0.9486,
+      "fold_aucs": [
+        0.958,
+        0.9513,
+        0.951,
+        0.9472,
+        0.9349
+      ]
+    },
+    "convnext_base": {
+      "members": 1,
+      "cv_auc": 0.9622,
+      "fold_aucs": [
+        0.9636,
+        0.9705,
+        0.957,
+        0.9599,
+        0.9589
+      ]
+    },
+    "plip_full": {
+      "members": 1,
+      "cv_auc": 0.951,
+      "fold_aucs": [
+        0.9548,
+        0.9693,
+        0.9456,
+        0.9432,
+        0.9426
+      ]
+    },
+    "musk_lora": {
+      "members": 1,
+      "cv_auc": 0.9462,
+      "fold_aucs": [
+        0.9619,
+        0.9499,
+        0.941,
+        0.949,
+        0.9286
+      ]
+    },
+    "conch_full + convnext_base": {
+      "members": 2,
+      "cv_auc": 0.965,
+      "fold_aucs": [
+        0.9708,
+        0.9692,
+        0.9629,
+        0.9633,
+        0.9588
+      ]
+    },
+    "conch_full + plip_full": {
+      "members": 2,
+      "cv_auc": 0.9585,
+      "fold_aucs": [
+        0.9645,
+        0.9674,
+        0.958,
+        0.9541,
+        0.9493
+      ]
+    },
+    "conch_full + musk_lora": {
+      "members": 2,
+      "cv_auc": 0.955,
+      "fold_aucs": [
+        0.9657,
+        0.9577,
+        0.9546,
+        0.9559,
+        0.9426
+      ]
+    },
+    "convnext_base + plip_full": {
+      "members": 2,
+      "cv_auc": 0.9641,
+      "fold_aucs": [
+        0.966,
+        0.9757,
+        0.9603,
+        0.9594,
+        0.9606
+      ]
+    },
+    "convnext_base + musk_lora": {
+      "members": 2,
+      "cv_auc": 0.9655,
+      "fold_aucs": [
+        0.9707,
+        0.9725,
+        0.9616,
+        0.9666,
+        0.9576
+      ]
+    },
+    "plip_full + musk_lora": {
+      "members": 2,
+      "cv_auc": 0.9583,
+      "fold_aucs": [
+        0.9647,
+        0.9704,
+        0.9523,
+        0.9564,
+        0.9468
+      ]
+    },
+    "conch_full + convnext_base + plip_full": {
+      "members": 3,
+      "cv_auc": 0.9656,
+      "fold_aucs": [
+        0.9704,
+        0.9727,
+        0.964,
+        0.9616,
+        0.9601
+      ]
+    },
+    "conch_full + convnext_base + musk_lora": {
+      "members": 3,
+      "cv_auc": 0.9661,
+      "fold_aucs": [
+        0.9722,
+        0.9707,
+        0.964,
+        0.9665,
+        0.9581
+      ]
+    },
+    "conch_full + plip_full + musk_lora": {
+      "members": 3,
+      "cv_auc": 0.9603,
+      "fold_aucs": [
+        0.9673,
+        0.968,
+        0.9578,
+        0.9583,
+        0.9496
+      ]
+    },
+    "convnext_base + plip_full + musk_lora": {
+      "members": 3,
+      "cv_auc": 0.9659,
+      "fold_aucs": [
+        0.9696,
+        0.9747,
+        0.9614,
+        0.9642,
+        0.9593
+      ]
+    },
+    "conch_full + convnext_base + plip_full + musk_lora": {
+      "members": 4,
+      "cv_auc": 0.9662,
+      "fold_aucs": [
+        0.9715,
+        0.973,
+        0.9637,
+        0.9646,
+        0.9594
+      ]
+    }
+  },
+  "best_group": "conch_full + convnext_base + plip_full + musk_lora",
+  "chosen": "convnext_base + musk_lora",
+  "weights": {
+    "convnext_base": 1.1297508540268815,
+    "musk_lora": 0.6407736612034074
+  },
+  "cut_off": 0.63,
+  "shown_cut_off": 0.272,
+  "calibration": {
+    "call": {
+      "coef": 1.000012568884454,
+      "intercept": 0.00023704595277354836
+    },
+    "shown": {
+      "coef": 2.2554691111633187,
+      "intercept": -2.186007432211623
+    }
+  },
+  "train_oof": {
+    "bal_acc": 0.8987,
+    "auc": 0.9655,
+    "acc_vs_majority": 0.8989,
+    "ssl_caught": 0.8984,
+    "hp_caught": 0.899,
+    "ece": 0.017,
+    "spearman_vs_votes": 0.8365,
+    "acc_on_4v3": 0.65
+  },
+  "TEST_chosen_panel": {
+    "bal_acc": 0.8883,
+    "auc": 0.9563,
+    "acc_vs_majority": 0.8874,
+    "ssl_caught": 0.8917,
+    "hp_caught": 0.8849,
+    "ece": 0.0223,
+    "spearman_vs_votes": 0.8582,
+    "acc_on_4v3": 0.6463
+  },
+  "test_context": {
+    "conch_full": {
+      "bal_acc": 0.8305,
+      "auc": 0.9324,
+      "acc_vs_majority": 0.8035,
+      "ssl_caught": 0.9333,
+      "hp_caught": 0.7277,
+      "ece": 0.084,
+      "spearman_vs_votes": 0.8163,
+      "acc_on_4v3": 0.5366
+    },
+    "convnext_base": {
+      "bal_acc": 0.8532,
+      "auc": 0.9482,
+      "acc_vs_majority": 0.827,
+      "ssl_caught": 0.9528,
+      "hp_caught": 0.7536,
+      "ece": 0.0999,
+      "spearman_vs_votes": 0.8395,
+      "acc_on_4v3": 0.5488
+    },
+    "plip_full": {
+      "bal_acc": 0.8619,
+      "auc": 0.9455,
+      "acc_vs_majority": 0.8577,
+      "ssl_caught": 0.8778,
+      "hp_caught": 0.846,
+      "ece": 0.1122,
+      "spearman_vs_votes": 0.8377,
+      "acc_on_4v3": 0.5732
+    },
+    "musk_lora": {
+      "bal_acc": 0.8196,
+      "auc": 0.9359,
+      "acc_vs_majority": 0.781,
+      "ssl_caught": 0.9667,
+      "hp_caught": 0.6726,
+      "ece": 0.0536,
+      "spearman_vs_votes": 0.8245,
+      "acc_on_4v3": 0.5183
+    },
+    "app now (4 partly fine-tuned CONCH)": {
+      "bal_acc": 0.8188,
+      "auc": 0.9076,
+      "acc_vs_majority": 0.826,
+      "ssl_caught": 0.7917,
+      "hp_caught": 0.846,
+      "ece": 0.0344,
+      "spearman_vs_votes": 0.7745,
+      "acc_on_4v3": 0.6159
+    }
+  }
+}

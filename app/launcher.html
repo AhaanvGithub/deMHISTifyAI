@@ -17,10 +17,15 @@
     const text = q.value.trim();
     if (!text) return;
     bar.classList.add('leaving');  // pill shrinks away, then the snip opens
-    setTimeout(() => { window.demhist.submit(text); q.value = ''; bar.classList.remove('leaving'); }, 170);
+    setTimeout(() => { window.demhist.submit(text); q.value = ''; bar.classList.remove('leaving'); bar.classList.add('away'); }, 170);
   });
-  window.demhist.onFocus(() => q.focus());
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') window.close?.(); });
+  // The page loads hidden at start-up, so its entrance animation would finish unseen. Park the pill while the
+  // window is hidden and replay the entrance each time the hotkey shows it.
+  bar.classList.add('away');
+  window.addEventListener('blur', () => bar.classList.add('away'));
+  window.demhist.onFocus(() => { bar.classList.remove('away'); q.focus(); });
+  window.demhist.onWarm(() => { bar.classList.remove('away'); setTimeout(() => bar.classList.add('away'), 450); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { bar.classList.add('away'); window.close?.(); } });
 </script>
 </body>
 </html>

@@ -1,4 +1,11 @@
-"""CONCH side of deMHISTifyAI: tiling, the 8 judges, heatmap and criteria scores.
+"""Image side of deMHISTifyAI: tiling, the image judges, heatmap and criteria scores.
+
+Judges = the chosen panel (config/panel_deploy.json, written by research/export_panel.py): fine-tuned
+ConvNeXt-Base + MUSK (LoRA), combined with learned weights and calibrated on MHIST training images. CONCH
+(original weights) still provides the feature scores and outlines. Without panel_deploy.json the older
+fine-tuned CONCH judges are used.
+
+Older notes:
 
 Judges = 4 class-prompt sets x 2 image conditions (raw, Macenko colour-normalised).
 Which 4 prompt sets are used comes from config/judges.json (picked on the MHIST
@@ -30,6 +37,13 @@ from embed_views import view_macenko  # noqa: E402  (same normalisation as the r
 PROMPTS_PATH = ROOT / "research" / "mhist_prompts.json"
 JUDGES_PATH = ROOT / "backend" / "config" / "judges.json"
 CALIB_PATH = ROOT / "backend" / "config" / "calibration.json"
+PANEL_PATH = ROOT / "backend" / "config" / "panel_deploy.json"
+OOD_REF_PATH = ROOT / "data" / "models" / "cv" / "ood_ref_convnext_base.npz"
+os.environ.setdefault("MUSK_SRC", str(Path(os.environ.get("TEMP", "")) / "claude" / "musk_src" / "MUSK"))
+MEMBER_INFO = {  # how each panel member is shown in the app
+    "convnext_base": {"id": "ConvNeXt", "about": "ConvNeXt-Base (ImageNet CNN), fine-tuned on MHIST"},
+    "musk_lora": {"id": "MUSK", "about": "MUSK pathology model, fine-tuned on MHIST (LoRA)"},
+}
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -79,12 +93,77 @@ class Engine:
         self.heads = dict(np.load(heads_path)) if heads_path.exists() else None  # trained by research/train_judges.py
         self.calib = json.loads(CALIB_PATH.read_text()) if CALIB_PATH.exists() else {}
         self.criteria_keys = [k for k in self.prompts if k.startswith("crit:")]
+        # The chosen panel (if exported) replaces the older fine-tuned CONCH judges.
+        self.panel = self._load_panel()
         # Fine-tuned CONCH versions (research/finetune_conch.py). If present they ARE the 8 judges:
         # 4 versions x {raw, colour-normalised}. Original CONCH stays for features/outlines.
-        self.ft = self._load_finetuned()
-        if self.ft:
+        self.ft = [] if self.panel else self._load_finetuned()
+        if self.panel:
+            self.judges = [{"id": MEMBER_INFO.get(t, {"id": t})["id"], "tag": t, "condition": "raw"} for t in self.panel["members"]]
+        elif self.ft:
             self.judges = [{"id": f"J{n + 1}", "seed": f["seed"], "version": i + 1, "condition": c}
                            for n, (i, f, c) in enumerate((i, f, c) for i, f in enumerate(self.ft) for c in CONDITIONS)]
+
+    def _load_panel(self) -> Optional[dict]:
+        """Load the panel members' final weights (trained on all 2,175 MHIST training images)."""
+        if not PANEL_PATH.exists():
+            return None
+        from kfold_cv import ConvNextBaseFT, MuskLoRAFT
+        cfg = json.loads(PANEL_PATH.read_text())
+        kinds = {"convnext_base": ConvNextBaseFT, "musk_lora": MuskLoRAFT}
+        nets = {}
+        for tag in cfg["members"]:
+            net = kinds[tag](-1)
+            ck = torch.load(ROOT / "data" / "models" / "cv" / tag / "final.pt", map_location="cpu")
+            net.load_state_dict(ck["state"], strict=False)  # LoRA checkpoints hold only the trained weights
+            nets[tag] = net.to(self.device).eval()
+        cfg["nets"] = nets
+        if OOD_REF_PATH.exists():
+            ref = np.load(OOD_REF_PATH)
+            cfg["ood_ref"] = torch.from_numpy(ref["feats"].astype(np.float32)).to(self.device)
+        return cfg
+
+    @torch.no_grad()
+    def _panel_logits(self, images: List[Image.Image], batch_size: int = 16):
+        """Each member's logit per image, plus the ConvNeXt features (for the unlike-training-data check)."""
+        F = torch.nn.functional
+        dev_type = "cuda" if str(self.device).startswith("cuda") else "cpu"
+        logits, feats = {}, []
+        for tag, net in self.panel["nets"].items():
+            tensors = list(_POOL.map(net.pre, images))
+            out = []
+            for i in range(0, len(tensors), batch_size):
+                x = torch.stack(tensors[i : i + batch_size]).to(self.device)
+                with torch.autocast(dev_type, dtype=torch.bfloat16):
+                    if tag.startswith("musk"):
+                        z = net.m(image=x, with_head=False, out_norm=False, ms_aug=False, return_global=True)[0]
+                    else:
+                        z = net.m(x)
+                z = F.normalize(z.float(), dim=-1)
+                out.append((net.cls(z).squeeze(-1) * 10.0).float().cpu().numpy())
+                if tag == "convnext_base":
+                    feats.append(z)
+            logits[tag] = np.concatenate(out)
+        return logits, (torch.cat(feats) if feats else None)
+
+    def _panel_score(self, logits: Dict[str, np.ndarray]) -> np.ndarray:
+        """Combined score (standardised member logits x learned weights), same as research/panel.py."""
+        m = self.panel["members"]
+        return self.panel["intercept"] + sum(m[t]["weight"] * (logits[t] - m[t]["mu"]) / m[t]["sd"] for t in m)
+
+    def _shown(self, z):
+        """Displayed P(SSL): calibrated to the 7-pathologist majority call on MHIST training images."""
+        c = self.panel["calibration"]["shown"]
+        return 1 / (1 + np.exp(-(c["coef"] * np.asarray(z) + c["intercept"])))
+
+    def _ood(self, feats) -> Optional[dict]:
+        """Unlike-training-data check: distance to the 5 nearest MHIST training images (ConvNeXt features)."""
+        if feats is None or "ood_ref" not in self.panel:
+            return None
+        o = self.panel["ood"]
+        sims = feats.float() @ self.panel["ood_ref"].T
+        d = float((1 - sims.topk(o["k"], dim=1).values.mean(1)).mean())
+        return {"distance": round(d, 4), "limit": o["limit"], "flag": d > o["limit"]}
 
     def _load_finetuned(self) -> List[dict]:
         """Each fine-tuned version only changed CONCH's last 2 blocks + pooling (+ a linear head),
@@ -239,7 +318,9 @@ class Engine:
         starts = [(r, c) for r in range(R - sub + 1) for c in range(C - sub + 1)]
         crops = [snip.crop((int(c * cw), int(r * ch), int(c * cw + tw), int(r * ch + th))) for r, c in starts]
         emb, ftp = self.encode(crops)
-        if self.ft:  # fine-tuned judges: mean P(SSA) over versions on the raw image
+        if self.panel:  # the panel's displayed P(SSL) per window
+            p_win = self._shown(self._panel_score(self._panel_logits(crops)[0]))
+        elif self.ft:  # fine-tuned judges: mean P(SSA) over versions on the raw image
             p_win = ftp.mean(axis=1)
         else:
             raw_judges = [n for n, j in enumerate(self.judges) if j["condition"] == "raw"]
@@ -269,7 +350,8 @@ class Engine:
         snip = snip.convert("RGB")
         return self._dense_heat(snip, self.make_grid(snip, tile_px), sub=sub)
 
-    def analyze(self, snip: Image.Image, tile_px: Optional[int] = None) -> dict:
+    def analyze(self, snip: Image.Image, tile_px: Optional[int] = None, cut: Optional[float] = None) -> dict:
+        """`cut`: the app's decision cut-off on the displayed P(SSL) scale (default: the balanced one)."""
         snip = snip.convert("RGB")
         if tile_px is None:
             # The researcher snips one field, framed like an MHIST image: score the whole snip as one
@@ -283,10 +365,9 @@ class Engine:
             mag = {"auto": False, "tile_px": tile_px}
         tiles = self.make_grid(snip, tile_px)
         crops = [snip.crop(t.box) for t in tiles]
-        emb = {
-            "raw": self.encode(crops),
-            "normalized": self.encode(list(_POOL.map(lambda c: view_macenko(c, None), crops))),
-        }
+        emb = {"raw": self.encode(crops)}
+        if not self.panel:  # colour-normalised checks only for the older CONCH judges (the panel uses raw images)
+            emb["normalized"] = self.encode(list(_POOL.map(lambda c: view_macenko(c, None), crops)))
 
         tissue = self._tissue(crops)
         for t, s in zip(tiles, tissue):
@@ -294,6 +375,9 @@ class Engine:
         mask = np.array([t.is_tissue for t in tiles])
         if not mask.any():
             return {"error": "no_tissue", "tiles": [t.__dict__ for t in tiles]}
+
+        if self.panel:
+            return self._analyze_panel(snip, tiles, crops, mask, emb, mag, tile_px, cut)
 
         judge_results, tile_probs = [], []
         # The fine-tuned versions only ever saw raw images. Fed Macenko-normalised tiles they drift to HP
@@ -362,4 +446,57 @@ class Engine:
             "magnification": {**mag, "tile_px": tile_px},
             "calibrated": bool(self.calib),
             "judge_mode": "fine-tuned" if self.ft else ("trained" if self.heads is not None else "zero-shot"),
+        }
+
+    def _analyze_panel(self, snip, tiles, crops, mask, emb, mag, tile_px, cut) -> dict:
+        cut = float(self.panel["shown_cut_off"] if cut is None else cut)
+        logits, feats = self._panel_logits(crops)
+        z = self._panel_score(logits)
+        p_tile = self._shown(z)
+        p_snip = float(self._shown(z[mask].mean()))
+        call = lambda p: "SSA" if p > cut else "HP"
+        judge_results = []
+        for j in self.judges:
+            c = self.panel["members"][j["tag"]]["shown"]
+            p = float(1 / (1 + np.exp(-(c["coef"] * logits[j["tag"]][mask].mean() + c["intercept"]))))
+            top = call(p)
+            judge_results.append({
+                "id": j["id"], "condition": "raw", "votes": True,
+                "prompts": {"SSA": MEMBER_INFO.get(j["tag"], {}).get("about", j["tag"]),
+                            "HP": f"weight in panel {self.panel['members'][j['tag']]['weight']:.2f}"},
+                "top": top, "top_conf": round(100 * (p if top == "SSA" else 1 - p)),
+                "alt": "HP" if top == "SSA" else "SSA", "alt_conf": round(100 * (1 - p if top == "SSA" else p)),
+                "p_ssl": round(p, 4)})
+        crit = self._criteria(emb["raw"][0])
+        for i, t in enumerate(tiles):
+            t.probs = {"SSA": float(p_tile[i]), "HP": float(1 - p_tile[i])}
+            t.criteria = {k.split(":", 1)[1]: float(crit[i, n]) for n, k in enumerate(self.criteria_keys)}
+        heat = self._dense_heat(snip, tiles)
+        votes = {c: sum(r["top"] == c for r in judge_results) for c in CLASSES}
+        top = call(p_snip)
+        snip_crit = crit[mask].mean(0)
+        return {
+            "grid": {"rows": max(t.row for t in tiles) + 1, "cols": max(t.col for t in tiles) + 1},
+            "tiles": [t.__dict__ for t in tiles],
+            "heat": heat,
+            "judges": judge_results,
+            "panel": {
+                "votes": votes, "top": top,
+                "top_conf": round(100 * (p_snip if top == "SSA" else 1 - p_snip)),
+                "alt": "HP" if top == "SSA" else "SSA",
+                "alt_conf": round(100 * (1 - p_snip if top == "SSA" else p_snip)),
+                "agreement": max(votes.values()) / len(judge_results), "n_voters": len(judge_results),
+                "p_ssl": round(p_snip, 4), "cut": round(cut, 4), "default_cut": self.panel["shown_cut_off"],
+            },
+            "ood": self._ood(feats[torch.from_numpy(mask).to(feats.device)] if feats is not None else None),
+            "criteria": {
+                k.split(":", 1)[1]: {"text": self.prompts[k], "score": round(float(snip_crit[n]), 3),
+                                     "reliability": self.calib.get(k, {}).get("reliability"),
+                                     "usable": self.calib.get(k, {}).get("usable", False),
+                                     "points_to": self.calib.get(k, {}).get("points_to")}
+                for n, k in enumerate(self.criteria_keys)
+            },
+            "magnification": {**mag, "tile_px": tile_px},
+            "calibrated": bool(self.calib),
+            "judge_mode": "panel",
         }

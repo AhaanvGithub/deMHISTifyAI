@@ -46,7 +46,7 @@ body.launcher { background: transparent; padding: 28px; overflow: hidden; }
                    rgba(180,108,255,.25)) border-box;
   box-shadow: 0 0 14px 1px rgba(255,122,89,.34), 0 0 22px rgba(180,108,255,.22),
               inset 0 1px 0 rgba(255,255,255,.18), inset 0 -10px 18px rgba(255,122,89,.06);
-  animation: drop .22s cubic-bezier(.2,.9,.3,1.2), border-spin 6s linear infinite;
+  animation: drop .28s cubic-bezier(.2,.9,.3,1.15), border-spin 6s linear infinite;
 }
 .bar:focus-within { box-shadow: 0 0 18px 2px rgba(255,140,90,.42), 0 0 24px rgba(180,108,255,.28),
                                 inset 0 1px 0 rgba(255,255,255,.22), inset 0 -10px 20px rgba(255,200,87,.08); }
@@ -63,7 +63,10 @@ body.launcher { background: transparent; padding: 28px; overflow: hidden; }
   opacity: .55; transition: opacity .15s;
 }
 .bar:focus-within kbd { opacity: 1; }
-@keyframes drop { from { opacity: 0; transform: translateY(-8px) scale(.98); } }
+@keyframes drop { from { opacity: 0; transform: translateY(-10px) scale(.96); } }
+/* hidden between hotkey presses; removing .away restarts the drop animation (launcher.html) */
+.bar.away { opacity: 0; transform: translateY(-10px) scale(.96); animation: border-spin 6s linear infinite; }
+.bar { will-change: opacity, transform; }  /* own compositor layer: the entrance doesn't repaint the glow each frame */
 @keyframes border-spin { to { --spin: 360deg; } }
 
 /* ---------- overlay ---------- */
@@ -140,7 +143,7 @@ button.primary kbd { color: #2a0f1c; border-color: rgba(0,0,0,.25); }
 .good { color: var(--good); } .bad { color: var(--bad); } .warn { color: var(--warn); }
 .judges { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px; }
 .judge { display: flex; align-items: center; gap: 6px; font-size: 12px; padding: 6px 8px; border-radius: 8px; background: rgba(255,255,255,.035); }
-.judge .jid { color: var(--muted); font-weight: 600; width: 20px; }
+.judge .jid { color: var(--muted); font-weight: 600; min-width: 20px; }
 .judge .cond { font-size: 10px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
 .judge.nonvoting { opacity: .5; }
 .judge.nonvoting:hover { opacity: .85; }

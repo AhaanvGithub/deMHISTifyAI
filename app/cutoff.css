@@ -1,0 +1,49 @@
+/* Cut-off settings sheet (cutoff.js). Uses the theme tokens from styles.css. */
+.gear { border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 8px;
+        width: 26px; height: 26px; padding: 0; font-size: 14px; line-height: 1; cursor: pointer; }
+.gear:hover { color: var(--text); border-color: rgba(255,190,160,.35); }
+.hdr-right { display: flex; gap: 8px; align-items: center; }
+.cut-hint { font-size: 11px; color: var(--muted); margin-top: 6px; cursor: pointer; }
+.cut-hint b { color: var(--text); font-weight: 600; }
+.cut-hint:hover { color: var(--text); }
+
+.cut-sheet {
+  position: fixed; z-index: 20; top: 64px; right: 20px; width: 392px; padding: 16px;
+  border-radius: 16px; background: var(--glass); backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-edge), 0 24px 70px rgba(16,4,24,.6); border: 1px solid var(--line);
+  animation: pop .22s ease-out; cursor: default; user-select: none;
+  max-height: calc(100vh - 84px); overflow-y: auto; scrollbar-width: none;
+}
+.cut-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.cut-head h3 { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); }
+.cut-sub { font-size: 12px; margin-top: 3px; background: var(--sunset); -webkit-background-clip: text; color: transparent; font-weight: 600; }
+.cut-close { border: 0; background: transparent; color: var(--muted); font-size: 14px; cursor: pointer; padding: 2px 4px; }
+.cut-close:hover { color: var(--text); }
+
+.cut-chart { width: 100%; height: auto; display: block; cursor: ew-resize; outline: none; border-radius: 10px;
+             background: rgba(255,255,255,.03); touch-action: none; }
+.cut-chart:focus-visible { box-shadow: 0 0 0 2px var(--accent); }
+.c-hp, .c-ssl { fill: none; stroke-width: 2; }
+.c-hp { stroke: var(--hp); } .c-ssl { stroke: var(--ssl); }
+.c-hp-fill { fill: var(--hp); opacity: .14; } .c-ssl-fill { fill: var(--ssl); opacity: .14; }
+.c-zone { fill: var(--ssl); opacity: .06; }
+.c-cut { stroke: var(--accent2); stroke-width: 2; }
+.c-knob { fill: var(--accent2); stroke: var(--bg-solid); stroke-width: 2; }
+.c-snip { stroke: var(--text); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.c-axis text { font-size: 9px; fill: var(--muted); text-anchor: middle; }
+.c-axis text:first-child { text-anchor: start; } .c-axis text:last-child { text-anchor: end; }
+.c-lab { font-size: 10px; font-weight: 700; }
+.c-lab-hp { fill: var(--hp); } .c-lab-ssl { fill: var(--ssl); }
+
+.cut-read { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 10px 0 6px; }
+.cut-read div { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 6px 8px; text-align: center; }
+.cut-read b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+.cut-read span { font-size: 10px; color: var(--muted); }
+.r-ssl { color: var(--ssl); } .r-hp { color: var(--hp); }
+.cut-plain { font-size: 12px; line-height: 1.5; margin: 6px 0 10px; }
+.cut-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.cut-presets button { font-size: 11px; padding: 5px 9px; border-radius: 999px; background: transparent;
+                      border: 1px solid var(--line); color: var(--muted); cursor: pointer; }
+.cut-presets button:hover { color: var(--text); }
+.cut-presets button.on { background: rgba(255,170,130,.18); color: var(--text); border-color: rgba(255,190,160,.4); }
+.cut-foot { font-size: 10px; color: var(--muted); line-height: 1.45; margin-top: 10px; }

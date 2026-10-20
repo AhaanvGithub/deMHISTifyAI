@@ -16,7 +16,8 @@ window.demhist.onInit(({ screenshot, researcher }) => {
   $('chip').textContent = `“${researcher}”`;
   img = new Image();
   img.onload = () => { scale = img.width / window.innerWidth; drawShot(); drawDim(); };
-  img.src = screenshot;
+  // raw PNG bytes from the main process (a data URL string from older builds)
+  img.src = typeof screenshot === 'string' ? screenshot : URL.createObjectURL(new Blob([screenshot], { type: 'image/png' }));
 });
 
 function fit(c) { c.width = window.innerWidth; c.height = window.innerHeight; }
@@ -141,9 +142,9 @@ document.addEventListener('keydown', e => {
 async function analyze() {
   state = 'results';
   $('actions').classList.add('hidden'); $('hint').classList.add('hidden');
-  tissue.classList.add('locked'); $('tissueTag').textContent = 'CONCH judges looking…';
+  tissue.classList.add('locked'); $('tissueTag').textContent = 'image panel looking…';
   layoutPanel();
-  const res = await postImage('/analyze', await tissueCrop(), { researcher: researcherText });
+  const res = await postImage('/analyze', await tissueCrop(), { researcher: researcherText, cut: Cutoff.state().cut });
   const reader = res.body.getReader(), dec = new TextDecoder();
   let buf = '';
   for (;;) {
@@ -167,6 +168,12 @@ function layoutPanel() {
   if (right >= left) { p.style.left = Math.min(selRect.x + selRect.w + gap, window.innerWidth - W - 12) + 'px'; }
   else { p.style.left = Math.max(selRect.x - W - gap, 12) + 'px'; }
   p.style.transformOrigin = right >= left ? 'top left' : 'top right';  // grow out from the selection side
+  // line the panel up with the selection: same top edge, and (once the verdict is in) the same bottom edge,
+  // so snip + panel read as one clean rectangle. Small snips get a minimum height, shifted up if needed.
+  const MIN_H = 360;
+  panelBox.h = Math.min(Math.max(selRect.h, MIN_H), window.innerHeight - 24);
+  panelBox.top = Math.min(selRect.y, window.innerHeight - 12 - panelBox.h);
+  p.style.top = panelBox.top + 'px';
   growPanel();
   const hc = $('heatControls');
   hc.style.left = (selRect.x + tissueBox.x) + 'px';
@@ -174,19 +181,23 @@ function layoutPanel() {
 }
 
 // the panel starts compact and its height eases to fit its content as each section fills in
-let panelRO = null;
+// (capped at the selection's height); when the verdict is in it settles at exactly the selection's height
+let panelRO = null, panelDone = false, fitPanel = () => {};
+const panelBox = { top: 64, h: 600 };
 function growPanel() {
   if (panelRO) return;
   const p = $('panel'), inner = $('panelInner');
-  const fitH = () => {
-    const max = window.innerHeight - 88, want = inner.scrollHeight + 34;  // 2 x 16px padding + border
-    p.style.height = Math.min(want, max) + 'px';
-    p.style.overflowY = want > max ? 'auto' : 'hidden';
+  fitPanel = () => {
+    const want = inner.scrollHeight + 34;  // 2 x 16px padding + border
+    const h = panelDone ? panelBox.h : Math.min(want, panelBox.h);
+    p.style.height = h + 'px';
+    p.style.overflowY = want > h ? 'auto' : 'hidden';
   };
-  panelRO = new ResizeObserver(fitH);
+  panelRO = new ResizeObserver(fitPanel);
   panelRO.observe(inner);
-  fitH();
+  fitPanel();
 }
+function finishPanel() { panelDone = true; fitPanel(); }
 
 function handle(ev, d) {
   if (ev === 'parsed') return renderYou(d);
@@ -199,6 +210,7 @@ function handle(ev, d) {
     $('panelSummary').innerHTML = `<span class="bad">${d.message === 'no_tissue' ? 'No tissue found in the box.' : 'Error: ' + d.message}</span>`;
     $('litSummary').textContent = '—'; $('verdict').textContent = '—';
     $('litCard').classList.remove('pending'); $('verdictCard').classList.remove('pending');
+    finishPanel();
   }
 }
 
@@ -229,24 +241,47 @@ function renderConch(r) {
   $('tissueTag').textContent = `${r.grid.cols} × ${r.grid.rows} tiles${mz.auto ? ` · zoom ×${mz.zoom_vs_training} vs training` : ''} · ${r.heat.cols} × ${r.heat.rows} cells · hover for detail`;
   $('heatControls').classList.remove('hidden');
   drawHeat();
-  const pnl = r.panel, agree = parsed?.call && pnl.top === parsed.call;
+  renderPanelSummary();
+  if (r.panel.p_ssl != null) Cutoff.setScore(r.panel.p_ssl);
+  const box = $('judges'); box.innerHTML = '';
+  r.judges.forEach((j, i) => setTimeout(() => box.appendChild(judgeEl(j)), 90 * i));
+}
+
+// the call follows the cut-off setting (gear): re-derive it from the panel's P(SSL) whenever the setting moves
+function applyCut(o) {
+  const cut = Cutoff.state().cut, top = o.p_ssl > cut ? 'SSA' : 'HP';
+  return { ...o, top, top_conf: Math.round(100 * (top === 'SSA' ? o.p_ssl : 1 - o.p_ssl)),
+           alt: top === 'SSA' ? 'HP' : 'SSA', alt_conf: Math.round(100 * (top === 'SSA' ? 1 - o.p_ssl : o.p_ssl)) };
+}
+function renderPanelSummary() {
+  const r = result; if (!r) return;
+  const panelMode = r.judge_mode === 'panel';
+  const judges = panelMode ? r.judges.map(applyCut) : r.judges;
+  const votes = panelMode ? { SSA: judges.filter(j => j.top === 'SSA').length, HP: judges.filter(j => j.top === 'HP').length } : r.panel.votes;
+  const pnl = panelMode ? { ...applyCut(r.panel), votes } : r.panel;
+  $('judgesNote').textContent = panelMode ? 'ConvNeXt + MUSK, combined' : '4 vote · 4 colour checks';
+  const agree = parsed?.call && pnl.top === parsed.call;
   $('panelSummary').classList.remove('muted');
   $('panelSummary').innerHTML =
     `${pct(LABEL[pnl.top], pnl.top_conf, agree || !parsed?.call ? 'good' : 'bad')}
      <div class="alt">- alt: ${LABEL[pnl.alt]} ${pnl.alt_conf}%</div>
-     <div class="votes">${Object.entries(pnl.votes).map(([c, n]) => `${LABEL[c]} ${n}/${pnl.n_voters || r.judges.length}`).join(' · ')}</div>`;
-  const box = $('judges'); box.innerHTML = '';
-  r.judges.forEach((j, i) => setTimeout(() => {
-    const el = document.createElement('div');
-    el.className = 'judge pop' + (j.votes === false ? ' nonvoting' : '');
-    el.title = `${j.prompts.SSA}\nvs\n${j.prompts.HP}` + (j.votes === false ? '\n\ncolour check only: does not vote (these versions were trained on raw images)' : '');
-    el.innerHTML = `<span class="jid">${j.id}</span><span class="cond">${j.condition === 'raw' ? 'raw' : 'norm'}</span>
-                    <b class="${j.top === 'SSA' ? 'ssl' : 'hp'}">${LABEL[j.top]} ${j.top_conf}</b>
-                    <span class="jalt">${LABEL[j.alt]} ${j.alt_conf}</span>
-                    <span class="jbar ${j.top === 'SSA' ? 'ssl' : 'hp'}"></span>`;
-    box.appendChild(el);
-    requestAnimationFrame(() => requestAnimationFrame(() => { el.querySelector('.jbar').style.width = j.top_conf + '%'; }));
-  }, 90 * i));
+     <div class="votes">${Object.entries(pnl.votes).map(([c, n]) => `${LABEL[c]} ${n}/${pnl.n_voters || r.judges.length}`).join(' · ')}</div>
+     ${panelMode ? `<div class="sub">${Math.round(100 * pnl.p_ssl)}% chance a 7-pathologist majority says SSL · calls SSL above ${Math.round(100 * Cutoff.state().cut)}%</div>` : ''}`;
+  countUp($('panelSummary'));
+  if (panelMode) document.querySelectorAll('#judges .judge').forEach((el, i) => el.replaceWith(judgeEl(judges[i], true)));
+}
+function judgeEl(j0, still = false) {
+  const panelMode = result.judge_mode === 'panel', j = panelMode ? applyCut(j0) : j0;
+  const el = document.createElement('div');
+  el.className = 'judge' + (still ? '' : ' pop') + (j.votes === false ? ' nonvoting' : '');
+  el.title = panelMode ? `${j.prompts.SSA} · ${j.prompts.HP}`
+    : `${j.prompts.SSA}\nvs\n${j.prompts.HP}` + (j.votes === false ? '\n\ncolour check only: does not vote (these versions were trained on raw images)' : '');
+  el.innerHTML = `<span class="jid">${j.id}</span>${panelMode ? '' : `<span class="cond">${j.condition === 'raw' ? 'raw' : 'norm'}</span>`}
+                  <b class="${j.top === 'SSA' ? 'ssl' : 'hp'}">${LABEL[j.top]} ${j.top_conf}</b>
+                  <span class="jalt">${LABEL[j.alt]} ${j.alt_conf}</span>
+                  <span class="jbar ${j.top === 'SSA' ? 'ssl' : 'hp'}"></span>`;
+  requestAnimationFrame(() => requestAnimationFrame(() => { el.querySelector('.jbar').style.width = j.top_conf + '%'; }));
+  return el;
 }
 
 // jet-style colour scale like pathology probability maps: blue -> cyan -> green -> yellow -> red
@@ -274,13 +309,19 @@ function drawHeat() {
   small.width = H.cols; small.height = H.rows;
   const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
   const ai = heatRef === 'ai';
+  const c0 = result.judge_mode === 'panel' ? Cutoff.state().cut : 0.5;
+  const centre = p => (p <= c0 ? 0.5 * p / c0 : 0.5 + 0.5 * (p - c0) / (1 - c0));  // cut-off -> middle of the scale
+  // A whole-snip field gives (nearly) one value everywhere: a uniform tint says nothing about *where* and only
+  // washes out the tissue, so a flat map is not painted (the call and colour bar still show the value).
+  const tv = H.p_ssa.filter((_, i) => H.tissue[i] >= 0.25);
+  const flat = tv.length && Math.max(...tv) - Math.min(...tv) < 0.03;
   for (let i = 0; i < H.p_ssa.length; i++) {
-    const p = H.p_ssa[i];
+    const p = ai ? centre(H.p_ssa[i]) : H.p_ssa[i];
     // AI view: fixed P(SSL) scale, HP-leaning tissue blue, SSL-leaning red, undecided (~0.5) fades out.
     // Your-call view: support for your call, clear when unlikely, then cyan -> green -> yellow -> red.
     const v = ai ? p : (ref === 'SSA' ? p : 1 - p);
     const k = ai ? smooth(0.06, 0.34, Math.abs(p - 0.5)) : smooth(0.22, 0.6, v);
-    const alpha = H.tissue[i] < 0.25 ? 0 : 0.8 * k;  // never fully opaque: tissue must stay readable
+    const alpha = H.tissue[i] < 0.25 || flat ? 0 : (ai ? 0.55 : 0.8) * k;  // never opaque: tissue must stay readable
     im.data.set([...jet(v), Math.round(255 * a * alpha)], i * 4);
   }
   sg.putImageData(im, 0, 0);
@@ -314,6 +355,7 @@ function drawHeat() {
   $('colorbar').classList.toggle('diverging', ai);
   $('cbLabel').textContent = ai ? 'P(SSL)' : `P(${LABEL[ref]}) · your call`;
   $('cbTop').textContent = ai ? '1.0 SSL' : '1.0'; $('cbBottom').textContent = ai ? '0 HP' : '0';
+  $('cbMid').textContent = ai && result.judge_mode === 'panel' ? `${Math.round(Cutoff.state().cut * 100)}% cut-off` : '0.5';
   drawFeatures();
 }
 
@@ -450,6 +492,7 @@ function renderFlags(flags) {
 
 function renderVerdict(v) {
   const el = $('verdict'); el.classList.remove('muted');
+  finishPanel();
   if (v.error) { el.innerHTML = '<span class="warn">Verdict unavailable.</span>'; return; }
   const cls = { agrees: 'good', 'partly agrees': 'warn', disagrees: 'bad' }[v.alignment] || '';
   el.innerHTML = `<div class="headline ${cls}">${esc(v.headline)}</div><p>${esc(v.conclusion)}</p>
@@ -459,3 +502,11 @@ function renderVerdict(v) {
 }
 
 window.addEventListener('resize', () => { if (img) { drawShot(); drawDim(selRect); drawHeat(); } });
+
+// ---------- decision cut-off (gear in the panel header) ----------
+const cutHint = s => { $('cutHint').innerHTML = `${s.label} · calls SSL above <b>${Math.round(s.cut * 100)}%</b> ⚙`; };
+Cutoff.load().then(cutHint);
+Cutoff.onChange(s => { cutHint(s); if (result?.judge_mode === 'panel') { renderPanelSummary(); drawHeat(); } });
+const openCut = () => Cutoff.open($('panel').classList.contains('hidden') ? null : $('panel').getBoundingClientRect());
+$('gear').onclick = openCut;
+$('cutHint').onclick = openCut;

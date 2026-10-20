@@ -15,14 +15,18 @@ Ashby Hackathon 2026 submission by Aiden Wang, Alice Yu and Ahaan Verma. Researc
 
 ## Using it
 
-1. Start the app: `cd app` then `npm start` (the Python backend starts with it).
+1. Start the app: `cd app` then `npm start`. It runs quietly in the background (the Python backend starts
+   with it) and opens a demo image with two MHIST-sized fields, A and B, to try it on.
 2. Press **Ctrl+Shift+Space**, type your call (e.g. "sessile serrated lesion, 70%") and press Enter.
 3. Drag a box around one field of tissue. Adjust the tissue box if needed and press Enter.
-4. Read the panel on the right. Toggle the heatmap between **AI's call** (P(SSL): HP blue, SSL red) and
-   **Your call** (support for your call).
+4. Read the panel beside your selection. Toggle the heatmap between **AI's call** (P(SSL): HP blue, SSL red)
+   and **Your call** (support for your call).
+5. Optional: the **gear** sets the decision cut-off. It shows how SSL and HP training images score, with
+   presets from "catch at least 95% of SSLs" to "clear at least 99% of HPs". The default is the balanced
+   cut-off, which the reported results use.
 
-Snip one field at roughly the magnification you would use to make the call. The whole snip is scored as
-one field, exactly as the models were trained.
+Snip one field of about 0.45 mm (MHIST's field size, roughly a 5x view). The whole snip is scored as one
+field, exactly as the models were trained.
 
 | Folder | What's in it |
 |---|---|
@@ -42,7 +46,8 @@ Models and data are not included; each user obtains access themselves (see Repro
 |---|---|
 | Capture | The screen is captured in true colour (Windows GDI) when the snip screen opens |
 | Tissue box | A local vision model proposes the tissue region inside your selection |
-| Image panel | Each panel member scores the field; their weighted, calibrated combination gives P(SSL) and the call |
+| Image panel | ConvNeXt-Base and MUSK each score the field; their weighted, calibrated combination gives P(SSL) and the call |
+| Unlike-training-data check | The snip's ConvNeXt features are compared with the 2,175 training images; if they are further away than 99% of training images are from each other, the panel warns that its call may not apply |
 | Heatmap | Tile-sized windows slide across the snip and are scored by the panel |
 | Feature scores | CONCH compares the image with text descriptions of WHO-2019 features; only features with measured reliability are used |
 | Literature judge | An LLM (Lumen) reasons over the image panel's result, the reliable feature scores and a curated passage library, citing only those passages. It never sees the image |
@@ -67,12 +72,16 @@ HP count equally), so the panel cannot score well by leaning toward the more com
 
 ### Members
 
-| Member | Type | Training | Learning rate | Input |
-|---|---|---|---|---|
-| CONCH | Pathology vision-language model | Classifier first, then all layers | 1e-5 | 224 px |
-| PLIP | Pathology vision-language model | Classifier first, then all layers | 1e-5 | 224 px |
-| MUSK | Pathology vision-language model (ViT-L) | Classifier first, then last 2 layers | 1e-5 | 384 px |
-| ConvNeXt-Tiny | ImageNet CNN | Classifier first, then all layers | 1e-4 | 224 px |
+Four candidates were trained; the panel-building rule (below) chose **ConvNeXt-Base + MUSK**.
+
+| Candidate | Type | Training | Learning rate | Input | Cross-validated AUC (train) | In the panel |
+|---|---|---|---|---|---|---|
+| ConvNeXt-Base | ImageNet CNN | Classifier first, then all layers | 1e-4 | 224 px | 0.962 | **Yes** (weight 1.13) |
+| MUSK | Pathology vision-language model (ViT-L) | Classifier first, then LoRA (rank 8) on the attention of all 24 layers | 1e-4 | 384 px | 0.946 | **Yes** (weight 0.64) |
+| PLIP | Pathology vision-language model | Classifier first, then all layers | 1e-5 | 224 px | 0.951 | No |
+| CONCH | Pathology vision-language model | Classifier first, then all layers | 1e-5 | 224 px | 0.949 | No |
+
+CONCH (original weights) still powers the feature scores and their outlines on the image.
 
 ### Training recipe (all members)
 
@@ -81,7 +90,7 @@ HP count equally), so the panel cannot score well by leaning toward the more com
 | Target | Share of the 7 pathologists who called SSL (e.g. 5/7 = 0.71) | Learns the consensus, including how split it was |
 | Class balance | Each SSL image weighted 2.45 (= 1,545 HP / 630 SSL) | Both classes carry equal total weight, matching balanced accuracy |
 | Classifier first | 1 epoch training only the classifier, then up to 8 fine-tuning epochs, best epoch kept | Fine-tuning starts from a sensible classifier, so the model's existing knowledge is adjusted gently |
-| Learning rate | 1e-5 for the pathology models, 1e-4 for the CNN | Standard rates for fine-tuning each kind of model on small data |
+| Learning rate | 1e-5 for full fine-tuning of pathology models, 1e-4 for the CNN and for LoRA | Standard rates for each kind of fine-tuning on small data |
 | Image variation (training only) | Flips, 90-degree rotations, mild brightness/contrast/saturation/hue jitter | Robust to lighting and stain differences; predictions use the image as-is, so a snip always gets the same score |
 | Precision | bf16 activations, fp32 weights | Full fine-tuning fits on an 8 GB laptop GPU |
 
@@ -91,9 +100,9 @@ HP count equally), so the panel cannot score well by leaning toward the more com
 |---|---|
 | Cross-validation | Each member is trained 5 times on 4/5 of the training images (same folds for all), so every training image gets a prediction from a model that never saw it |
 | Every combination | All 15 groups of members are scored, each with one learned weight per member |
-| Selection | The best group by AUC; among groups within 0.003 AUC of it, the smallest wins |
-| Calibration | Platt scaling, so "80%" means about 80% |
-| Cut-off | Set to maximise balanced accuracy on the training images |
+| Selection | The best group by AUC; among groups within 0.003 AUC of it, the smallest wins. All four scored 0.9662; ConvNeXt-Base + MUSK scored 0.9655 and was chosen (ConvNeXt-Base alone, 0.9622, was not close enough) |
+| Calibration | The displayed percentage is calibrated to the 7-pathologist majority call, so "80%" means the majority says SSL about 80% of the time on MHIST-like fields |
+| Cut-off | Set to maximise balanced accuracy on the training images: the app calls SSL above 27% |
 | Final models | Each chosen member is retrained once on all 2,175 training images; the app runs these |
 | Evaluation | The 977 test images are scored once, on the exact version the app runs |
 
@@ -103,16 +112,22 @@ All choices are made on training images; the test split is used only for the fin
 
 ## Performance
 
-On the 977 MHIST test images, through the app's own pipeline (`docs/results/app_pipeline_eval_v2.json`):
+On the 977 MHIST test images, scored once with the exact models, weights and cut-off the app runs
+(`docs/results/panel.json`):
 
-| Model | Balanced accuracy | AUC | Plain accuracy | Calibration error | Correlation with vote count |
-|---|---|---|---|---|---|
-| Fine-tuned CONCH (current release) | 0.819 | 0.908 | 0.826 | 0.034 | 0.774 |
-| Panel "CLIK" (ConvNeXt + PLIP + MUSK), preliminary | 0.877 | 0.959 | 0.863 | 0.047 | 0.860 |
+| | Balanced accuracy | AUC | Accuracy | SSL caught | HP caught | Calibration error | Correlation with vote count |
+|---|---|---|---|---|---|---|---|
+| **Panel (ConvNeXt-Base + MUSK)** | **0.888** | **0.956** | **0.887** | **89.2%** | **88.5%** | **2.2%** | **0.858** |
+| ConvNeXt-Base alone | 0.853 | 0.948 | 0.827 | 95.3% | 75.4% | 10.0% | 0.840 |
+| PLIP alone | 0.862 | 0.946 | 0.858 | 87.8% | 84.6% | 11.2% | 0.838 |
+| MUSK alone | 0.820 | 0.936 | 0.781 | 96.7% | 67.3% | 5.4% | 0.825 |
+| CONCH alone | 0.831 | 0.932 | 0.804 | 93.3% | 72.8% | 8.4% | 0.816 |
+| Fine-tuned CONCH, last 2 blocks (earlier release) | 0.819 | 0.908 | 0.826 | 79.2% | 84.6% | 3.4% | 0.775 |
 
-Accuracy holds when the snip comes from a scaled screenshot (150% display: balanced accuracy 0.825,
-AUC 0.910). About 1 in 6 test tiles is a 4-3 split among the pathologists, which caps any model:
-even a perfect model would agree with a fresh 7-pathologist majority only about 89-92% of the time.
+Single members use a plain 50% cut-off, so they lean toward SSL; the panel's calibrated cut-off balances
+the two classes. About 1 in 6 test tiles is a 4-3 split among the pathologists, which caps any model: even
+a perfect model would agree with a fresh 7-pathologist majority only about 89-92% of the time. The panel's
+0.887 accuracy is at that ceiling. On the 4-3 splits it agrees with the majority 65% of the time.
 
 ### Compared with published results on MHIST
 
@@ -126,19 +141,18 @@ sorted by balanced accuracy; rows that do not report it follow. Blank = not repo
 
 | Method | How the model is adapted | Balanced acc. | Accuracy | AUC | F1 | ECE | Test images used to choose the model | Source |
 |---|---|---|---|---|---|---|---|---|
-| **deMHISTifyAI panel "CLIK"** (ConvNeXt + PLIP + MUSK), preliminary | Fine-tuned (section above); 5-fold model average | **0.877** | **0.863** | **0.959** | **0.865** | **4.7%** | None | this repo [p] |
+| **deMHISTifyAI panel** (ConvNeXt-Base + MUSK) | Fine-tuned (section above), group chosen on training data | **0.888** | **0.887** | **0.956** | **0.888** | **2.2%** | None | this repo |
+| Virchow2, LoRA fine-tuned | LoRA | | | | ~0.875 (derived) | | None (validation carved from train) | THUNDER [2] |
 | Virchow2 | Frozen + linear | 0.848 | | | 0.836 | 0.6% | None (validation carved from train) | THUNDER [2] |
 | H-optimus-0 | Frozen + linear | 0.837 | | | 0.828 | 1.6% | None (validation carved from train) | THUNDER [2] |
 | Virchow | Frozen + linear | 0.827 | | | 0.823 | 3.5% | None (validation carved from train) | THUNDER [2] |
 | UNI | Frozen + linear | 0.825 | | | 0.824 | 3.1% | None (validation carved from train) | THUNDER [2] |
-| **deMHISTifyAI, current release** (fine-tuned CONCH x4) | Last 2 blocks fine-tuned, soft labels, calibrated | **0.819** | **0.826** | **0.908** | **0.827** | **3.4%** | None | this repo |
+| deMHISTifyAI, earlier release (fine-tuned CONCH x4) | Last 2 blocks fine-tuned, soft labels, calibrated | 0.819 | 0.826 | 0.908 | 0.827 | 3.4% | None | this repo |
 | DINOv2-B (natural images) | Frozen + linear | 0.819 | | | 0.826 | 0.6% | None (validation carved from train) | THUNDER [2] |
 | CONCH | Frozen + linear | 0.800 | | | 0.797 | 3.2% | None (validation carved from train) | THUNDER [2] |
 | MUSK | Frozen + linear | 0.792 | | | 0.800 | 7.0% | None (validation carved from train) | THUNDER [2] |
 | PLIP | Frozen + linear | 0.790 | | | 0.785 | 1.7% | None (validation carved from train) | THUNDER [2] |
 | QuiltNet | Frozen + linear | 0.735 | | | 0.735 | 1.8% | None (validation carved from train) | THUNDER [2] |
-| **deMHISTifyAI, final panel** | Final retrained models, group chosen on training data | to be added after the final test run | | | | | None | this repo |
-| Virchow2, LoRA fine-tuned | LoRA | | | | ~0.875 (derived) | | None (validation carved from train) | THUNDER [2] |
 | CONCH, LoRA fine-tuned | LoRA | | | | ~0.851 (derived) | | None (validation carved from train) | THUNDER [2] |
 | UNI, LoRA fine-tuned | LoRA | | | | ~0.847 (derived) | | None (validation carved from train) | THUNDER [2] |
 
@@ -160,16 +174,10 @@ sorted by balanced accuracy; rows that do not report it follow. Blank = not repo
 | ResNet-18, from scratch | Fully trained | | | 0.845 | | | All 977 (best epochs kept) | MHIST paper [1] |
 
 How the protocols differ:
-- **deMHISTifyAI**: every choice (epochs, weights, cut-off) is made on training images; the test split is
-  scored once.
-- **[p] Preliminary**: test logits averaged over the 5 cross-validation models (the final models retrained on
-  all of train come later); weights, calibration and the cut-off were fit on training images only, and the
-  final group is still chosen by the training-data rule. Across all member groups the range is 0.862-0.882
-  balanced accuracy and 0.938-0.961 AUC (`docs/results/preliminary_test_check.json`).
-- **Plain accuracy**: CLIK's cut-off is tuned for balanced accuracy, which costs plain accuracy. Tuned instead
-  for plain accuracy (also on training images only), CLIK reaches accuracy 0.892, weighted F1 0.892 and
-  balanced accuracy 0.890 on test, matching PolarHE [5]. This was observed after the cut-off rule was fixed,
-  so the app keeps the balanced-accuracy rule.
+- **deMHISTifyAI**: every choice (members, epochs, weights, calibration, cut-off) is made on training images;
+  the test split is scored once. F1 is weighted F1, as in the other rows. The panel has the highest balanced
+  accuracy and AUC of any comparable result we found, using only openly available models; accuracy and F1
+  are level with PolarHE [5], which does not say how its model was selected.
 - **[5] PolarHE**: frozen features with a linear classifier; reports the official split sizes (2,175 / 977) but
   not how the model was selected.
 - **Not comparable**: a 2026 preprint reporting 90.2% accuracy and 0.955 AUC with vision transformers (CaiT) used
@@ -199,9 +207,13 @@ Supporting analyses:
 | Does more training data help? | Yes: AUC 0.878 / 0.896 / 0.906 with 25 / 50 / 100% of train | `docs/results/finetune_learning_curve.json` |
 | Do brightness/contrast/zoom adjustments at prediction time help? | No: all within +-0.002 AUC of the plain image | `research/image_tta_sweep.py` |
 | Do the feature scores match the visible tissue? | Only weakly; they are shown as hints, not proof | `docs/results/feature_reality_check.md` |
+| Does stain normalisation help? | No: Reinhard, Macenko, Vahadane and a derived method all score slightly below no normalisation, on MHIST and on four simulated labs (ConvNeXt-Base, held-out training folds). The app uses images as they are | `docs/results/stain_compare.json` |
+| Does it hold up on another hospital's slides? | UniToPatho (Turin; different scanner and stain), scaled to MHIST's field size: ConvNeXt-Base calls 99-100% of 545 hyperplastic polyps (41 slides) HP, depending on how each patch is cropped to one field. Normal colon and adenomas score lower still (median P(SSL) 0.15 and 0.18 vs 0.21 for HP), matching their lack of serration. UniToPatho has no SSLs, so outside SSL detection is untested | `docs/results/unitopatho_check.json` |
+| Does the unlike-training-data check work? | It flags all 16 non-tissue and wrong-stain test images (photos, noise, a brown immunostain, a photo recoloured in H&E colours) and 1% of MHIST training images by design. On UniToPatho it flags 14% of HP, 9% of adenoma and 20% of normal colon fields. Frozen CONCH features flagged 51% of the outside HP and were not used | `research/export_panel.py` |
 
-Scope: trained on MHIST (one lab, one magnification). Slides that look very different, e.g. much higher
-power or a very different stain, are outside what the models have learned.
+Scope: trained on MHIST (one lab, about 5x). Slides that look very different, e.g. much higher power or a
+very different stain, are outside what the models have learned; the unlike-training-data check warns about
+many of these.
 
 ---
 
@@ -212,20 +224,23 @@ Use `.venv\Scripts\python.exe` (Python 3.12, CUDA). Requires Hugging Face access
 loaded from a clone of github.com/lilab-stanford/MUSK via `MUSK_SRC`.
 
 ```bash
-# 5-fold cross-validation per member
-python research/kfold_cv.py --backbone conch    --blocks -1 --lr 1e-5 --batch 8 --accum 2 --tag conch_full
-python research/kfold_cv.py --backbone convnext --blocks -1 --lr 1e-4 --tag convnext_full
-python research/kfold_cv.py --backbone plip     --blocks -1 --lr 1e-5 --tag plip_full
-MUSK_SRC=<MUSK clone> python research/kfold_cv.py --backbone musk --blocks 2 --lr 1e-5 --batch 8 --tag musk_b2
+# 5-fold cross-validation per candidate
+python research/kfold_cv.py --backbone conch         --blocks -1 --lr 1e-5 --batch 8 --accum 2 --tag conch_full
+python research/kfold_cv.py --backbone convnext_base --blocks -1 --lr 1e-4 --batch 8 --accum 2 --tag convnext_base
+python research/kfold_cv.py --backbone plip          --blocks -1 --lr 1e-5 --tag plip_full
+MUSK_SRC=<MUSK clone> python research/kfold_cv.py --backbone musk_lora --lr 1e-4 --batch 2 --accum 8 --tag musk_lora
 
-# final model per member on all training images (N = median best epoch from its folds)
-python research/kfold_cv.py --backbone conch --blocks -1 --lr 1e-5 --batch 8 --accum 2 --tag conch_full --final-epochs N
+# final model per candidate on all training images (N = median best epoch from its folds), e.g.
+python research/kfold_cv.py --backbone convnext_base --blocks -1 --lr 1e-4 --batch 8 --accum 2 --tag convnext_base --final-epochs N
 
 # choose the panel on training data, then score the test split once
-python research/panel.py --members conch_full convnext_full plip_full musk_b2
+python research/panel.py --members conch_full convnext_base plip_full musk_lora
 
-# evaluate the app pipeline on rendered snips
-python research/eval_app_pipeline.py 977 native,screenshot
+# export what the app needs (standardisation, calibrations, cut-off chart, unlike-training-data reference)
+python research/export_panel.py
+
+# demo image opened at start-up (needs the UniToPatho HP patches in data/unitopatho/)
+python research/make_demo_image.py
 ```
 
 ---
