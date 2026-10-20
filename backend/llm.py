@@ -1,9 +1,9 @@
 """Lumen (NCSA) side of deMHISTifyAI: paper retrieval, the research LLM judge,
 the final verdict, and parsing what the researcher typed.
 
-The LLMs never see the image. They see only what CONCH measured (judge votes,
-criteria presence scores) plus excerpts from the curated paper library, and may
-cite only those excerpts.
+The LLMs never see the image. They see only what the image models measured (the panel's
+calibrated P(SSL), its cut-off and the members' votes; CONCH feature scores) plus excerpts
+from the curated paper library, and may cite only those excerpts.
 """
 
 import json
@@ -120,6 +120,9 @@ def research_judge(criteria: dict, papers: List[dict], panel: Optional[dict] = N
     if panel:
         p_ssa = panel["top_conf"] if panel["top"] == "SSA" else panel["alt_conf"]
         judges = f"P(SSA) = {p_ssa}%, votes {panel['votes']}, agreement {panel['agreement']:.0%}"
+        if panel.get("cut") is not None:  # the panel calls SSL above its cut-off, not above 50%
+            judges += (f"; the panel calls SSA above {round(100 * panel['cut'])}% (cut-off chosen on training images "
+                       f"to balance missed SSA and over-called HP), so its call is {panel['top']}")
     refs = "\n\n".join(f"[{p['ref']}] {p['title']}\n{p['excerpt']}" for p in papers) or "(no excerpts available)"
     payload = (f"Image judges: {judges}\n\nMeasurable features:\n{feats}\n\n"
                f"Not measurable by the image model: {not_measurable}\n\nLiterature excerpts:\n{refs}")
@@ -156,7 +159,7 @@ def research_judge(criteria: dict, papers: List[dict], panel: Optional[dict] = N
 
 # ---------- final verdict ----------
 VERDICT_SYSTEM = """You write the final summary for a pathology research tool. You cannot see the image.
-Compare the researcher's call and stated certainty with (a) a panel of 8 image-model judges and (b) a literature-grounded reasoning model.
+Compare the researcher's call and stated certainty with (a) the image panel (two fine-tuned image models combined; its percentage is calibrated to the 7-pathologist majority, and it calls SSA above its stated cut-off, not above 50%) and (b) a literature-grounded reasoning model.
 Be direct and brief. Point out disagreement, over- or under-confidence, and what the researcher should look at again. This is a research tool, not a diagnosis.
 Respond with JSON only:
 {"alignment": "agrees" | "partly agrees" | "disagrees", "headline": "max 10 words",

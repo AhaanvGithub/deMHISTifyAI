@@ -80,7 +80,7 @@ def _grow_to_gland_edge(keep: np.ndarray, n: int, hema: np.ndarray, tissue: np.n
             after = np.flatnonzero(prof[peak : dmax + 1] < half)
             edge = peak + (int(after[0]) if after.size else dmax - peak)
             grow |= px & (dist <= edge)
-        grow = morphology.binary_opening(morphology.binary_closing(grow, morphology.disk(2)), morphology.disk(1))
+        grow = morphology.opening(morphology.closing(grow, morphology.disk(2)), morphology.disk(1))
         grow = ndi.binary_fill_holes(grow) & ((owner == i) | me)
         out[grow & (out == 0)] = i
         ring_share[i] = clear / max(seen, 1)
@@ -92,15 +92,15 @@ def measure(field: Image.Image) -> List[dict]:
     from skimage import measure as M, morphology, segmentation
 
     a, gray, sat, hema = _arrays(field)
-    tissue = morphology.remove_small_objects(~((gray > 0.86) & (sat < 0.08)), 64)   # not bare glass
+    tissue = morphology.remove_small_objects(~((gray > 0.86) & (sat < 0.08)), max_size=63)   # not bare glass
     # "pale" is relative to this slide's staining (light and dark labs differ): brighter than halfway from the
     # tissue's typical brightness to white, and no more coloured than typical tissue
     g_med = np.median(gray[tissue]) if tissue.any() else 0.6
     white = max(np.percentile(gray, 99), g_med + 0.1)
     pale = (gray > g_med + 0.5 * (white - g_med)) & (sat < max(0.08, np.median(sat[tissue]) if tissue.any() else 0.2))
-    interior = morphology.binary_closing(pale, morphology.disk(2))                   # merge goblet cells
-    interior = morphology.remove_small_holes(interior, 40)
-    interior = morphology.binary_opening(interior, morphology.disk(1))
+    interior = morphology.closing(pale, morphology.disk(2))                   # merge goblet cells
+    interior = morphology.remove_small_holes(interior, max_size=39)
+    interior = morphology.opening(interior, morphology.disk(1))
     lab = M.label(interior)
     h_tissue = np.percentile(hema[tissue & ~interior], 55) if (tissue & ~interior).any() else np.inf
     min_area = np.pi * (MIN_CRYPT_UM / UM_PER_PX / 2) ** 2
@@ -113,7 +113,7 @@ def measure(field: Image.Image) -> List[dict]:
             continue
         me = lab == p.label
         # nuclei sit at the base of the epithelium, up to ~20 um from a wide lumen: look in a band 4-18 um out
-        ring = morphology.binary_dilation(me, morphology.disk(10)) & ~morphology.binary_dilation(me, morphology.disk(2))
+        ring = morphology.dilation(me, morphology.disk(10)) & ~morphology.dilation(me, morphology.disk(2))
         if tissue[ring].mean() < 0.8 or np.percentile(hema[ring], 75) < h_tissue:   # needs a dark nuclear ring
             continue
         keep[me] = len(props) + 1
@@ -137,7 +137,7 @@ def measure(field: Image.Image) -> List[dict]:
             "outline": [[round(float(x) / S, 4), round(float(y) / S, 4)] for y, x in c],
             "center": [round(float(p.centroid[1]) / S, 4), round(float(p.centroid[0]) / S, 4)],
             "crypt_um": round(2 * np.sqrt(p.area / np.pi) * UM_PER_PX, 1),
-            "width_um": round(float(p.minor_axis_length) * UM_PER_PX, 1),   # dilation = wide, not long
+            "width_um": round(float(p.axis_minor_length) * UM_PER_PX, 1),   # dilation = wide, not long
             "lumen_um": round(2 * np.sqrt(lp.area / np.pi) * UM_PER_PX, 1) if lp is not None else 0.0,
             "roughness": round(rough, 3) if rough is not None else None,
             "solidity": round(float(p.solidity), 3),
