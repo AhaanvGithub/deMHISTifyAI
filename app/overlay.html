@@ -12,10 +12,14 @@
   <div id="chip" class="chip"></div>
   <div id="hint" class="hint">Drag to select the slide region · <kbd>Esc</kbd> to cancel</div>
   <div id="sizeTag" class="size-tag hidden"></div>
+  <!-- scale bar read on the whole screen before the snip, and the one-field square it gives -->
+  <div id="scaleMark" class="scale-mark hidden"><span id="scaleMarkTag"></span></div>
+  <div id="fieldPreview" class="field-preview hidden"></div>
 
   <!-- tissue box + heatmap live inside the selection -->
   <div id="sel" class="sel hidden">
     <div id="tissue" class="tissue hidden">
+      <canvas id="view" class="hidden"></canvas>
       <canvas id="heat"></canvas>
       <canvas id="feat"></canvas>
       <div id="colorbar" class="colorbar hidden"><div class="cb-grad"></div><div class="cb-ticks"><span id="cbTop">1.0 SSL</span><span id="cbMid">0.5</span><span id="cbBottom">0 HP</span></div><div id="cbLabel" class="cb-label">P(SSL)</div></div>
@@ -32,14 +36,29 @@
   </div>
 
   <div id="heatControls" class="heat-controls hidden">
-    <div class="seg">
-      <button data-ref="ai" class="on">AI's call</button>
-      <button data-ref="researcher">Your call</button>
+    <div class="hc-row">
+      <div class="seg">
+        <button data-ref="ai" class="on">AI's call</button>
+        <button data-ref="researcher">Your call</button>
+      </div>
+      <label>Opacity <input id="opacity" type="range" min="0" max="100" value="45"></label>
+      <label class="chk"><input id="showGrid" type="checkbox" checked> Grid</label>
+      <label class="chk"><input id="showFeat" type="checkbox" checked> Crypts</label>
+      <span class="legend" title="Measured on the image; thresholds set on MHIST training images"><span><i style="background:var(--ssl)"></i>dilated</span><span><i style="background:var(--hp)"></i>round regular</span></span>
     </div>
-    <label>Opacity <input id="opacity" type="range" min="0" max="100" value="45"></label>
-    <label class="chk"><input id="showGrid" type="checkbox" checked> Grid</label>
-    <label class="chk"><input id="showFeat" type="checkbox" checked> Crypts</label>
-    <span class="legend" title="Measured on the image; thresholds set on MHIST training images"><span><i style="background:var(--ssl)"></i>dilated</span><span><i style="background:var(--hp)"></i>round regular</span></span>
+    <!-- inspection: these change only how the field is shown, never the call -->
+    <div class="hc-row inspect">
+      <span id="zoomTag" class="zoom-tag" title="Scroll on the field to zoom, drag to pan, 0 or double-click to reset">1.0×</span>
+      <span id="looks" class="looks">
+        <button data-look="exposure"><kbd>E</kbd>exposure</button>
+        <button data-look="contrast"><kbd>C</kbd>contrast</button>
+        <button data-look="greyscale"><kbd>G</kbd>greyscale</button>
+        <button data-look="saturation"><kbd>S</kbd>saturation</button>
+        <button data-look="sharpen"><kbd>D</kbd>sharpen</button>
+        <button data-look="nuclei"><kbd>N</kbd>nuclei only</button>
+      </span>
+      <span class="keys-hint">hold <kbd>Space</kbd> to hide the AI · scroll to zoom · <kbd>0</kbd> reset</span>
+    </div>
   </div>
 
   <aside id="panel" class="panel hidden">

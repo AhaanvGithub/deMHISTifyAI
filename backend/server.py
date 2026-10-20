@@ -1,6 +1,7 @@
 """Local backend for the deMHISTifyAI desktop app (http://127.0.0.1:8765).
 
-POST /capture        x, y, w, h -> true-colour screenshot path
+POST /capture        x, y, w, h -> true-colour screenshot path (and starts reading the scale bar on it)
+GET  /scale          -> the scale bar read on that screenshot: one field's size in screen pixels
 POST /region/guess   image -> square field on the tissue (tissue vs glass by colour, instant)
 POST /analyze        image (already cropped to the confirmed box) + researcher text
                      -> Server-Sent Events: parsed, conch, flags, judge, verdict, done
@@ -110,16 +111,30 @@ def _read_scale(shot):
         return None
 
 
+def _scale(timeout: float = 3):
+    # reading the bar takes ~2-8 s on a full screen (Windows OCR on each candidate bar), started at capture
+    fut = STATE.get("scale")
+    try:
+        return fut.result(timeout=timeout) if fut is not None else None
+    except Exception:
+        return None
+
+
+@app.get("/scale")
+def scale_bar():
+    """The scale bar read on the whole screenshot (before any snip), so the snip screen can size one field up front.
+    Bar coordinates and field size are in screenshot pixels."""
+    s = _scale(timeout=20)  # asked as soon as the snip screen opens: worth waiting for, the user is still looking
+    if not s:
+        return {"found": False}
+    return {"found": True, "um_per_px": round(s["um_per_px"], 4), "label_um": s["label_um"], "bar": s["bar"],
+            "field_px": round(FIELD_UM / s["um_per_px"], 1)}
+
+
 @app.post("/region/guess")
 async def region_guess(image: UploadFile = File(...)):
     img = await _read(image)
-    scale = None
-    fut = STATE.get("scale")
-    if fut is not None:
-        try:
-            scale = fut.result(timeout=3)
-        except Exception:
-            scale = None
+    scale = _scale(timeout=10)
     if scale:
         # one MHIST field = 448 um. The snip is in screenshot pixels, the same pixels the scale bar was measured in
         side = FIELD_UM / scale["um_per_px"]

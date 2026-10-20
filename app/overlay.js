@@ -10,12 +10,13 @@ let selRect = null;         // selection in CSS px (screen)
 let tissueBox = null;       // tissue box in CSS px, relative to selection
 let state = 'select';       // select | region | results
 let result = null, parsed = null, heatRef = 'ai';  // AI's map first, then compare with your call
+let screenScale = null;     // the viewer's scale bar, read on the whole screen before the snip (screenshot px)
 
 window.demhist.onInit(({ screenshot, researcher }) => {
   researcherText = researcher;
   $('chip').textContent = `“${researcher}”`;
   img = new Image();
-  img.onload = () => { scale = img.width / window.innerWidth; drawShot(); drawDim(); };
+  img.onload = () => { scale = img.width / window.innerWidth; drawShot(); drawDim(); readScreenScale(); };
   // raw PNG bytes from the main process (a data URL string from older builds)
   img.src = typeof screenshot === 'string' ? screenshot : URL.createObjectURL(new Blob([screenshot], { type: 'image/png' }));
 });
@@ -38,29 +39,75 @@ function drawDim(r) {
 }
 
 // ---------- 1. selection ----------
-let drag = null;
+// The backend reads the viewer's scale bar on the whole screenshot as soon as it is taken. Once it's in, one 448 um
+// field has a known size on screen: a dashed square of that size follows the mouse, a click puts the field there and a
+// drag smaller than a field grows to one around it (a larger drag still lets the field find the tissue inside it).
+async function readScreenScale() {
+  try {
+    const s = await (await fetch(API + '/scale', { signal: AbortSignal.timeout(25000) })).json();
+    if (state !== 'select') return;  // already snipped: /region/guess uses the same reading
+    if (!s.found) { $('hint').innerHTML = 'No scale bar found on screen · drag to select the slide region · <kbd>Esc</kbd> to cancel'; return; }
+    screenScale = s;
+    const [x0, y0, x1, y1] = s.bar.map(v => v / scale), pad = 4;
+    place($('scaleMark'), { x: x0 - pad, y: y0 - pad, w: x1 - x0 + 2 * pad, h: y1 - y0 + 2 * pad });
+    $('scaleMarkTag').textContent = `${s.label_um} µm scale bar read`;
+    $('scaleMark').classList.remove('hidden');
+    const advice = s.field_px > Math.min(img.width, img.height) ? ' · zoom out: one field is bigger than the screen'
+      : s.field_px < 224 ? ' · zoom in: one field is under 224 screen pixels' : '';
+    $('hint').innerHTML = `One 448 µm field is ${Math.round(s.field_px)} px here${advice} · click or drag where the field should go · <kbd>Esc</kbd> to cancel`;
+    if (lastMouse) previewAt(lastMouse.x, lastMouse.y);
+  } catch { /* backend not up: plain drag-to-select */ }
+}
+const fieldSide = () => Math.min(screenScale.field_px / scale, window.innerWidth, window.innerHeight);  // CSS px
+function fieldAt(cx, cy) {  // one field-sized square centred on a point, kept on screen
+  const side = fieldSide();
+  return { x: Math.min(Math.max(0, cx - side / 2), window.innerWidth - side),
+           y: Math.min(Math.max(0, cy - side / 2), window.innerHeight - side), w: side, h: side };
+}
+function previewAt(cx, cy) { place($('fieldPreview'), fieldAt(cx, cy)); $('fieldPreview').classList.remove('hidden'); }
+let drag = null, lastMouse = null;
 dim.addEventListener('mousedown', e => {
   if (state !== 'select') return;
   drag = { x: e.clientX, y: e.clientY };
 });
 window.addEventListener('mousemove', e => {
+  lastMouse = { x: e.clientX, y: e.clientY };
+  if (state === 'select' && screenScale) {
+    const r = drag ? norm(drag.x, drag.y, e.clientX, e.clientY) : null;
+    r ? previewAt(r.x + r.w / 2, r.y + r.h / 2) : previewAt(e.clientX, e.clientY);
+  }
   if (state === 'select' && drag) {
     selRect = norm(drag.x, drag.y, e.clientX, e.clientY);
     drawDim(selRect); place(sel, selRect); sel.classList.remove('hidden');
     const tag = $('sizeTag');
     tag.classList.remove('hidden');
-    tag.textContent = `${Math.round(selRect.w * scale)} × ${Math.round(selRect.h * scale)}`;
+    tag.textContent = `${Math.round(selRect.w * scale)} × ${Math.round(selRect.h * scale)}` +
+      (screenScale ? ` · one field ${Math.round(screenScale.field_px)} px` : '');
     tag.style.left = selRect.x + 'px'; tag.style.top = (selRect.y + selRect.h + 8) + 'px';
   }
   if (boxDrag) moveBox(e);
+  if (panDrag) pan(e);
 });
 window.addEventListener('mouseup', () => {
   if (state === 'select' && drag) {
+    const d = drag, big = selRect && selRect.w > 40 && selRect.h > 40;
     drag = null;
-    if (selRect && selRect.w > 40 && selRect.h > 40) startRegion();
+    if (screenScale) {
+      // a click: one field centred there; a drag: at least one field, grown around the drag's centre
+      const f = big ? fieldAt(selRect.x + selRect.w / 2, selRect.y + selRect.h / 2) : fieldAt(d.x, d.y);
+      selRect = big ? union(selRect, f) : f;
+      drawDim(selRect); place(sel, selRect); sel.classList.remove('hidden');
+      $('fieldPreview').classList.add('hidden'); $('scaleMark').classList.add('hidden');
+      startRegion();
+    } else if (big) startRegion();
   }
   boxDrag = null;
+  endPan();
 });
+function union(a, b) {
+  const x = Math.min(a.x, b.x), y = Math.min(a.y, b.y);
+  return { x, y, w: Math.max(a.x + a.w, b.x + b.w) - x, h: Math.max(a.y + a.h, b.y + b.h) - y };
+}
 function norm(x0, y0, x1, y1) { return { x: Math.min(x0, x1), y: Math.min(y0, y1), w: Math.abs(x1 - x0), h: Math.abs(y1 - y0) }; }
 function place(el, r) { Object.assign(el.style, { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' }); }
 
@@ -199,9 +246,16 @@ function layoutPanel() {
   panelBox.top = Math.min(selRect.y, window.innerHeight - 12 - panelBox.h);
   p.style.top = panelBox.top + 'px';
   growPanel();
-  const hc = $('heatControls');
-  hc.style.left = (selRect.x + tissueBox.x) + 'px';
-  hc.style.top = Math.min(selRect.y + selRect.h + 36, window.innerHeight - 52) + 'px';
+  placeControls();
+}
+// map + inspection controls under the field, as wide as the gap beside the panel (wrapping if narrower); above the
+// field when there's no room below, so they never sit on the tissue or under the panel
+function placeControls() {
+  const hc = $('heatControls'), left = selRect.x + tissueBox.x, p = $('panel').getBoundingClientRect();
+  hc.style.left = left + 'px';
+  hc.style.maxWidth = ((p.width && p.left > left ? p.left : window.innerWidth) - left - 12) + 'px';
+  const h = hc.offsetHeight, below = selRect.y + selRect.h + 36, above = selRect.y + tissueBox.y - 34 - h;
+  hc.style.top = (below + h <= window.innerHeight - 8 ? below : above >= 8 ? above : window.innerHeight - h - 8) + 'px';
 }
 
 // the panel starts compact and its height eases to fit its content as each section fills in
@@ -271,6 +325,7 @@ function renderConch(r) {
   $('tissueTag').textContent = r.heat.kind === 'evidence' ? `what drives the call · ${r.heat.level} × ${r.heat.level} per field · sharpening…`
     : `${r.grid.cols} × ${r.grid.rows} tiles${mz.auto ? ` · zoom ×${mz.zoom_vs_training} vs training` : ''} · ${r.heat.cols} × ${r.heat.rows} cells · hover for detail`;
   $('heatControls').classList.remove('hidden');
+  placeControls();
   drawHeat();
   renderPanelSummary();
   if (r.panel.p_ssl != null) Cutoff.setScore(r.panel.p_ssl);
@@ -332,60 +387,69 @@ function drawHeat() {
   const rect = tissue.getBoundingClientRect();
   for (const c of [heat, $('feat')]) { c.width = Math.round(rect.width * dpr); c.height = Math.round(rect.height * dpr); }
   const g = heat.getContext('2d'), a = $('opacity').value / 100;
+  g.setTransform(1, 0, 0, 1, 0, 0);
   g.clearRect(0, 0, heat.width, heat.height);
+  const z = zoomTo(g, heat);  // zoomed in: draw only the visible part of the field
 
   // 1. probability of the reference call per fine cell; low values fade to transparent
-  const small = document.createElement('canvas');
-  small.width = H.cols; small.height = H.rows;
-  const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
   const ai = heatRef === 'ai';
   const rgb = CLASS_RGB();
   const ev = H.kind === 'evidence';  // cover-up map: 0.5 = no effect, above = pushed toward SSL, below = toward HP
   const c0 = result.judge_mode === 'panel' && !ev ? Cutoff.state().cut : 0.5;
-  const centre = p => (p <= c0 ? 0.5 * p / c0 : 0.5 + 0.5 * (p - c0) / (1 - c0));  // cut-off -> middle of the scale
-  // A whole-snip field gives (nearly) one value everywhere: a uniform tint says nothing about *where* and only
-  // washes out the tissue, so a flat map is not painted (the call and colour bar still show the value).
-  const tv = H.p_ssa.filter((_, i) => H.tissue[i] >= 0.25);
-  const flat = tv.length && Math.max(...tv) - Math.min(...tv) < 0.03;
-  for (let i = 0; i < H.p_ssa.length; i++) {
-    const p = ai ? centre(H.p_ssa[i]) : H.p_ssa[i];
-    // AI view: fixed P(SSL) scale, HP-leaning tissue teal, SSL-leaning orange, undecided (~0.5) fades out.
-    // Your-call view: support for your call, in that call's colour, clear when unlikely.
-    const v = ai ? p : (ref === 'SSA' ? p : 1 - p);
-    // soft fade from 'no effect' (transparent) to strong evidence, so empty cells don't cut hard edges
-    const k = ai ? smooth(0.0, 0.4, Math.abs(p - 0.5)) : ev ? smooth(0.0, 0.4, v - 0.5) : smooth(0.22, 0.6, v);
-    const alpha = H.tissue[i] < 0.25 || flat ? 0 : (ai ? 0.55 : 0.8) * k;  // never opaque: tissue must stay readable
-    im.data.set([...(ai ? (p >= 0.5 ? rgb.SSA : rgb.HP) : rgb[ref]), Math.round(255 * a * alpha)], i * 4);
+  // the soft map only changes with the map, opacity, view and cut-off: rebuilt then, reused while zooming
+  const key = [a, heatRef, ref, c0].join('|');
+  if (heatBlob.H !== H || heatBlob.key !== key) {
+    const small = document.createElement('canvas');
+    small.width = H.cols; small.height = H.rows;
+    const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
+    const centre = p => (p <= c0 ? 0.5 * p / c0 : 0.5 + 0.5 * (p - c0) / (1 - c0));  // cut-off -> middle of the scale
+    // A whole-snip field gives (nearly) one value everywhere: a uniform tint says nothing about *where* and only
+    // washes out the tissue, so a flat map is not painted (the call and colour bar still show the value).
+    const tv = H.p_ssa.filter((_, i) => H.tissue[i] >= 0.25);
+    const flat = tv.length && Math.max(...tv) - Math.min(...tv) < 0.03;
+    for (let i = 0; i < H.p_ssa.length; i++) {
+      const p = ai ? centre(H.p_ssa[i]) : H.p_ssa[i];
+      // AI view: fixed P(SSL) scale, HP-leaning tissue teal, SSL-leaning orange, undecided (~0.5) fades out.
+      // Your-call view: support for your call, in that call's colour, clear when unlikely.
+      const v = ai ? p : (ref === 'SSA' ? p : 1 - p);
+      // soft fade from 'no effect' (transparent) to strong evidence, so empty cells don't cut hard edges
+      const k = ai ? smooth(0.0, 0.4, Math.abs(p - 0.5)) : ev ? smooth(0.0, 0.4, v - 0.5) : smooth(0.22, 0.6, v);
+      const alpha = H.tissue[i] < 0.25 || flat ? 0 : (ai ? 0.55 : 0.8) * k;  // never opaque: tissue must stay readable
+      im.data.set([...(ai ? (p >= 0.5 ? rgb.SSA : rgb.HP) : rgb[ref]), Math.round(255 * a * alpha)], i * 4);
+    }
+    sg.putImageData(im, 0, 0);
+    // two-step upscale + blur gives soft blob edges like slide-level probability maps
+    const mid = document.createElement('canvas');
+    const cp = Math.max(8, Math.round(1024 / Math.max(H.cols, H.rows)));  // px per cell on the blur canvas
+    mid.width = H.cols * cp; mid.height = H.rows * cp;
+    const mg = mid.getContext('2d');
+    mg.imageSmoothingEnabled = true; mg.imageSmoothingQuality = 'high';
+    mg.filter = `blur(${Math.round(cp * 1.2)}px)`;  // ~1.2 cells at every refinement level
+    mg.drawImage(small, 0, 0, mid.width, mid.height);
+    heatBlob = { H, key, mid };
   }
-  sg.putImageData(im, 0, 0);
-  // two-step upscale + blur gives soft blob edges like slide-level probability maps
-  const mid = document.createElement('canvas');
-  const cp = Math.max(8, Math.round(1024 / Math.max(H.cols, H.rows)));  // px per cell on the blur canvas
-  mid.width = H.cols * cp; mid.height = H.rows * cp;
-  const mg = mid.getContext('2d');
-  mg.imageSmoothingEnabled = true; mg.imageSmoothingQuality = 'high';
-  mg.filter = `blur(${Math.round(cp * 1.2)}px)`;  // ~1.2 cells at every refinement level
-  mg.drawImage(small, 0, 0, mid.width, mid.height);
   g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
-  g.drawImage(mid, 0, 0, heat.width, heat.height);
+  g.drawImage(heatBlob.mid, 0, 0, heat.width, heat.height);
 
   // 2. optional grid: faint sub-cells, stronger lines per judge tile
   const show = $('showGrid').checked;
   if (show) {
     const cw = heat.width / H.cols, ch = heat.height / H.rows;
     const line = (x0, y0, x1, y1) => { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); };
-    g.lineWidth = 1; g.strokeStyle = 'rgba(255,255,255,0.06)';
+    g.lineWidth = 1 / z; g.strokeStyle = 'rgba(255,255,255,0.06)';
     // fine lines no closer than ~12 device px, so a 64-cell map doesn't turn into a grey mesh
-    const every = Math.max(1, Math.ceil(12 * dpr / Math.min(cw, ch)));
+    const every = Math.max(1, Math.ceil(12 * dpr / (z * Math.min(cw, ch))));
     for (let c = every; c < H.cols; c += every) if (c % H.sub) line(Math.round(c * cw) + .5, 0, Math.round(c * cw) + .5, heat.height);
     for (let r = every; r < H.rows; r += every) if (r % H.sub) line(0, Math.round(r * ch) + .5, heat.width, Math.round(r * ch) + .5);
-    g.strokeStyle = 'rgba(255,255,255,0.28)'; g.lineWidth = Math.max(1, dpr);
+    g.strokeStyle = 'rgba(255,255,255,0.28)'; g.lineWidth = Math.max(1, dpr) / z;
     for (let c = H.sub; c < H.cols; c += H.sub) line(Math.round(c * cw), 0, Math.round(c * cw), heat.height);
     for (let r = H.sub; r < H.rows; r += H.sub) line(0, Math.round(r * ch), heat.width, Math.round(r * ch));
   }
+  g.setTransform(1, 0, 0, 1, 0, 0);
   const tw = rect.width / result.grid.cols, th = rect.height / result.grid.rows;
-  $('colLabels').innerHTML = show ? Array.from({ length: result.grid.cols }, (_, i) => `<span style="width:${tw}px">${i + 1}</span>`).join('') : '';
-  $('rowLabels').innerHTML = show ? Array.from({ length: result.grid.rows }, (_, i) => `<span style="height:${th}px">${String.fromCharCode(65 + (i % 26))}</span>`).join('') : '';
+  const axes = show && z === 1;  // tile letters/numbers sit outside the box: only when the whole field is shown
+  $('colLabels').innerHTML = axes ? Array.from({ length: result.grid.cols }, (_, i) => `<span style="width:${tw}px">${i + 1}</span>`).join('') : '';
+  $('rowLabels').innerHTML = axes ? Array.from({ length: result.grid.rows }, (_, i) => `<span style="height:${th}px">${String.fromCharCode(65 + (i % 26))}</span>`).join('') : '';
 
   $('colorbar').classList.remove('hidden');
   $('colorbar').classList.toggle('diverging', ai);
@@ -406,12 +470,13 @@ function drawHeat() {
 // literature-judge feature outlines in the colour of the class they point to (white = either)
 const featColor = f => (f.points_to === 'SSA' ? cssVar('--ssl') : f.points_to === 'HP' ? cssVar('--hp') : '#ffffff');
 let keyFeatures = [];
+let heatBlob = {};  // the soft heatmap image, kept while only the zoom changes
 // ---------- measured crypts (backend/glands.py): outlines follow real glands, labels come from measurements ----------
 // dilated crypts lean SSL, round regular crypts lean HP: drawn in those classes' colours
 const GLAND_COLORS = new Proxy({}, { get: (_, k) => ({ 'dilated crypt': cssVar('--ssl'), 'round regular crypt': cssVar('--hp') })[k] });
 function drawGlands(fc, g) {
   const W = fc.width, Hh = fc.height, dpr = window.devicePixelRatio || 1, rect = tissue.getBoundingClientRect();
-  const placed = [];
+  const placed = [], z = zoomTo(g, fc);
   const free = (x, y, w, h) => !placed.some(b => x < b.x + b.w && x + w > b.x && y < b.y + b.h && y + h > b.y);
   // strongest evidence first, so the glands that drove the call get their labels before any collision
   [...result.glands].sort((a, b) => !!b.label - !!a.label || Math.abs(b.evidence) - Math.abs(a.evidence)).forEach(gl => {
@@ -420,17 +485,19 @@ function drawGlands(fc, g) {
     gl.outline.forEach(([x, y], i) => (i ? g.lineTo(x * W, y * Hh) : g.moveTo(x * W, y * Hh)));
     g.closePath();
     if (!col) {  // a crypt with nothing clear to say: a faint outline only, no label
-      g.lineJoin = 'round'; g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.2 * dpr;
+      g.lineJoin = 'round'; g.strokeStyle = 'rgba(255,255,255,.55)'; g.lineWidth = 1.2 * dpr / z;
       g.stroke();
       return;
     }
     g.lineJoin = 'round'; g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 3 * dpr;
-    g.strokeStyle = col; g.lineWidth = 2 * dpr;
+    g.strokeStyle = col; g.lineWidth = 2 * dpr / z;
     g.stroke(); g.shadowBlur = 0;
+    if (!inView(toView(...gl.center))) return;  // zoomed in: no label for a crypt whose centre is out of view
     // label just above the gland (or below if that spot is taken); skipped if both collide - hover still shows it
     const top = gl.outline.reduce((m, p) => (p[1] < m[1] ? p : m)), bot = gl.outline.reduce((m, p) => (p[1] > m[1] ? p : m));
     const text = (gl.tags && gl.tags.length > 1) ? gl.tags.join(' · ') : gl.label, w = text.length * 6.2 + 18, h = 20;
-    for (const [px, py] of [[gl.center[0] * rect.width, top[1] * rect.height - h - 2], [gl.center[0] * rect.width, bot[1] * rect.height + 2]]) {
+    const cx = toView(...gl.center)[0] * rect.width, ty = toView(0, top[1])[1] * rect.height, by = toView(0, bot[1])[1] * rect.height;
+    for (const [px, py] of [[cx, ty - h - 2], [cx, by + 2]]) {
       const x = Math.min(Math.max(px - w / 2, 0), rect.width - w), y = Math.min(Math.max(py, 0), rect.height - h);
       if (!free(x, y, w, h)) continue;
       placed.push({ x, y, w, h });
@@ -454,11 +521,13 @@ const glandAt = (x, y) => (result?.glands || []).find(gl => {  // point-in-polyg
 
 function drawFeatures() {
   const fc = $('feat'), g = fc.getContext('2d');
+  g.setTransform(1, 0, 0, 1, 0, 0);
   g.clearRect(0, 0, fc.width, fc.height);
   document.querySelectorAll('.feat-label, .gland-label').forEach(e => e.remove());
   if (result?.glands && $('showFeat').checked) return drawGlands(fc, g);
   if (!result || !$('showFeat').checked || !keyFeatures.length) return;
   const H = result.heat, cw = fc.width / H.cols, ch = fc.height / H.rows, dpr = window.devicePixelRatio || 1;
+  const z = zoomTo(g, fc);
   keyFeatures.forEach((f, k) => {
     const m = H.features && H.features[f.feature_id];
     if (!m) return;
@@ -466,7 +535,7 @@ function drawFeatures() {
     if (!vals.length) return;
     const thr = Math.max(0.7, vals[Math.floor(vals.length * 0.9)]);  // strongest ~10% of tissue, and clearly above typical
     const on = (r, c) => r >= 0 && c >= 0 && r < H.rows && c < H.cols && m[r * H.cols + c] >= thr && H.tissue[r * H.cols + c] >= 0.25;
-    g.strokeStyle = featColor(f); g.lineWidth = 2 * dpr; g.lineJoin = g.lineCap = 'round';
+    g.strokeStyle = featColor(f); g.lineWidth = 2 * dpr / z; g.lineJoin = g.lineCap = 'round';
     g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 3 * dpr;
     let best = null;
     g.beginPath();
@@ -480,12 +549,13 @@ function drawFeatures() {
       if (!on(r, c + 1)) { g.moveTo(x + cw, y); g.lineTo(x + cw, y + ch); }
     }
     g.stroke(); g.shadowBlur = 0;
-    if (best) {
+    const at = best && toView((best.c + 0.5) / H.cols, (best.r + 0.5) / H.rows);
+    if (at && inView(at)) {
       const lab = document.createElement('div');
       lab.className = 'feat-label';
       lab.style.borderColor = featColor(f);
-      lab.style.left = ((best.c + 0.5) * cw / dpr) + 'px';
-      lab.style.top = ((best.r + 0.5) * ch / dpr) + 'px';
+      lab.style.left = (at[0] * fc.width / dpr) + 'px';
+      lab.style.top = (at[1] * fc.height / dpr) + 'px';
       lab.innerHTML = `${esc(f.feature)} <span class="${f.points_to === 'SSA' ? 'ssl' : 'hp'}">→ ${LABEL[f.points_to] || ''}</span>${(f.cites || []).map(c => `<sup>${c}</sup>`).join('')}`;
       tissue.appendChild(lab);
     }
@@ -500,13 +570,15 @@ tip.className = 'heat-tip hidden';
 document.body.appendChild(tip);
 tissue.addEventListener('mousemove', e => {
   if (state !== 'results' || !result) return tip.classList.add('hidden');
+  if (panDrag) return tip.classList.add('hidden');
   const r = tissue.getBoundingClientRect(), H = result.heat;
-  const fc = Math.min(H.cols - 1, Math.floor((e.clientX - r.left) / r.width * H.cols));
-  const fr = Math.min(H.rows - 1, Math.floor((e.clientY - r.top) / r.height * H.rows));
+  const [fx, fy] = fromView((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);  // 0..1 of the field
+  const fc = Math.max(0, Math.min(H.cols - 1, Math.floor(fx * H.cols)));
+  const fr = Math.max(0, Math.min(H.rows - 1, Math.floor(fy * H.rows)));
   const ref = heatRef === 'ai' ? 'SSA' : (parsed?.call || result.panel.top);  // AI view always reads P(SSL)
   const p = H.p_ssa[fr * H.cols + fc], s = ref === 'SSA' ? p : 1 - p;
   const feats = Object.entries(H.features || {}).sort((x, y) => y[1][fr * H.cols + fc] - x[1][fr * H.cols + fc]).slice(0, 2).map(([k]) => k.replace(/_/g, ' '));
-  const gl = glandAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  const gl = glandAt(fx, fy);
   const glandLine = gl ? `<div><b style="color:${GLAND_COLORS[gl.label] || 'var(--text)'}">${gl.label || 'crypt'}</b>${gl.crypt_um != null ? ` · ${gl.crypt_um} µm across` : ''}` +
     `</div>` : '';
   const tile = `${String.fromCharCode(65 + Math.floor(fr / H.sub))}${Math.floor(fc / H.sub) + 1}`;
@@ -524,6 +596,130 @@ document.querySelectorAll('.seg button').forEach(b => b.onclick = () => {
   document.querySelectorAll('.seg button').forEach(x => x.classList.toggle('on', x === b));
   heatRef = b.dataset.ref; drawHeat();
 });
+
+// ---------- 4. inspect (once analysis starts): zoom, colour views, hold Space for the bare field ----------
+// None of this changes the call: it only changes how the field is shown. The view is drawn from the full-resolution
+// screenshot, so zooming shows every pixel the slide viewer drew (no more than that).
+const view = $('view'), MAX_ZOOM = 8;
+const V = { x: 0, y: 0, w: 1, h: 1 };  // visible part of the field, in 0..1 of the tissue box
+const toView = (x, y) => [(x - V.x) / V.w, (y - V.y) / V.h];
+const fromView = (u, v) => [V.x + u * V.w, V.y + v * V.h];
+const inView = ([u, v]) => u >= 0 && u <= 1 && v >= 0 && v <= 1;
+// draw on canvas c as if it showed the whole field: returns the zoom, to keep line widths constant on screen
+function zoomTo(g, c) {
+  g.setTransform(1 / V.w, 0, 0, 1 / V.h, -V.x * c.width / V.w, -V.y * c.height / V.h);
+  return 1 / V.w;
+}
+const looks = new Set();
+const KEY_LOOKS = { e: 'exposure', c: 'contrast', g: 'greyscale', s: 'saturation', d: 'sharpen', n: 'nuclei' };
+const cssLooks = () => [looks.has('exposure') && 'brightness(1.3)', looks.has('contrast') && 'contrast(1.55)',
+  looks.has('saturation') && 'saturate(1.9)', looks.has('greyscale') && 'grayscale(1)'].filter(Boolean).join(' ') || 'none';
+
+function renderView() {
+  if (state !== 'results' || !tissueBox) return;
+  const plain = V.w === 1 && !looks.size;
+  view.classList.toggle('hidden', plain);  // nothing changed: the screenshot underneath already shows the field
+  if (plain) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = Math.round(view.clientWidth * dpr), H = Math.round(view.clientHeight * dpr);
+  if (view.width !== W || view.height !== H) { view.width = W; view.height = H; }
+  // the analysed crop (the tissue box, in screenshot px), and the visible part of it
+  const bx = (selRect.x + tissueBox.x) * scale, by = (selRect.y + tissueBox.y) * scale, bw = tissueBox.w * scale, bh = tissueBox.h * scale;
+  const base = document.createElement('canvas');
+  base.width = W; base.height = H;
+  const bg = base.getContext('2d');
+  bg.imageSmoothingQuality = 'high';
+  bg.drawImage(img, bx + V.x * bw, by + V.y * bh, V.w * bw, V.h * bh, 0, 0, W, H);
+  if (looks.has('nuclei')) nucleiOnly(bg, W, H);
+  const g = view.getContext('2d');
+  g.clearRect(0, 0, W, H);
+  g.filter = cssLooks();
+  g.drawImage(base, 0, 0);
+  g.filter = 'none';
+  if (looks.has('sharpen')) sharpen(g, W, H);
+}
+
+// haematoxylin only (nuclei): colour deconvolution with the standard H&E stain vectors (Ruifrok & Johnston 2001),
+// shown back in haematoxylin's own blue-purple on white
+const STAINS = [[0.65, 0.70, 0.29], [0.07, 0.99, 0.11], [0.27, 0.57, 0.78]].map(v => { const n = Math.hypot(...v); return v.map(x => x / n); });
+const UNMIX = (m => {  // inverse of the 3x3 stain matrix (rows = stains): optical density -> stain amounts
+  const [[a, b, c], [d, e, f], [g, h, i]] = m, A = e * i - f * h, B = f * g - d * i, C = d * h - e * g, det = a * A + b * B + c * C;
+  return [[A, c * h - b * i, b * f - c * e], [B, a * i - c * g, c * d - a * f], [C, b * g - a * h, a * e - b * d]].map(r => r.map(x => x / det));
+})(STAINS);
+const OD = Float32Array.from({ length: 256 }, (_, v) => -Math.log((v + 1) / 256));  // optical density per 8-bit value
+const H_OUT = [0, 1, 2].map(k => Uint8ClampedArray.from({ length: 1024 }, (_, i) => 255 * Math.exp(-(i / 256) * STAINS[0][k])));
+function nucleiOnly(g, W, H) {
+  const im = g.getImageData(0, 0, W, H), d = im.data, [u0, u1, u2] = [UNMIX[0][0], UNMIX[1][0], UNMIX[2][0]];
+  const [r, gr, b] = H_OUT;
+  for (let p = 0; p < d.length; p += 4) {
+    // haematoxylin amount (0..4 optical density), looked up back to colour in 1/256 steps
+    const i = Math.min(1023, Math.max(0, Math.round(256 * (OD[d[p]] * u0 + OD[d[p + 1]] * u1 + OD[d[p + 2]] * u2))));
+    d[p] = r[i]; d[p + 1] = gr[i]; d[p + 2] = b[i];
+  }
+  g.putImageData(im, 0, 0);
+}
+function sharpen(g, W, H) {  // 3x3 unsharp kernel: centre 5, edge neighbours -1
+  const im = g.getImageData(0, 0, W, H), src = new Uint8ClampedArray(im.data), d = im.data, row = W * 4;
+  for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+    const p = y * row + x * 4;
+    for (let k = 0; k < 3; k++) d[p + k] = 5 * src[p + k] - src[p + k - 4] - src[p + k + 4] - src[p + k - row] - src[p + k + row];
+  }
+  g.putImageData(im, 0, 0);
+}
+
+let redrawQueued = false;
+function redraw() {  // one repaint per frame while scrolling or dragging
+  if (redrawQueued) return;
+  redrawQueued = true;
+  requestAnimationFrame(() => {
+    redrawQueued = false;
+    renderView(); drawHeat();
+    $('zoomTag').textContent = `${(1 / V.w).toFixed(1)}×`;
+    tissue.classList.toggle('zoomed', V.w < 1);
+  });
+}
+const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
+function resetZoom() { Object.assign(V, { x: 0, y: 0, w: 1, h: 1 }); redraw(); }
+tissue.addEventListener('wheel', e => {
+  if (state !== 'results') return;
+  e.preventDefault();
+  const r = tissue.getBoundingClientRect(), u = (e.clientX - r.left) / r.width, v = (e.clientY - r.top) / r.height;
+  const [px, py] = fromView(u, v);  // the point under the mouse stays put
+  const w = clamp(V.w * Math.pow(1.0025, e.deltaY), 1 / MAX_ZOOM, 1);  // ~1.28x per wheel notch
+  Object.assign(V, { w, h: w, x: clamp(px - u * w, 0, 1 - w), y: clamp(py - v * w, 0, 1 - w) });
+  redraw();
+}, { passive: false });
+let panDrag = null;
+tissue.addEventListener('mousedown', e => {
+  if (state !== 'results' || V.w === 1) return;
+  panDrag = { x: e.clientX, y: e.clientY, vx: V.x, vy: V.y };
+  tissue.classList.add('panning');
+});
+function pan(e) {
+  const r = tissue.getBoundingClientRect();
+  V.x = clamp(panDrag.vx - (e.clientX - panDrag.x) / r.width * V.w, 0, 1 - V.w);
+  V.y = clamp(panDrag.vy - (e.clientY - panDrag.y) / r.height * V.h, 0, 1 - V.h);
+  redraw();
+}
+function endPan() { panDrag = null; tissue.classList.remove('panning'); }
+tissue.addEventListener('dblclick', () => state === 'results' && resetZoom());
+
+function toggleLook(name) {
+  looks.has(name) ? looks.delete(name) : looks.add(name);
+  document.querySelectorAll('#looks button').forEach(b => b.classList.toggle('on', looks.has(b.dataset.look)));
+  redraw();
+}
+document.querySelectorAll('#looks button').forEach(b => b.onclick = () => toggleLook(b.dataset.look));
+const setBare = on => document.body.classList.toggle('bare', on);  // hold Space: the field without anything the AI drew
+document.addEventListener('keydown', e => {
+  if (state !== 'results' || e.ctrlKey || e.altKey || e.metaKey || e.target.matches?.('input[type=text], input[type=number], textarea')) return;
+  if (e.key === ' ') { e.preventDefault(); document.activeElement?.blur?.(); setBare(true); return; }
+  const look = KEY_LOOKS[e.key.toLowerCase()];
+  if (look && !e.repeat) toggleLook(look);
+  if (e.key === '0') resetZoom();
+});
+document.addEventListener('keyup', e => { if (e.key === ' ') { e.preventDefault(); setBare(false); } });
+window.addEventListener('blur', () => setBare(false));  // never stuck hidden after Alt+Tab with Space down
 
 // stream text in word by word (and list items one by one) so LLM output feels like it's being written
 function reveal(root, perWord = 14, maxDelay = 1600) {
@@ -602,7 +798,7 @@ function renderVerdict(v) {
   el.querySelectorAll('p').forEach(p => reveal(p, 16, 1200));
 }
 
-window.addEventListener('resize', () => { if (img) { drawShot(); drawDim(selRect); drawHeat(); } });
+window.addEventListener('resize', () => { if (img) { drawShot(); drawDim(selRect); drawHeat(); renderView(); if (state === 'results') placeControls(); } });
 
 // ---------- decision cut-off (gear in the panel header) ----------
 const cutHint = s => { $('cutHint').innerHTML = `${s.label} · calls SSL above <b>${Math.round(s.cut * 100)}%</b> ⚙`; };
