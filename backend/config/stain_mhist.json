@@ -1,0 +1,22 @@
+{
+  "stain_matrix": [
+    [
+      0.57144,
+      0.40393
+    ],
+    [
+      0.65977,
+      0.86457
+    ],
+    [
+      0.48803,
+      0.29892
+    ]
+  ],
+  "max_conc": [
+    1.6628,
+    1.36197
+  ],
+  "n_images": 2175,
+  "source": "MHIST train, median per-image Macenko estimate"
+}
