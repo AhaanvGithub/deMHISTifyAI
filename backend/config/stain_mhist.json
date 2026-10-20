@@ -18,5 +18,38 @@
     1.36197
   ],
   "n_images": 2175,
-  "source": "MHIST train, median per-image Macenko estimate"
+  "source": "MHIST train, median per-image Macenko estimate",
+  "reinhard_mean": [
+    52.4234,
+    22.4006,
+    -21.0182
+  ],
+  "reinhard_std": [
+    13.1944,
+    5.479,
+    5.875
+  ],
+  "vahadane_matrix": [
+    [
+      0.58405,
+      0.35918
+    ],
+    [
+      0.63873,
+      0.89442
+    ],
+    [
+      0.50092,
+      0.26646
+    ]
+  ],
+  "vahadane_median": [
+    0.4866,
+    0.4386
+  ],
+  "vahadane_p99": [
+    1.68879,
+    1.27571
+  ],
+  "alternatives_n_images": 400
 }
