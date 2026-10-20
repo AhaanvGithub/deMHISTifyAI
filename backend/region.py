@@ -35,12 +35,24 @@ def tissue_mask(img: Image.Image, work: int = 256):
     return m, s
 
 
-def tissue_square(img: Image.Image) -> Box:
+def tissue_square(img: Image.Image, side_px: float = None) -> Box:
+    """Largest mostly-tissue square, or - when the scale is known - a square of exactly side_px snip pixels
+    (one MHIST field) placed on the most tissue. A fixed square may extend past a small selection."""
     w, h = img.size
     m, s = tissue_mask(img)
     H, W = m.shape
     ii = np.pad(m.astype(np.int32).cumsum(0).cumsum(1), ((1, 0), (1, 0)))   # integral image
     full = min(W, H)
+    if side_px is not None:                                            # fixed size from the scale bar
+        side = max(4, int(round(side_px * s)))
+        if side >= full:                                               # bigger than the selection: centre it
+            x0 = int((w - side_px) / 2); y0 = int((h - side_px) / 2)
+            return (x0, y0, x0 + int(side_px), y0 + int(side_px))
+        tot = ii[side:, side:] - ii[:-side, side:] - ii[side:, :-side] + ii[:-side, :-side]
+        y, x = np.unravel_index(int(tot.argmax()), tot.shape)
+        x0, y0 = int(x / s), int(y / s)
+        x0, y0 = min(x0, int(w - side_px)), min(y0, int(h - side_px))
+        return (x0, y0, x0 + int(side_px), y0 + int(side_px))
     if m.sum() == 0:
         side = full; y, x = (H - side) // 2, (W - side) // 2
     else:

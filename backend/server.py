@@ -15,7 +15,7 @@ import json
 from typing import Optional
 import threading
 import time
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 
 import uvicorn
 from fastapi import FastAPI, File, Form, UploadFile
@@ -29,9 +29,11 @@ from region import tissue_square
 app = FastAPI(title="deMHISTifyAI backend")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
-STATE = {"engine": None, "engine_error": None}
+STATE = {"engine": None, "engine_error": None, "scale": None}
+FIELD_UM = 448  # one MHIST field: 224 px at ~2.0 um/px
 LIBRARY = llm.Library()
 POOL = ThreadPoolExecutor(4)
+HEAT_POOL = ThreadPoolExecutor(1)  # heatmap passes run one at a time on the GPU, beside the LLM calls
 
 
 def _load_engine():
@@ -79,14 +81,38 @@ def capture(x: int = Form(...), y: int = Form(...), w: int = Form(...), h: int =
     from PIL import ImageGrab
 
     path = os.path.join(tempfile.gettempdir(), f"demhist-snip-{os.getpid()}.png")
-    ImageGrab.grab(bbox=(x, y, x + w, y + h), all_screens=True).save(path, compress_level=1)
+    shot = ImageGrab.grab(bbox=(x, y, x + w, y + h), all_screens=True)
+    shot.save(path, compress_level=1)
+    # read the viewer's scale bar (if any) in the background; /region/guess uses it to size the field
+    STATE["scale"] = POOL.submit(_read_scale, shot)
     return {"path": path}
+
+
+def _read_scale(shot):
+    try:
+        import scalebar
+        return scalebar.read_scale(shot)
+    except Exception:
+        return None
 
 
 @app.post("/region/guess")
 async def region_guess(image: UploadFile = File(...)):
     img = await _read(image)
-    return {"box": tissue_square(img), "size": img.size}
+    scale = None
+    fut = STATE.get("scale")
+    if fut is not None:
+        try:
+            scale = fut.result(timeout=3)
+        except Exception:
+            scale = None
+    if scale:
+        # one MHIST field = 448 um. The snip is in screenshot pixels, the same pixels the scale bar was measured in
+        side = FIELD_UM / scale["um_per_px"]
+        advice = ("zoom_out" if side > min(img.size) else "zoom_in" if side < 224 else None)
+        return {"box": tissue_square(img, side), "size": img.size, "fixed": True, "advice": advice,
+                "scale": {"um_per_px": round(scale["um_per_px"], 4), "label_um": scale["label_um"], "field_px": round(side)}}
+    return {"box": tissue_square(img), "size": img.size, "fixed": False}
 
 
 def trust_flags(researcher: dict, conch: dict, judge: dict) -> list:
@@ -154,21 +180,31 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
                  + " ".join(v["text"] for v in top_feats))
         papers = LIBRARY.search(query)
         judge_future = POOL.submit(llm.research_judge, conch["criteria"], papers, conch["panel"])
-        # while Lumen thinks, sharpen the heatmap on the GPU: the panel's cover-up map refines 16 -> 32 -> 64 -> 128 cells
-        # per field (older judges: one denser pass)
-        for sub in ((32, 64, 128) if conch.get("judge_mode") == "panel" else (8,)):
-            try:
-                yield _sse("heat", engine.refine_heat(img, conch["magnification"]["tile_px"], sub=sub))
-                _free_gpu()
-            except Exception as e:
-                yield _sse("heat_error", {"message": str(e)})
-                break
-        judge = judge_future.result()
-        yield _sse("judge", judge)
-
-        flags = trust_flags(parsed, conch, judge)
-        yield _sse("flags", flags)
-        yield _sse("verdict", llm.final_verdict(parsed, conch["panel"], judge, flags))
+        # While Lumen thinks, sharpen the heatmap on the GPU in the background: the panel's cover-up map refines
+        # 16 -> 32 -> 64 -> 128 cells per field (older judges: one denser pass). Whichever is ready first is sent
+        # first, so the literature judge and verdict never wait for the last heatmap pass.
+        passes = list((32, 64, 128) if conch.get("judge_mode") == "panel" else (8,))
+        tile_px = conch["magnification"]["tile_px"]
+        heat_future = HEAT_POOL.submit(engine.refine_heat, img, tile_px, passes.pop(0))
+        judge_sent = False
+        while heat_future is not None or not judge_sent:
+            waiting = [f for f in (heat_future, None if judge_sent else judge_future) if f is not None]
+            done, _ = wait(waiting, return_when=FIRST_COMPLETED)
+            if heat_future in done:
+                try:
+                    yield _sse("heat", heat_future.result())
+                    _free_gpu()
+                    heat_future = HEAT_POOL.submit(engine.refine_heat, img, tile_px, passes.pop(0)) if passes else None
+                except Exception as e:
+                    yield _sse("heat_error", {"message": str(e)})
+                    heat_future = None
+            if not judge_sent and judge_future in done:
+                judge_sent = True
+                judge = judge_future.result()
+                yield _sse("judge", judge)
+                flags = trust_flags(parsed, conch, judge)
+                yield _sse("flags", flags)
+                yield _sse("verdict", llm.final_verdict(parsed, conch["panel"], judge, flags))
         yield _sse("done", {})
 
     return StreamingResponse(stream(), media_type="text/event-stream")

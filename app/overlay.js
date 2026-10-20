@@ -88,8 +88,11 @@ function squareIn(b) {
   const y = Math.min(Math.max(0, b.y + (b.h - side) / 2), selRect.h - side);
   return { x, y, w: side, h: side };
 }
+let fixedField = false;  // true when the viewer's scale bar was read: the square is exactly one 448 um field
 function setTissue(boxPx, label) {
   // box comes in image pixels of the selection crop
+  const raw = { x: boxPx[0] / scale, y: boxPx[1] / scale, w: (boxPx[2] - boxPx[0]) / scale, h: (boxPx[3] - boxPx[1]) / scale };
+  if (fixedField) { tissueBox = raw; place(tissue, tissueBox); tissue.classList.remove('hidden'); $('tissueTag').textContent = label; return; }
   tissueBox = squareIn({ x: boxPx[0] / scale, y: boxPx[1] / scale, w: (boxPx[2] - boxPx[0]) / scale, h: (boxPx[3] - boxPx[1]) / scale });
   place(tissue, tissueBox); tissue.classList.remove('hidden');
   $('tissueTag').textContent = label;
@@ -106,7 +109,13 @@ async function startRegion() {
     const g = await (await postImage('/region/guess', blob)).json();
     if (state === 'region') {
       tissue.classList.add('anim');
-      setTissue(g.box, 'one field on the tissue · drag or resize · Enter to analyze');
+      fixedField = !!g.fixed;
+      tissue.classList.toggle('fixed', fixedField);
+      const advice = { zoom_out: ' · zoom out: one field is bigger than your selection',
+                       zoom_in: ' · zoom in: one field is under 224 screen pixels' }[g.advice] || '';
+      setTissue(g.box, fixedField
+        ? `one 448 µm field (scale bar ${g.scale.label_um} µm read)${advice} · drag to move · Enter to analyze`
+        : 'one field on the tissue · drag or resize · Enter to analyze');
       setTimeout(() => tissue.classList.remove('anim'), 400);
     }
   } catch { $('tissueTag').textContent = 'backend offline? drag to adjust'; }
@@ -127,8 +136,13 @@ tissue.addEventListener('mousedown', e => {
 });
 function moveBox(e) {
   const dx = e.clientX - boxDrag.x, dy = e.clientY - boxDrag.y, s = boxDrag.start, m = boxDrag.mode, b = { ...s };
-  if (m === 'move') {
+  if (m === 'move' && fixedField) {  // fixed-size field: move anywhere on screen, never resize
+    b.x = Math.max(-selRect.x, Math.min(s.x + dx, window.innerWidth - selRect.x - s.w));
+    b.y = Math.max(-selRect.y, Math.min(s.y + dy, window.innerHeight - selRect.y - s.h));
+  } else if (m === 'move') {
     b.x = Math.max(0, Math.min(s.x + dx, selRect.w - s.w)); b.y = Math.max(0, Math.min(s.y + dy, selRect.h - s.h));
+  } else if (fixedField) {
+    return;
   } else {  // corner handle: resize as a square, the opposite corner stays put
     const left = m.includes('w'), top = m.includes('n');
     const ax = left ? s.x + s.w : s.x, ay = top ? s.y + s.h : s.y;  // anchor = opposite corner

@@ -305,3 +305,6 @@ body.overlay #dim { animation: fadein .5s ease; }
 .gland-label .ssl { color: var(--ssl); } .gland-label .hp { color: var(--hp); }
 .legend { display: inline-flex; gap: 8px; font-size: 11px; color: var(--muted); }
 .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+
+/* fixed-size field (scale bar read): move only */
+.tissue.fixed .handle { display: none; }
