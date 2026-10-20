@@ -51,5 +51,9 @@ for tag in ("dilated", "serrated", "round regular"):
                 "share_pushing_toward_SSL_area": round(float((d[m].evidence_area > 0).mean()), 3)}
 dil, rnd = d[d.tags.apply(lambda t: "dilated" in t)].evidence_area, d[d.tags.apply(lambda t: "round regular" in t)].evidence_area
 out["dilated_vs_round_p"] = float(mannwhitneyu(dil, rnd).pvalue) if len(dil) and len(rnd) else None
+# within each class separately (pooling mixes the classes: HP fields carry HP-pushing evidence everywhere)
+for name, cls in (("SSL", d.ssl), ("HP", ~d.ssl)):
+    a, b = dil[cls[dil.index]], rnd[cls[rnd.index]]
+    out[f"dilated_vs_round_p_in_{name}_images"] = float(mannwhitneyu(a, b).pvalue) if len(a) and len(b) else None
 (ROOT / "docs/results/evidence_vs_crypts.json").write_text(json.dumps(out, indent=2))
 print(json.dumps(out, indent=2))

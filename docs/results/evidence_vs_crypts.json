@@ -3,7 +3,7 @@
   "labelled_crypts": 903,
   "dilated": {
     "crypts": 222,
-    "mean_evidence_centre": -0.147,
+    "mean_evidence_centre": -0.13,
     "mean_evidence_area": -0.13,
     "in_SSL_images": 0.251,
     "in_HP_images": -0.201,
@@ -11,7 +11,7 @@
   },
   "serrated": {
     "crypts": 504,
-    "mean_evidence_centre": -0.199,
+    "mean_evidence_centre": -0.175,
     "mean_evidence_area": -0.175,
     "in_SSL_images": 0.061,
     "in_HP_images": -0.22,
@@ -19,11 +19,13 @@
   },
   "round regular": {
     "crypts": 295,
-    "mean_evidence_centre": -0.079,
+    "mean_evidence_centre": -0.073,
     "mean_evidence_area": -0.073,
     "in_SSL_images": 0.076,
     "in_HP_images": -0.088,
     "share_pushing_toward_SSL_area": 0.373
   },
-  "dilated_vs_round_p": 0.05526741706181801
+  "dilated_vs_round_p": 0.05526741706181801,
+  "dilated_vs_round_p_in_SSL_images": 0.008849541969329943,
+  "dilated_vs_round_p_in_HP_images": 0.0019125866296653001
 }
