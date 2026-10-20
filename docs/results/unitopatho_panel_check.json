@@ -1,0 +1,50 @@
+{
+  "HP": {
+    "fields": 545,
+    "slides": 41,
+    "errors": 1,
+    "called_HP": 0.9963,
+    "median_p_ssl": 0.023,
+    "p90_p_ssl": 0.08,
+    "members_disagree": 0.0202,
+    "unlike_training_flagged": 0.1893,
+    "crypts_per_field": 12.9,
+    "labelled_per_field": 2.12,
+    "share_dilated": 0.577,
+    "share_serrated": 0.274,
+    "share_round_regular": 0.239,
+    "seconds": 466
+  },
+  "TA.LG": {
+    "fields": 150,
+    "slides": 146,
+    "errors": 0,
+    "called_HP": 1.0,
+    "median_p_ssl": 0.015,
+    "p90_p_ssl": 0.056,
+    "members_disagree": 0.0,
+    "unlike_training_flagged": 0.1067,
+    "crypts_per_field": 9.2,
+    "labelled_per_field": 1.35,
+    "share_dilated": 0.728,
+    "share_serrated": 0.064,
+    "share_round_regular": 0.233,
+    "seconds": 110
+  },
+  "NORM": {
+    "fields": 100,
+    "slides": 21,
+    "errors": 0,
+    "called_HP": 1.0,
+    "median_p_ssl": 0.007,
+    "p90_p_ssl": 0.024,
+    "members_disagree": 0.0,
+    "unlike_training_flagged": 0.21,
+    "crypts_per_field": 10.4,
+    "labelled_per_field": 1.29,
+    "share_dilated": 0.519,
+    "share_serrated": 0.031,
+    "share_round_regular": 0.465,
+    "seconds": 80
+  }
+}

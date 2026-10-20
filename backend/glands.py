@@ -156,11 +156,17 @@ def label(glands: List[dict]) -> List[dict]:
     global _T
     if _T is None:
         _T = json.loads(THRESH_PATH.read_text()) if THRESH_PATH.exists() else {}
+    # "dilated" means wider than the crypts around it: above the MHIST threshold AND >= 1.5x this field's median
+    # width (when the field has 3+ clear crypts). On another lab's normal colon this halves false "dilated" calls
+    # (14% -> 7% of crypts); on 1,575 held-out MHIST training images agreement is about the same (AUC 0.589 -> 0.582,
+    # within noise). A judgement call: the labels explain the call, they don't make it.
+    ringed = [g["width_um"] for g in glands if g.get("ring", 1) >= LABEL_RING]
+    field_median = float(np.median(ringed)) if len(ringed) >= 3 else 0.0
     for g in glands:
         g["label"], g["points_to"], g["tags"] = None, None, []
         if not _T or g.get("ring", 1) < LABEL_RING:              # only name crypts with a clear, continuous ring
             continue
-        if g["width_um"] >= _T["dilated_width_um"]:
+        if g["width_um"] >= _T["dilated_width_um"] and g["width_um"] >= 1.5 * field_median:
             g["tags"].append("dilated")
         if g["roughness"] is not None and g["roughness"] >= _T["serrated_roughness"]:
             g["tags"].append("serrated")                         # HP and SSL are both serrated

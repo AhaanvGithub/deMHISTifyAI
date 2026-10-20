@@ -1,22 +1,22 @@
 {
   "images": 1575,
-  "images_with_labelled_crypts": 1224,
+  "images_with_labelled_crypts": 1222,
   "dilated": {
-    "spearman_vs_ssl_votes": 0.228,
-    "auc_ssl_vs_hp": 0.589,
-    "mean_share_hp": 0.338,
-    "mean_share_ssl": 0.466
+    "spearman_vs_ssl_votes": 0.18,
+    "auc_ssl_vs_hp": 0.582,
+    "mean_share_hp": 0.284,
+    "mean_share_ssl": 0.402
   },
   "round": {
-    "spearman_vs_ssl_votes": -0.269,
-    "auc_ssl_vs_hp": 0.382,
-    "mean_share_hp": 0.346,
-    "mean_share_ssl": 0.185
+    "spearman_vs_ssl_votes": -0.271,
+    "auc_ssl_vs_hp": 0.381,
+    "mean_share_hp": 0.349,
+    "mean_share_ssl": 0.186
   },
   "serrated": {
-    "spearman_vs_ssl_votes": 0.271,
-    "auc_ssl_vs_hp": 0.613,
-    "mean_share_hp": 0.484,
-    "mean_share_ssl": 0.645
+    "spearman_vs_ssl_votes": 0.275,
+    "auc_ssl_vs_hp": 0.61,
+    "mean_share_hp": 0.498,
+    "mean_share_ssl": 0.658
   }
 }
