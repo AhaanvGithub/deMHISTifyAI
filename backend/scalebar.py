@@ -15,8 +15,10 @@ from typing import Optional
 import numpy as np
 from PIL import Image, ImageOps
 
-# OCR misreads "µ" as u, p, j, w, y or d, or drops it; "mm" is millimetres
-LABEL = re.compile(r"(\d+(?:[.,]\d+)?)\s*(mm|[µμujpdwy]?m)\b", re.IGNORECASE)
+# A number, then the unit. OCR garbles "µm" in many ways ("um", "pm", "urn", "prn", "1.1m", or drops it), but reads
+# "mm" reliably: anything other than "mm" (up to 4 characters ending in m or n, or nothing) is taken as microns.
+# A label only counts next to a bar, and the resulting scale must be plausible (see read_scale).
+LABEL = re.compile(r"(\d+(?:[.,]\d+)?)\s*(mm|[^\s\d]{0,3}[mn]|)", re.IGNORECASE)
 
 
 async def _ocr_async(img: Image.Image):
@@ -55,8 +57,13 @@ def _labels(img: Image.Image, zoom: int = 3):
         m = LABEL.fullmatch(text.strip())
         if not m or not words:
             continue
-        val = float(m.group(1).replace(",", "."))
+        num = m.group(1).replace(",", ".")
+        if len(num) > 1 and num[0] == "0" and "." not in num:     # "05" is "0.5" with the point lost by OCR
+            num = "0." + num[1:]
+        val = float(num)
         um = val * 1000 if m.group(2).lower() == "mm" else val
+        if um <= 0:
+            continue
         x0 = min(r[0] for _, r in words); y0 = min(r[1] for _, r in words)
         x1 = max(r[0] + r[2] for _, r in words); y1 = max(r[1] + r[3] for _, r in words)
         found.append((um, x0 / zoom, y0 / zoom, (x1 - x0) / zoom, (y1 - y0) / zoom))
@@ -82,6 +89,33 @@ def _bars(a: np.ndarray):
                 continue
             out.append((sl[1].start, sl[0].start, w, h))
     return out
+
+
+def _same_colour(crop: Image.Image, rgb: np.ndarray, tol: float = 0.5, gamma: float = 2.0) -> Image.Image:
+    """Black where the crop matches the bar's colour, white elsewhere. Partial matches (anti-aliased or blurred
+    letter edges) are darkened by `gamma` so thin strokes survive."""
+    a = np.asarray(crop, dtype=np.float32) / 255.0
+    d = np.sqrt(((a - rgb[None, None, :]) ** 2).sum(2))
+    v = np.clip(d / tol, 0, 1) ** gamma                          # 0 = bar colour, 1 = far from it
+    return Image.fromarray((v * 255).astype(np.uint8)).convert("RGB")
+
+
+def _bar_length(a: np.ndarray, bx: int, by: int, bw: int, bh: int) -> float:
+    """Sub-pixel bar length: where each (possibly blurred) end is halfway between bar and background colour."""
+    rows = a[by : by + bh]
+    bar = np.median(rows[:, bx : bx + bw].reshape(-1, 3), axis=0)
+    x0, x1 = max(0, bx - 6), min(a.shape[1], bx + bw + 6)
+    seg = rows[:, x0:x1].mean(0)                                  # mean colour along the bar's rows
+    bg = np.median(np.concatenate([seg[:3], seg[-3:]]), axis=0)
+    span = np.sqrt(((bg - bar) ** 2).sum()) + 1e-6
+    f = np.sqrt(((seg - bar) ** 2).sum(1)) / span                 # 0 at the bar, 1 at the background
+    inside = np.flatnonzero(f < 0.5)
+    if inside.size < 2:
+        return float(bw)
+    i0, i1 = inside[0], inside[-1]
+    left = i0 - (0.5 - f[i0]) / (f[i0 - 1] - f[i0]) if i0 > 0 and f[i0 - 1] != f[i0] else i0 - 0.5
+    right = i1 + (0.5 - f[i1]) / (f[i1 + 1] - f[i1]) if i1 + 1 < len(f) and f[i1 + 1] != f[i1] else i1 + 0.5
+    return float(right - left)
 
 
 def _text_only(crop: Image.Image) -> Image.Image:
@@ -116,9 +150,19 @@ def read_scale(img: Image.Image) -> Optional[dict]:
         pad_x, pad_y = max(140, bw), max(40, 6 * bh)  # labels can sit beside the bar, not just above or below
         X0, Y0 = max(0, bx - pad_x), max(0, by - pad_y)
         X1, Y1 = min(img.width, bx + bw + pad_x), min(img.height, by + bh + pad_y)
-        crop = _text_only(img.crop((X0, Y0, X1, Y1)))
-        inv = ImageOps.invert(crop)  # viewers often draw white labels on dark overlays; OCR reads dark-on-light best
-        labels = next((r for r in (_labels(c, z) for c in (crop, inv) for z in (3, 1)) if r), [])
+        raw = img.crop((X0, Y0, X1, Y1)).copy()
+        # erase the bar itself so it can't run into the label's letters (painted with the surrounding colour)
+        around = a[max(0, by - 3) : by + bh + 3, max(0, bx - 3) : bx + bw + 3].reshape(-1, 3)
+        bar_rgb0 = np.median(a[by : by + bh, bx : bx + bw].reshape(-1, 3), axis=0)
+        far = around[np.sqrt(((around - bar_rgb0) ** 2).sum(1)) > 0.3]
+        fill = tuple(int(v * 255) for v in (np.median(far, axis=0) if len(far) else 1 - bar_rgb0))
+        raw.paste(fill, (bx - X0 - 1, by - Y0 - 1, bx - X0 + bw + 1, by - Y0 + bh + 1))
+        bar_rgb = np.median(a[by : by + bh, bx : bx + bw].reshape(-1, 3), axis=0)
+        # 1st try: viewers draw the label in the bar's colour - keep only that colour, as black text on white
+        # (works for coloured labels, white-on-dark and blurred text); then the general cleaning, plain and inverted
+        crop = _text_only(raw)
+        tries = (_same_colour(raw, bar_rgb), _same_colour(raw, bar_rgb, 0.7, 2.5), crop, ImageOps.invert(crop))
+        labels = next((r for r in (_labels(c, z) for c in tries for z in (3, 1)) if r), [])
         for um, lx, ly, lw, lh in labels:
             lx, ly = lx + X0, ly + Y0
             lcx, lcy = lx + lw / 2, ly + lh / 2
@@ -128,9 +172,14 @@ def read_scale(img: Image.Image) -> Optional[dict]:
             if not (beside or stacked):
                 continue
             d = abs(bcy - lcy) + 0.25 * abs(bcx - lcx)
+            if not 0.05 <= um / bw <= 5:                        # not a plausible viewing scale (5 um/px: a field is 90 px)
+                continue
             if best is None or d < best[0]:
                 best = (d, um, bx, by, bw, bh)
     if best is None:
         return None
     _, um, bx, by, bw, bh = best
+    length = _bar_length(a, bx, by, bw, bh)
+    if abs(length - bw) <= 3:                                     # trust the sub-pixel length only near the box
+        bw = length
     return {"um_per_px": um / bw, "label_um": um, "bar_px": int(bw), "bar": [int(bx), int(by), int(bx + bw), int(by + bh)]}

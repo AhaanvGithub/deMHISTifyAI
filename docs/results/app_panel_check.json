@@ -1,0 +1,36 @@
+{
+  "official_test": {
+    "bal_acc": 0.8883,
+    "auc": 0.9563,
+    "acc_vs_majority": 0.8874,
+    "ssl_caught": 0.8917,
+    "hp_caught": 0.8849,
+    "ece": 0.0223,
+    "spearman_vs_votes": 0.8582,
+    "acc_on_4v3": 0.6463
+  },
+  "native": {
+    "images": 977,
+    "errors": 0,
+    "bal_acc": 0.8863,
+    "auc": 0.9585,
+    "acc_vs_majority": 0.8813,
+    "ssl_caught": 0.9056,
+    "hp_caught": 0.8671,
+    "spearman_vs_votes": 0.8588,
+    "unlike_training_flagged": 0.0082,
+    "seconds": 146
+  },
+  "scaled150": {
+    "images": 977,
+    "errors": 0,
+    "bal_acc": 0.8915,
+    "auc": 0.9588,
+    "acc_vs_majority": 0.8864,
+    "ssl_caught": 0.9111,
+    "hp_caught": 0.872,
+    "spearman_vs_votes": 0.8582,
+    "unlike_training_flagged": 0.0123,
+    "seconds": 146
+  }
+}
