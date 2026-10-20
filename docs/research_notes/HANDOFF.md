@@ -127,6 +127,9 @@ the test split to choose the model" vs "used it or did not say")
 - Log: `%TEMP%\claude\queue.log`. Restart safely: kill python processes matching queue2/queue_runner/kfold_cv,
   then rerun both runners (they skip "DONE" jobs; CV resumes from the last finished fold).
 - Note: `queue_runner.py` sleeps in 60-s naps (a single long sleep stalled when the laptop slept).
+- **Progress 21:20**: all final retrains done. **ConvNeXt-Base won** (OOF AUC 0.962 vs Tiny 0.957; final model
+  trained) -> panel uses `convnext_base`. MUSK-LoRA ran out of memory at batch 4 and is running at batch 2 x
+  accum 8 (fold 1 epoch 1 val AUC 0.928; ~28 min/fold -> done ~00:30), then the panel + single test run.
 
 ## 9. Stain normalisation (in progress)
 
@@ -172,3 +175,45 @@ the test split to choose the model" vs "used it or did not say")
 | `docs/research_notes/benchmark_job_plan.md` | job list, findings, to-do |
 | `README.md` | product description, performance, literature tables |
 | MUSK code | clone of github.com/lilab-stanford/MUSK at `%TEMP%\claude\musk_src\MUSK` (`MUSK_SRC`); einops + fairscale installed `--no-deps` |
+
+## 12. Addendum (2026-10-19 evening): scale check and outside datasets
+
+### MHIST field size re-checked: ~2.0 um/px (~448 um per tile) holds
+
+- The MHIST paper's wording is ambiguous: "scanned by an Aperio AT2 scanner at 40x resolution; to increase the
+  field of view, we compress the slides with 8x magnification." Read as "shrunk **by** 8x" -> ~2.0 um/px,
+  448 um per tile; read as "shrunk **to** 8x" -> ~1.25 um/px, 280 um per tile. HistoKT (arXiv 2201.11246,
+  Table 1) lists MHIST at 1.25 um.
+- Measured on 12 training tiles by eye (20-px grid; no test images):
+
+| Structure | Real size | Expected at 2.0 um/px | Expected at 1.25 um/px | Seen |
+|---|---|---|---|---|
+| Lymphocyte nucleus | ~7 um | ~3.5 px | ~5.6 px | 1-3 px dark dots |
+| Colon crypt, cross-section | ~50-60 um | ~25-30 px | ~40-48 px | mostly ~22-30 px |
+
+- **Conclusion**: 1.25 um/px does not fit; ~2.0 um/px does. Precise to roughly 1.8-2.2 um/px (crypt size
+  varies), which is enough for the 448 um snip square. An automatic nucleus-size measurement was unreliable at
+  this resolution (nuclei are a few pixels) and was not used. Definitive answer, if ever needed: ask the MHIST
+  authors (Jerry Wei / Saeed Hassanpour, Dartmouth).
+
+### Outside datasets (none used for training)
+
+| Dataset | What it is | HP / SSL labels? | Use for us |
+|---|---|---|---|
+| **ADPv2** (Hosseini et al., arXiv 2507.05656, Zenodo) | 20,004 patches from 461 slides of **healthy** colon (Kingston General Hospital, St. Michael's, Sunnybrook, TCGA); 32 tissue types, several per patch; 544 x 544 um patches at 0.2-0.5 um/px; KGH slides stained HPS, the rest H&E | No | Don't train on it. Possible extra stain test or "unlike training data" demo (shrink to ~2.0 um/px). Its paper found a model trained on healthy tissue was clearly less confident on SSL+HP regions than normal tissue (weaker for adenomas) - citable outside support that serrated polyps look distinct. Licence not stated. |
+| **UniToPatho** (Univ. of Turin, arXiv 2101.09991, IEEE DataPort, Zenodo) | 9,536 H&E patches from 292 slides; Hamamatsu NanoZoomer S210 at 20x (~0.44 um/px); classes: normal, HP, tubular / tubulo-villous adenoma (low / high grade) | HP only (~545 regions), **no SSL** | Outside test of HP calls from another hospital, scanner and stain (shrink to ~2.0 um/px; the app should call HP); good real-stain case for the stain normalisation comparison (section 9). Adenoma patches can demo the out-of-distribution warning. Check licence before showing publicly. |
+
+- "pKGH" (from another agent's roadmap) is most likely ADPv2's Kingston General Hospital source - HPS stain,
+  healthy tissue; not usable for training.
+- The DHMC colorectal polyp slide archive was **rejected for training**: same hospital as MHIST, possibly the
+  same patients, and MHIST publishes no slide IDs, so overlap with the test split cannot be ruled out. Also no
+  time before the Wed 00:00 training deadline. Good "future work" line: more institutions and stains, checked
+  for patient overlap.
+
+### Pathologist input (family friend, willing to help)
+
+- Keep the endorsement genuine; disclose the relationship if asked.
+- Plan: blind test on 15-20 MHIST test tiles including some 4-3 splits (choosing tiles involves no model
+  scoring). They call each tile, then use the app. Record agreement and whether the heatmap matched where they
+  looked. Ask: where would you use it, what would make you distrust it, what's missing. Quote only what they
+  actually saw or said, with role and institution if they agree to be named.
