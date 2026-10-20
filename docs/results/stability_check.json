@@ -1,358 +1,6 @@
 {
- "gpu_mb_idle_after_load": 3292,
+ "gpu_mb_idle_after_load": 5710,
  "sequential": [
-  {
-   "total_s": 45.3,
-   "to_result_s": 15.8,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.9,
-   "to_result_s": 1.9,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 20.2,
-   "to_result_s": 2.3,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.3,
-   "to_result_s": 1.7,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.5,
-   "to_result_s": 1.7,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 20.6,
-   "to_result_s": 2.8,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.7,
-   "to_result_s": 1.9,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.4,
-   "to_result_s": 1.6,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 20.1,
-   "to_result_s": 2.4,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.5,
-   "to_result_s": 1.7,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.5,
-   "to_result_s": 1.7,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.9,
-   "to_result_s": 2.1,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.8,
-   "to_result_s": 2.1,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.5,
-   "to_result_s": 1.6,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 20.4,
-   "to_result_s": 2.7,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.7,
-   "to_result_s": 1.8,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.8,
-   "to_result_s": 1.8,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.6,
-   "to_result_s": 1.6,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.6,
-   "to_result_s": 1.7,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 20.6,
-   "to_result_s": 2.6,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 20.1,
-   "to_result_s": 2.1,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
-  {
-   "total_s": 19.6,
-   "to_result_s": 1.6,
-   "events": [
-    "parsed",
-    "conch",
-    "judge",
-    "flags",
-    "verdict",
-    "heat",
-    "heat",
-    "heat",
-    "done"
-   ],
-   "gpu_mb": 3328
-  },
   {
    "total_s": 20.0,
    "to_result_s": 2.0,
@@ -367,7 +15,359 @@
     "heat",
     "done"
    ],
-   "gpu_mb": 3328
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.6,
+   "to_result_s": 1.8,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 20.1,
+   "to_result_s": 2.2,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.3,
+   "to_result_s": 1.6,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.4,
+   "to_result_s": 1.7,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 20.5,
+   "to_result_s": 2.8,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.6,
+   "to_result_s": 1.8,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.5,
+   "to_result_s": 1.7,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 20.1,
+   "to_result_s": 2.5,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.3,
+   "to_result_s": 1.6,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.4,
+   "to_result_s": 1.7,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.8,
+   "to_result_s": 2.1,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.7,
+   "to_result_s": 2.1,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.5,
+   "to_result_s": 1.6,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 20.2,
+   "to_result_s": 2.5,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.7,
+   "to_result_s": 1.8,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.5,
+   "to_result_s": 1.8,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.6,
+   "to_result_s": 1.6,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.6,
+   "to_result_s": 1.7,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 20.3,
+   "to_result_s": 2.6,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 20.0,
+   "to_result_s": 2.1,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.3,
+   "to_result_s": 1.6,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
+  },
+  {
+   "total_s": 19.8,
+   "to_result_s": 1.9,
+   "events": [
+    "parsed",
+    "conch",
+    "judge",
+    "flags",
+    "verdict",
+    "heat",
+    "heat",
+    "heat",
+    "done"
+   ],
+   "gpu_mb": 5710
   },
   {
    "total_s": 19.3,
@@ -383,7 +383,7 @@
     "heat",
     "done"
    ],
-   "gpu_mb": 3328
+   "gpu_mb": 5710
   },
   {
    "total_s": 19.3,
@@ -399,12 +399,12 @@
     "heat",
     "done"
    ],
-   "gpu_mb": 3328
+   "gpu_mb": 5710
   }
  ],
  "overlap": {
   "a": {
-   "total_s": 20.0,
+   "total_s": 2.1,
    "to_result_s": 1.8,
    "events": [
     "parsed",
@@ -412,16 +412,13 @@
     "judge",
     "flags",
     "verdict",
-    "heat",
-    "heat",
-    "heat",
     "done"
    ],
    "complete": true
   },
   "b": {
-   "total_s": 36.3,
-   "to_result_s": 18.4,
+   "total_s": 19.3,
+   "to_result_s": 1.6,
    "events": [
     "parsed",
     "conch",
@@ -436,5 +433,5 @@
    "complete": true
   }
  },
- "gpu_mb_end": 3358
+ "gpu_mb_end": 5712
 }
