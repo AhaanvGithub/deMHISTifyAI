@@ -38,6 +38,7 @@ PROMPTS_PATH = ROOT / "research" / "mhist_prompts.json"
 JUDGES_PATH = ROOT / "backend" / "config" / "judges.json"
 CALIB_PATH = ROOT / "backend" / "config" / "calibration.json"
 PANEL_PATH = ROOT / "backend" / "config" / "panel_deploy.json"
+OOD_FAR = 0.65  # unlike-training distance beyond which the field is not colon tissue at all (see Engine._ood)
 OOD_REF_PATH = ROOT / "data" / "models" / "cv" / "ood_ref_convnext_base.npz"
 os.environ.setdefault("MUSK_SRC", str(Path(os.environ.get("TEMP", "")) / "claude" / "musk_src" / "MUSK"))
 MEMBER_INFO = {  # how each panel member is shown in the app
@@ -163,7 +164,9 @@ class Engine:
         o = self.panel["ood"]
         sims = feats.float() @ self.panel["ood_ref"].T
         d = float((1 - sims.topk(o["k"], dim=1).values.mean(1)).mean())
-        return {"distance": round(d, 4), "limit": o["limit"], "flag": d > o["limit"]}
+        # "far": beyond anything real tissue reached. Measured on outside data: UniToPatho colon tissue (another lab)
+        # reached 0.57 at most; photos and noise 0.71+; a brown immunostain 0.55 (tissue, wrong stain: a caution only)
+        return {"distance": round(d, 4), "limit": o["limit"], "flag": d > o["limit"], "far": d > OOD_FAR}
 
     def _load_finetuned(self) -> List[dict]:
         """Each fine-tuned version only changed CONCH's last 2 blocks + pooling (+ a linear head),
@@ -472,7 +475,9 @@ class Engine:
             t.probs = {"SSA": float(p_tile[i]), "HP": float(1 - p_tile[i])}
             t.criteria = {k.split(":", 1)[1]: float(crit[i, n]) for n, k in enumerate(self.criteria_keys)}
         heat = self._dense_heat(snip, tiles)
-        glands = self._glands(snip, tiles, heat)
+        logits_ood = self._ood(feats[torch.from_numpy(mask).to(feats.device)] if feats is not None else None)
+        # nothing to measure on a photo or noise: crypt outlines there would be shapes in random texture
+        glands = [] if (logits_ood and logits_ood["far"]) else self._glands(snip, tiles, heat)
         votes = {c: sum(r["top"] == c for r in judge_results) for c in CLASSES}
         top = call(p_snip)
         snip_crit = crit[mask].mean(0)
@@ -489,7 +494,7 @@ class Engine:
                 "agreement": max(votes.values()) / len(judge_results), "n_voters": len(judge_results),
                 "p_ssl": round(p_snip, 4), "cut": round(cut, 4), "default_cut": self.panel["shown_cut_off"],
             },
-            "ood": self._ood(feats[torch.from_numpy(mask).to(feats.device)] if feats is not None else None),
+            "ood": logits_ood,
             "glands": glands,
             "criteria": {
                 k.split(":", 1)[1]: {"text": self.prompts[k], "score": round(float(snip_crit[n]), 3),

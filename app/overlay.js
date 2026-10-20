@@ -552,7 +552,12 @@ function renderJudge(j) {
   keyFeatures = (j.key_features || []).filter(f => f.feature_id && result?.criteria?.[f.feature_id]?.usable).slice(0, 3);
   drawFeatures();
   const el = $('litSummary'); el.classList.remove('muted');
-  if (j.error) { el.innerHTML = '<span class="warn">Literature judge unavailable (Lumen).</span>'; return; }
+  if (j.error) {
+    el.innerHTML = j.error === 'not_tissue'
+      ? '<span class="warn">Skipped: the selection doesn\'t look like colon polyp tissue.</span>'
+      : '<span class="warn">Literature judge unavailable (Lumen).</span>';
+    return;
+  }
   const agree = !parsed?.call || j.call === parsed.call;
   el.innerHTML = `${pct(LABEL[j.call], j.consistency, agree ? 'good' : 'bad')}
     <div class="alt">- alt: ${LABEL[j.alt]} ${j.alt_consistency}%</div>

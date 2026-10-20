@@ -121,7 +121,7 @@ Rules:
 - WHO 2019: one unequivocally architecturally distorted crypt (basal dilation, boot/L/inverted-T shapes, horizontal
   growth along the muscularis mucosae, serration into the base) is enough for SSA. Say plainly when this field cannot
   show crypt bases.
-- If the field is flagged as unlike the training data, say the image evidence may not apply.
+- If the field is flagged as unlike the training data, say so in your FIRST sentence: the image evidence may not apply.
 - When you suggest what to check by eye, say WHERE when the measurements give a position (e.g. "the dilated crypt at
   the upper right", "the region that pushed toward SSA, lower left").
 - Cite only the given excerpts, by [P#]. If they don't support a claim, don't make it.
@@ -389,6 +389,15 @@ Respond with JSON only:
 {"alignment": "agrees" | "partly agrees" | "disagrees", "headline": "max 10 words",
  "conclusion": "2-4 sentences", "look_again_at": "features or regions to re-check, or empty",
  "certainty_note": "one sentence comparing the researcher's certainty with the panel's percentage"}"""
+
+
+def not_tissue_verdict() -> dict:
+    """Fixed verdict for a field that is far from any colon tissue (photo, noise, screen chrome)."""
+    return {"alignment": "partly agrees", "headline": "This doesn't look like colon polyp tissue",
+            "conclusion": "The selected area is far from anything the image panel was trained on, so its call and any "
+                          "measurements don't apply, and the literature comparison was skipped. Select one field of an H&E "
+                          "colon polyp slide at about 5x.",
+            "look_again_at": "", "certainty_note": "No comparison: the image evidence does not apply to this selection."}
 
 
 def final_verdict(researcher: dict, panel: dict, judge: dict, flags: List[str], conch: Optional[dict] = None) -> dict:

@@ -125,7 +125,10 @@ def trust_flags(researcher: dict, conch: dict, judge: dict) -> list:
     if mag.get("auto") and mag.get("clamped"):
         flags.append(f"Snip zoom is far from the training images (x{mag['zoom_vs_training']}); results may be less reliable.")
     ood = conch.get("ood")
-    if ood and ood.get("flag"):
+    if ood and ood.get("far"):
+        flags.append("This selection doesn't look like colon polyp tissue at all (photo, noise or screen content); "
+                     "the image call does not apply.")
+    elif ood and ood.get("flag"):
         flags.append("This snip looks unlike the MHIST training images (other tissue, stain, zoom or not tissue); "
                      "treat the image call with caution.")
     if conch.get("judge_mode") == "zero-shot":
@@ -177,13 +180,15 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
         # literature judge (Lumen) runs while the UI animates the image judges
         query = llm.judge_query(conch)  # from what this field shows (measured crypts) plus the WHO criteria
         papers = LIBRARY.search(query)
-        judge_future = POOL.submit(llm.research_judge, conch, papers)
+        far = bool((conch.get("ood") or {}).get("far"))
+        # a photo, noise or something else that isn't colon tissue: no literature reasoning about it (and no LLM calls)
+        judge_future = POOL.submit(lambda: {"error": "not_tissue"}) if far else POOL.submit(llm.research_judge, conch, papers)
         # While Lumen thinks, sharpen the heatmap on the GPU in the background: the panel's cover-up map refines
         # 16 -> 32 -> 64 -> 128 cells per field (older judges: one denser pass). Whichever is ready first is sent
         # first, so the literature judge and verdict never wait for the last heatmap pass.
-        passes = list((32, 64, 128) if conch.get("judge_mode") == "panel" else (8,))
+        passes = [] if far else list((32, 64, 128) if conch.get("judge_mode") == "panel" else (8,))
         tile_px = conch["magnification"]["tile_px"]
-        heat_future = HEAT_POOL.submit(engine.refine_heat, img, tile_px, passes.pop(0))
+        heat_future = HEAT_POOL.submit(engine.refine_heat, img, tile_px, passes.pop(0)) if passes else None
         judge_sent = False
         while heat_future is not None or not judge_sent:
             waiting = [f for f in (heat_future, None if judge_sent else judge_future) if f is not None]
@@ -202,7 +207,7 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
                 yield _sse("judge", judge)
                 flags = trust_flags(parsed, conch, judge)
                 yield _sse("flags", flags)
-                yield _sse("verdict", llm.final_verdict(parsed, conch["panel"], judge, flags, conch))
+                yield _sse("verdict", llm.not_tissue_verdict() if far else llm.final_verdict(parsed, conch["panel"], judge, flags, conch))
         yield _sse("done", {})
 
     return StreamingResponse(stream(), media_type="text/event-stream")
