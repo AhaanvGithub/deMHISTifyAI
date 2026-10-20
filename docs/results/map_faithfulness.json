@@ -1,0 +1,22 @@
+{
+  "images": 120,
+  "cells_removed": "15% of tissue cells the model sees",
+  "SSL images": {
+    "n": 60,
+    "mean_logit_drop_top_evidence": 1.773,
+    "mean_logit_drop_random": 0.394,
+    "share_where_top_beats_random": 0.983
+  },
+  "HP images": {
+    "n": 60,
+    "mean_logit_drop_top_evidence": 0.943,
+    "mean_logit_drop_random": 0.251,
+    "share_where_top_beats_random": 0.983
+  },
+  "all": {
+    "n": 120,
+    "mean_logit_drop_top_evidence": 1.358,
+    "mean_logit_drop_random": 0.323,
+    "share_where_top_beats_random": 0.983
+  }
+}
