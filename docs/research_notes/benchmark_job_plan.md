@@ -76,8 +76,8 @@ fold. The overnight runner (scratchpad `queue_runner.py`) handled the allowed ho
       above X%"); then re-run `research/eval_app_pipeline.py`. Top priority Tuesday.
 - [ ] **Scale-aware snip square** (after deployment): when the snip screen opens, read the viewer's scale bar
       (local vision model for the label, bar detection for its pixel length; manual "drag along the scale bar and
-      type its label" as fallback), size a draggable square to one MHIST field (~0.45 mm, confirm MHIST's
-      um/pixel first), and prompt "zoom out" if it does not fit on screen or "zoom in" if it is under 224 screen
+      type its label" as fallback), size a draggable square to one MHIST field (448 um x 448 um: Aperio AT2 at 40x
+      ~0.25 um/px, downsampled 8x to 5x = ~2.0 um/px x 224 px; MHIST paper, Virchow paper, kaiko eva docs), and prompt "zoom out" if it does not fit on screen or "zoom in" if it is under 224 screen
       px. Score the square's contents resized to 224 px. Handles any magnification; does not fix stain
       differences between labs.
 - [ ] **"Unlike training data" warning**: flag snips whose colour/features are far from MHIST.
