@@ -13,16 +13,16 @@
     "mean_seconds": 21.8
   },
   "new": {
-    "answers": 11,
+    "answers": 12,
     "matches_majority": 10,
-    "agrees_with_panel": 11,
-    "rule_breaks_total": 0,
-    "answers_with_any_rule_break": 0,
+    "agrees_with_panel": 12,
+    "rule_breaks_total": 2,
+    "answers_with_any_rule_break": 2,
     "invented_citations": 0,
-    "overclaims": 0,
-    "mean_citations": 5.0,
+    "overclaims": 2,
+    "mean_citations": 4.8,
     "mean_topics_given": 6.1,
-    "mean_seconds": 21.8
+    "mean_seconds": 21.3
   },
   "rows": [
     {
@@ -53,11 +53,11 @@
         "overclaims": 0,
         "n_citations": 4,
         "distinct_topics_given": 6,
-        "seconds": 21.6,
-        "reasoning": "The image panel strongly calls for HP (P(SSA) 0%). Measured findings support this, showing a regular round crypt round regular crypts (measured) and a feature score suggesting serration is limited to the upper crypt serration limited to the upper half of the crypts (feature score), which aligns with the description of HP [P5]. There is no evidence of the basal distortions (L-shapes, horizontal growth, or basal dilation) required for an SSA diagnosis under WHO 2019 criteria [P1, P3]. Because the panel is the strongest evidence and the weak measured features are consistent with HP, the call is HP.",
+        "seconds": 19.3,
+        "reasoning": "The image panel strongly calls HP (0% SSA). Measured findings support this: a regular round crypt (measured) and a feature score suggesting serration is limited to the upper crypt (feature score), which aligns with the definition of a hyperplastic polyp [P5]. There is no measured evidence of the architectural distortions (e.g., L-shaped or boot-shaped crypts) required to diagnose a sessile serrated lesion under WHO 2019 criteria [P1, P3].",
         "check_by_eye": [
-          "Presence of any unequivocal architecturally distorted crypts (L/T-shaped, boot-shaped, or basal dilation), as a single such crypt is sufficient for SSA [P1, P3].",
-          "Whether the crypt bases are fully visible and well-oriented, as a diagnosis of HP cannot be established if the bases are not evaluable [P3, P8]."
+          "Verify if crypt bases are visible and if any unequivocal architectural distortion (L-shape, boot-shape, or basal dilation) exists, as one such crypt is sufficient for SSA [P1, P3].",
+          "Check for microvesicular mucin or abundant goblet cells to further characterize the HP subtype [P5]."
         ],
         "key_features": [
           {
@@ -65,7 +65,7 @@
             "feature": "round regular crypt",
             "points_to": "HP",
             "strength": "weak",
-            "why": "Regular, non-distorted crypts are characteristic of HP [P5].",
+            "why": "Regular crypt architecture is characteristic of HP [P5].",
             "cites": [
               "P5"
             ]
@@ -75,7 +75,7 @@
             "feature": "upper-half serration",
             "points_to": "HP",
             "strength": "weak",
-            "why": "Serration confined to the upper half/third is typical for HP [P5].",
+            "why": "Serration limited to the upper half/third is typical for HP [P5].",
             "cites": [
               "P5"
             ]
@@ -111,12 +111,12 @@
         "overclaims": 0,
         "n_citations": 5,
         "distinct_topics_given": 6,
-        "seconds": 20.9,
-        "reasoning": "The image panel strongly favors HP (P(SSA) 1%). Measured features provide weak support for HP, specifically the high score for narrow crypt bases narrow, straight crypt bases (feature score) and serration limited to the upper crypts serration limited to the upper half of the crypts (feature score), which contrast with the basal dilation and basal serration required for an SSA diagnosis [P2, P8]. While serrated crypts with serration extending to the base of the crypt (feature score) has a moderate score (0.69), its reliability is very low (0.21) and it is outweighed by the panel and other feature scores. Per WHO 2019, the absence of unequivocal architectural distortion points to HP [P1, P3].",
+        "seconds": 27.9,
+        "reasoning": "The image panel strongly favors HP (P(SSA) 1%). Measured features support this, with a high score for narrow crypt bases (feature score) and serration limited to the upper crypt (feature score), which contrast with the basal dilation and basal serration typical of SSA [P2, P8]. While one crypt was measured as serrated (measured), this is non-specific [P3]. No unequivocal architectural distortions (L-shapes, boot-shapes, or basal dilation) were measured. Per WHO 2019, the absence of such unequivocal distortion supports a diagnosis of HP [P1, P8].",
         "check_by_eye": [
-          "Presence of boot-shaped, L-shaped, or inverted-T crypts, as these are highly specific for SSA [P2, P8]",
-          "Basal crypt dilation or horizontal growth along the muscularis mucosae [P1, P8]",
-          "Whether the crypt bases are actually visible in this plane of section, as tangential sectioning can hide SSA features [P4]"
+          "Verify if any crypt base is unequivocally dilated or shows L/T/boot shapes, as one such crypt is sufficient for SSA [P1, P8].",
+          "Check if the muscularis mucosae is visible to assess for horizontal growth, which is a high-specificity feature for SSA [P2, P4].",
+          "Assess if the serration at the centre ( (measured)) truly extends to the crypt base, as basal hyperserration favors SSA [P2, P8]."
         ],
         "key_features": [
           {
@@ -124,7 +124,7 @@
             "feature": "narrow crypt bases",
             "points_to": "HP",
             "strength": "weak",
-            "why": "Narrow, straight bases contrast with the basal dilation typical of SSA [P2, P8]",
+            "why": "Narrow, straight bases are characteristic of HP, whereas SSA typically shows basal dilation [P2, P8].",
             "cites": [
               "P2",
               "P8"
@@ -135,10 +135,19 @@
             "feature": "upper-half serration",
             "points_to": "HP",
             "strength": "weak",
-            "why": "Serration confined to the upper crypt is characteristic of HP [P2, P8]",
+            "why": "Serration limited to the upper crypt is typical for HP [P8].",
             "cites": [
-              "P2",
               "P8"
+            ]
+          },
+          {
+            "feature_id": "crypts:serrated",
+            "feature": "serrated lumen",
+            "points_to": "neither",
+            "strength": "weak",
+            "why": "Serration is common to both HP and SSA and does not distinguish them [P3].",
+            "cites": [
+              "P3"
             ]
           }
         ]
@@ -172,11 +181,12 @@
         "overclaims": 0,
         "n_citations": 5,
         "distinct_topics_given": 6,
-        "seconds": 24.4,
-        "reasoning": "The image panel, the strongest evidence, strongly calls this field HP (P(SSA) 0%). While the feature score serrated crypts with serration extending to the base of the crypt (feature score) suggests basal serration, its reliability is very low (0.21), and serrated crypt lumens (measured) is non-specific. Per WHO 2019, SSA requires unequivocal architectural distortion [P1, P8]. No such distortion (e.g., boot-shaped crypts or basal dilation) was measured. Without unequivocal distortion, the morphology is consistent with HP [P1, P3].",
+        "seconds": 23.9,
+        "reasoning": "The image panel strongly calls for HP (P(SSA) 0%). While the feature score for basal serration (feature score) is 0.74, its reliability is very low (0.21) and it is contradicted by the narrow, straight crypt bases (feature score) score. No unequivocal architectural distortions (boot-shaped, L-shaped, or dilated bases) were measured, and only one serrated crypt was identified (measured). According to WHO 2019, the absence of such unequivocal distortion supports HP [P1, P3, P8].",
         "check_by_eye": [
-          "Unequivocal architectural distortion (L/T-shaped crypts or basal dilation), as a single such crypt is sufficient for SSA [P1, P8].",
-          "Presence of the muscularis mucosae to determine if crypts are growing horizontally along it [P4, P8]."
+          "Verify if crypt bases are present in this field; if the bases are missing, the architectural features required for SSA cannot be assessed [P4].",
+          "Check for unequivocal basal dilation or boot/L-shaped silhouettes, as one such crypt is sufficient for SSA [P1, P8].",
+          "Assess if the serration at the middle right extends unequivocally to the crypt base [P2, P8]."
         ],
         "key_features": [
           {
@@ -190,13 +200,14 @@
             ]
           },
           {
-            "feature_id": "serration_to_base",
-            "feature": "basal serration",
-            "points_to": "SSA",
+            "feature_id": "narrow_crypt_base",
+            "feature": "narrow crypt bases",
+            "points_to": "HP",
             "strength": "weak",
-            "why": "While high in SSA, the reliability score (0.21) is very low, making this a weak hint [P2].",
+            "why": "Lack of basal dilation is typical for HP [P2, P8].",
             "cites": [
-              "P2"
+              "P2",
+              "P8"
             ]
           }
         ]
@@ -230,19 +241,19 @@
         "overclaims": 0,
         "n_citations": 5,
         "distinct_topics_given": 6,
-        "seconds": 22.8,
-        "reasoning": "The image panel, the strongest evidence, strongly calls this field HP (P(SSA) 0%). Measured crypts show a mix of serrated and round/regular morphology, the latter favoring HP [P3]. While the feature score for serration to the base is elevated (0.78), its very low reliability (0.21) makes it a weak hint that does not overrule the panel. Per WHO 2019, SSA requires unequivocal architectural distortion [P1]. No such unequivocal distortion (e.g., L-shapes or basal dilation) was measured in this field, supporting the HP call [P1, P2].",
+        "seconds": 19.7,
+        "reasoning": "The image panel strongly calls this field HP (P(SSA) 0%). Measured crypts show a mix of serrated and round morphologies without documented architectural distortion. While the feature score for serration to the base is elevated ( (feature score)), its reliability is very low (0.21), making it insufficient to overrule the panel. According to WHO 2019, SSA requires at least one unequivocal architecturally distorted crypt [P1]. Since no such distortion (e.g., boot-shaped or horizontal growth) was measured, the evidence supports the panel's call of HP [P1, P3].",
         "check_by_eye": [
-          "Presence of unequivocal architectural distortion (L/boot-shapes, horizontal growth, or basal dilation) as a single such crypt is sufficient for SSA [P1, P2].",
-          "Whether the crypt bases are actually visible in this field; if the base is missing, the field cannot exclude SSA [P5, P6]."
+          "Verify if the crypt bases are actually visible in this field; if the bases are cut off, the field cannot be used to rule out SSA [P5, P6].",
+          "Check for unequivocal architectural distortion (e.g., L-shaped or boot-shaped crypts) at the upper right, as one such crypt is sufficient for SSA [P1, P2]."
         ],
         "key_features": [
           {
             "feature_id": "crypts:round",
-            "feature": "round regular crypts",
+            "feature": "round crypt",
             "points_to": "HP",
             "strength": "weak",
-            "why": "Regular crypt architecture is typical of HP or normal mucosa [P3].",
+            "why": "Regular, non-distorted crypts are characteristic of HP or normal mucosa [P3].",
             "cites": [
               "P3"
             ]
@@ -252,7 +263,7 @@
             "feature": "basal serration score",
             "points_to": "SSA",
             "strength": "weak",
-            "why": "A score of 0.78 hints at basal serration, which is sensitive for SSA [P2], but reliability is very low (0.21).",
+            "why": "A score of 0.78 suggests basal serration, which is sensitive for SSA [P2], but reliability is very low (0.21).",
             "cites": [
               "P2"
             ]
@@ -286,14 +297,14 @@
         "rule_breaks": 0,
         "invented_citations": 0,
         "overclaims": 0,
-        "n_citations": 6,
+        "n_citations": 4,
         "distinct_topics_given": 6,
-        "seconds": 21.5,
-        "reasoning": "The image panel strongly calls SSA (100%), which is the primary evidence. Measured findings provide weak supporting evidence: one dilated crypt dilated crypts (measured) and a feature score suggesting serration extending to the base serrated crypts with serration extending to the base of the crypt (feature score), both of which are sensitive markers for SSA [P2]. According to WHO 2019, a single unequivocal architecturally distorted serrated crypt is sufficient for a diagnosis of SSA [P1, P6]. While the measured features are weak individually, they align with the panel's high-confidence call.",
+        "seconds": 20.4,
+        "reasoning": "The image panel strongly calls SSA (100%), which is the strongest evidence. This is supported by weak measurements: one dilated crypt (measured) and a feature score suggesting serration extending to the base (feature score), both of which are sensitive markers for SSA [P2]. Per WHO 2019, a single unequivocal architecturally distorted crypt is sufficient for SSA [P1]. However, since it was not measured whether the dilation is specifically at the base or if other high-specificity shapes (L/T-shaped) are present, a pathologist must verify these architectural distortions [P2, P3].",
         "check_by_eye": [
-          "Verify if the dilated crypts (measured) occurs at the crypt base and if the crypt is 'unequivocally' distorted, as one such crypt suffices for SSA [P1, P6].",
-          "Check for boot-shaped, L-shaped, or inverted-T shaped crypts, as these are highly specific for SSA [P2, P3].",
-          "Ensure the crypt bases and muscularis mucosae are present in the section to avoid orientation pitfalls [P4]."
+          "Whether the dilated crypt at the lower middle shows dilation specifically at the BASE, as this is required for SSA [P3]",
+          "Presence of L-, boot-shaped, or inverted-T crypts, as these are highly specific for SSA [P2]",
+          "Whether the crypt bases and muscularis mucosae are actually present in the plane of section, as their absence prevents an SSA diagnosis [P3, P4]"
         ],
         "key_features": [
           {
@@ -301,7 +312,7 @@
             "feature": "dilated crypt",
             "points_to": "SSA",
             "strength": "weak",
-            "why": "Basal dilation is a sensitive architectural feature for SSA [P2].",
+            "why": "One of four crypts is dilated, which is a sensitive but low-specificity feature for SSA [P2].",
             "cites": [
               "P2"
             ]
@@ -311,7 +322,7 @@
             "feature": "basal serration",
             "points_to": "SSA",
             "strength": "weak",
-            "why": "Serration extending to the crypt base is highly sensitive for SSA [P2].",
+            "why": "A score of 0.69 suggests serration extending to the base, the most sensitive architectural feature for SSA [P2].",
             "cites": [
               "P2"
             ]
@@ -342,25 +353,25 @@
         "matches_majority": true,
         "agrees_with_panel": true,
         "consistency": 100,
-        "rule_breaks": 0,
+        "rule_breaks": 1,
         "invented_citations": 0,
-        "overclaims": 0,
-        "n_citations": 5,
+        "overclaims": 1,
+        "n_citations": 4,
         "distinct_topics_given": 6,
-        "seconds": 19.8,
-        "reasoning": "The image panel strongly calls SSA (99%), which is the most reliable evidence provided. Measured data shows one dilated crypt dilated crypts (measured) and a score suggesting serration extending to the base serrated crypts with serration extending to the base of the crypt (feature score), both of which are sensitive features for SSA [P2]. Per WHO 2019, a single unequivocal architecturally distorted crypt is sufficient for an SSA diagnosis [P1, P6]. While the measured features are individually weak, they align with the high-confidence panel call. However, a pathologist must verify if the crypt bases are fully captured in the section to avoid pitfalls of tangential sectioning [P4].",
+        "seconds": 20.6,
+        "reasoning": "The image panel strongly calls SSA (99%), which is the most reliable evidence for this field. While measured crypt data is limited, the presence of a dilated crypt (measured) and a feature score suggesting serration to the base (feature score) align with SSA characteristics [P2]. Per WHO 2019, a single unequivocal architecturally distorted crypt is sufficient for an SSA diagnosis [P1]. However, because basal dilation and horizontal growth were not explicitly measured, a pathologist must verify these architectural distortions at the crypt base to confirm the call [P3, P4].",
         "check_by_eye": [
-          "Presence of L-shaped, boot-shaped, or inverted-T crypts, as these have the highest specificity for SSA [P2].",
-          "Horizontal growth of crypts along the muscularis mucosae [P1, P3].",
-          "Whether the crypt bases are actually visible in this field, as the diagnosis depends on basal architecture [P4]."
+          "Verify if the dilated crypt at the middle right has a dilated BASE or exhibits L/boot-shaped horizontal growth, as these are key for SSA [P1, P2, P3]",
+          "Confirm if the serration extends unequivocally into the basal third of the crypts [P2, P4]",
+          "Check if the muscularis mucosae is visible in this field to ensure the crypt bases are actually present [P4]"
         ],
         "key_features": [
           {
             "feature_id": "crypts:dilated",
-            "feature": "dilated crypts",
+            "feature": "dilated crypt",
             "points_to": "SSA",
             "strength": "weak",
-            "why": "Dilated crypt bases are sensitive for SSA, though less specific than L-shaped crypts [P2].",
+            "why": "One dilated crypt is noted at the middle right, though basal location is not measured [P2].",
             "cites": [
               "P2"
             ]
@@ -370,7 +381,7 @@
             "feature": "basal serration",
             "points_to": "SSA",
             "strength": "weak",
-            "why": "Serration extending to the crypt base is a high-frequency feature of SSA [P2].",
+            "why": "A score of 0.63 suggests serration extending to the crypt base, a sensitive feature for SSA [P2].",
             "cites": [
               "P2"
             ]
@@ -404,21 +415,22 @@
         "rule_breaks": 0,
         "invented_citations": 0,
         "overclaims": 0,
-        "n_citations": 5,
+        "n_citations": 6,
         "distinct_topics_given": 6,
-        "seconds": 23.0,
-        "reasoning": "The image panel strongly calls SSA (100%), which is the primary evidence. This is supported by a moderate feature score for serration extending to the crypt base serrated crypts with serration extending to the base of the crypt (feature score), a feature that is highly sensitive for SSL and rare in HP [P2]. While some crypts appear round/regular round regular crypts (measured), the WHO 2019 criteria state that a single unequivocal architecturally distorted crypt is sufficient for an SSA diagnosis [P1]. The combination of the high-confidence model call and the basal serration hint aligns with SSA.",
+        "seconds": 23.9,
+        "reasoning": "The image panel strongly calls SSA (100%), which is the most reliable evidence for this field. This is supported by a moderate feature score for serration extending to the base (feature score), a key discriminator since basal serration is found in ~94% of SSLs and only ~8% of HPs [P2]. While some round crypts (measured) are present, WHO 2019 criteria state that a single unequivocally distorted crypt is sufficient for an SSA diagnosis [P1]. The presence of serrated crypts (measured) is non-specific but consistent with the call.",
         "check_by_eye": [
-          "Presence of basal dilation, L-shaped, or boot-shaped crypts, as a single unequivocal distorted crypt is sufficient for SSA [P1, P2].",
-          "Verification that the crypt bases are actually present in the section, as tangential sectioning can hide SSL features [P5, P6]."
+          "Verify if crypt bases are visible in the field; if the muscularis mucosae is not present, the architectural features required for SSA cannot be assessed [P5, P6].",
+          "Look for unequivocal architectural distortion (boot-shaped, L-shaped, or horizontal growth) at the base of the serrated crypts in the center/middle right [P1, P2].",
+          "Check for dilated crypt bases, particularly in the serrated crypts, as this supports SSA [P2]."
         ],
         "key_features": [
           {
             "feature_id": "serration_to_base",
             "feature": "basal serration",
             "points_to": "SSA",
-            "strength": "moderate",
-            "why": "Serration extending to the crypt base is a sensitive marker for SSL, appearing in only ~8% of HPs [P2].",
+            "strength": "weak",
+            "why": "Serration extending into the crypt base is highly sensitive for SSL and rare in HP [P2].",
             "cites": [
               "P2"
             ]
@@ -428,9 +440,9 @@
             "feature": "serrated lumen",
             "points_to": "neither",
             "strength": "weak",
-            "why": "Serration is common to both HP and SSA [P1, P3].",
+            "why": "Serration is common to both HP and SSA [P2, P3].",
             "cites": [
-              "P1",
+              "P2",
               "P3"
             ]
           }
@@ -460,35 +472,25 @@
         "matches_majority": true,
         "agrees_with_panel": true,
         "consistency": 100,
-        "rule_breaks": 0,
+        "rule_breaks": 1,
         "invented_citations": 0,
-        "overclaims": 0,
+        "overclaims": 1,
         "n_citations": 4,
         "distinct_topics_given": 6,
-        "seconds": 23.8,
-        "reasoning": "The image panel strongly calls SSA (100%), which is the primary evidence. Measured findings provide weak supportive evidence: one dilated crypt dilated crypts (measured) and a moderate score for serration extending to the base serrated crypts with serration extending to the base of the crypt (feature score), both of which are sensitive features for SSL [P2]. Per WHO 2019, a single unequivocal architecturally distorted crypt is sufficient for an SSA diagnosis [P1]. While the measured features are weak individually, they align with the panel's high-confidence call.",
+        "seconds": 19.7,
+        "reasoning": "The image panel strongly calls SSA (100%), which is the most reliable evidence for this field. Measured findings show a dilated crypt at the centre (measured), which is a sensitive architectural feature of SSA [P2]. While feature scores for basal serration and narrow bases are ambiguous, the WHO 2019 criteria state that a single unequivocal architecturally distorted crypt is sufficient for an SSA diagnosis [P1]. The pathologist must verify that the observed dilation and any serration occur at the crypt base to confirm the diagnosis [P3, P4].",
         "check_by_eye": [
-          "Presence of boot-shaped, L-shaped, or inverted-T shaped crypts, as these have the highest specificity for SSA [P2].",
-          "Horizontal growth along the muscularis mucosae, which is a defining criterion for SSA [P1, P3].",
-          "Whether the crypt bases are actually visible in this field, as the diagnosis depends on basal architecture [P4]."
+          "Verify if the dilated crypt at the centre shows widening specifically at the BASE, as basal dilation is a key SSL criterion [P1, P3].",
+          "Check for L-shaped, boot-shaped, or inverted-T shaped crypts, which are highly specific for SSA [P2].",
+          "Confirm if serration extends into the crypt base at the centre, as this is a sensitive indicator for SSA [P2, P3]."
         ],
         "key_features": [
           {
             "feature_id": "crypts:dilated",
-            "feature": "dilated crypts",
+            "feature": "dilated crypt",
             "points_to": "SSA",
             "strength": "weak",
-            "why": "Basal dilation is a sensitive architectural feature of SSL [P2].",
-            "cites": [
-              "P2"
-            ]
-          },
-          {
-            "feature_id": "serration_to_base",
-            "feature": "basal serration",
-            "points_to": "SSA",
-            "strength": "weak",
-            "why": "Serration extending to the crypt base is highly sensitive for SSL [P2].",
+            "why": "Basal dilation is a sensitive architectural feature for SSL [P2].",
             "cites": [
               "P2"
             ]
@@ -522,14 +524,14 @@
         "rule_breaks": 0,
         "invented_citations": 0,
         "overclaims": 0,
-        "n_citations": 6,
+        "n_citations": 7,
         "distinct_topics_given": 6,
         "seconds": 20.9,
-        "reasoning": "The image panel calls SSA (29%), which is the strongest evidence available. Measured data is limited: one crypt is dilated dilated crypts (measured), which can point toward SSA if the dilation is basal [P2, P4], but this is not explicitly measured. Feature scores for basal serration serrated crypts with serration extending to the base of the crypt (feature score) and narrow bases narrow, straight crypt bases (feature score) are low/ambiguous. According to WHO 2019, a single unequivocal architecturally distorted crypt is sufficient for SSA [P1]. However, the evidence here is weak, and the pathologist must verify if the distortion is truly basal and unequivocal [P4, P6].",
+        "reasoning": "The image panel calls SSA, which is the strongest evidence provided. Measured data shows one dilated crypt at the middle right, which aligns with SSA architectural distortion [P2, P4], though its location at the base was not measured. Conversely, one round regular crypt suggests HP [P3]. Under WHO 2019, a single unequivocal distorted crypt is sufficient for SSA [P1]. However, the feature scores for basal serration and narrow bases are low/ambiguous, and the panel's probability (29%) is close to the cut-off, suggesting a borderline case where 'unequivocal' distortion must be verified by a pathologist [P6, P8].",
         "check_by_eye": [
-          "Whether the dilated crypts (measured) crypt shows dilation specifically at the base, as this is required for SSA [P4].",
-          "Presence of L-shaped, boot-shaped, or inverted-T crypts, which are highly specific for SSA [P2, P4].",
-          "Whether the crypt bases are visible in this field; if they are not, architectural distortion cannot be assessed [P5, P8]."
+          "Verify if the dilated crypt at the middle right shows widening specifically at the BASE, as basal dilation is required for SSA [P4].",
+          "Look for L-shaped, boot-shaped, or inverted-T crypts, as these are highly specific for SSA [P2].",
+          "Check if the crypt bases are visible in this field; if not, the architectural criteria for SSA cannot be assessed [P5, P8]."
         ],
         "key_features": [
           {
@@ -537,10 +539,20 @@
             "feature": "dilated crypt",
             "points_to": "SSA",
             "strength": "weak",
-            "why": "One of seven crypts is dilated; while basal dilation is a key SSA feature, this measure doesn't specify if it's at the base [P2, P4].",
+            "why": "A single dilated crypt is a sensitive architectural feature for SSA [P2, P4], though it must be at the base to be unequivocal.",
             "cites": [
               "P2",
               "P4"
+            ]
+          },
+          {
+            "feature_id": "crypts:round",
+            "feature": "round regular crypt",
+            "points_to": "HP",
+            "strength": "weak",
+            "why": "Regular, narrow crypt bases are typical of HP [P3].",
+            "cites": [
+              "P3"
             ]
           }
         ]
@@ -572,22 +584,21 @@
         "rule_breaks": 0,
         "invented_citations": 0,
         "overclaims": 0,
-        "n_citations": 5,
+        "n_citations": 4,
         "distinct_topics_given": 6,
-        "seconds": 22.3,
-        "reasoning": "The image panel calls SSA, which is the strongest evidence provided. This is supported by a moderate feature score for serration extending to the base serrated crypts with serration extending to the base of the crypt (feature score), a key architectural abnormality for SSA [P3, P8]. While one measured crypt is round and regular round regular crypts (measured) (suggestive of HP [P5]), the WHO 2019 criteria state that a single unequivocal distorted crypt is sufficient for an SSA diagnosis [P1]. Because the panel's call is SSA and there is supporting evidence of basal serration, the call is SSA, though confidence is tempered by the presence of regular crypts.",
+        "seconds": 20.0,
+        "reasoning": "The image panel calls SSA (44% probability, above the 27% cut-off), which is the strongest evidence. This is supported by a moderate CONCH score for serration extending to the base (feature score), a key feature of SSA [P3, P8]. While one measured crypt is regular round regular crypts (measured) and there are hints of HP-like features (upper-half serration (feature score), narrow bases (feature score)), the WHO 2019 criteria state that a single unequivocal distorted crypt is sufficient for an SSA diagnosis [P1]. The panel's call is prioritized over the weak, conflicting measured features.",
         "check_by_eye": [
-          "Presence of basal dilation or L/boot-shaped crypts, as a single unequivocal distorted crypt is sufficient for SSA [P1, P3].",
-          "Horizontal growth along the muscularis mucosae, which is a top-ranked diagnostic feature for SSA [P8].",
-          "Whether the crypt bases are fully visible in this field, as the diagnosis depends on evaluating the basal third [P3, P8]."
+          "Verify if the crypt bases are actually visible in this field, as SSL diagnosis requires evaluable bases [P8].",
+          "Search for any unequivocal architectural distortion (L-shaped, boot-shaped, or basal dilation) to satisfy the WHO 2019 one-crypt rule [P1, P3]."
         ],
         "key_features": [
           {
             "feature_id": "serration_to_base",
             "feature": "basal serration",
             "points_to": "SSA",
-            "strength": "moderate",
-            "why": "Serration extending into the crypt base is a strong confirmatory feature of SSL [P3, P8].",
+            "strength": "weak",
+            "why": "Serrations extending into the crypt base are a strong confirmatory feature of SSL [P3, P8].",
             "cites": [
               "P3",
               "P8"
@@ -598,7 +609,7 @@
             "feature": "round regular crypt",
             "points_to": "HP",
             "strength": "weak",
-            "why": "Regular, non-distorted crypts are characteristic of HP [P5].",
+            "why": "A regular, non-distorted crypt is more typical of HP or normal mucosa [P5].",
             "cites": [
               "P5"
             ]
@@ -625,7 +636,44 @@
         "reasoning": "The image panel strongly favors HP (P(SSA)=12%), which is the primary evidence. Measurable features are contradictory and weak: a score of 0.71 for basal serration suggests SSA [P5], but a 0.57 for upper-half serration and 0.50 for narrow bases align with HP [P1]. Given the low reliability of these measurements (0.13-0.21), they cannot override the image model's call. However, because a single dis"
       },
       "new": {
-        "error": "llm_unavailable"
+        "call": "HP",
+        "matches_majority": false,
+        "agrees_with_panel": true,
+        "consistency": 100,
+        "rule_breaks": 0,
+        "invented_citations": 0,
+        "overclaims": 0,
+        "n_citations": 5,
+        "distinct_topics_given": 6,
+        "seconds": 20.3,
+        "reasoning": "The image panel, the strongest evidence, calls this field HP (P(SSA) 12%). While a feature score suggests serration to the base (feature score), its reliability is very low (0.21). Measured crypts only show general serration (measured), which does not distinguish between HP and SSA [P2]. No unequivocal architectural distortions (basal dilation, L-shaped, or boot-shaped crypts) were measured. According to WHO 2019, the absence of such distortion points toward HP [P1, P3].",
+        "check_by_eye": [
+          "Whether the crypt base is visible in this field; if the base is missing, architectural distortion cannot be assessed [P4].",
+          "Unequivocal basal dilation or L/boot/T-shaped silhouettes, as a single such crypt is sufficient for SSA [P1, P8].",
+          "Whether serration actually extends into the basal third of the crypts at the upper right [P2, P8]."
+        ],
+        "key_features": [
+          {
+            "feature_id": "crypts:serrated",
+            "feature": "serrated lumen",
+            "points_to": "neither",
+            "strength": "weak",
+            "why": "Serration is common to both HP and SSA [P2].",
+            "cites": [
+              "P2"
+            ]
+          },
+          {
+            "feature_id": "serration_to_base",
+            "feature": "basal serration score",
+            "points_to": "SSA",
+            "strength": "weak",
+            "why": "The score is 0.71 but reliability is very low (0.21), making it a weak hint [P2].",
+            "cites": [
+              "P2"
+            ]
+          }
+        ]
       }
     },
     {
@@ -654,16 +702,31 @@
         "rule_breaks": 0,
         "invented_citations": 0,
         "overclaims": 0,
-        "n_citations": 5,
+        "n_citations": 4,
         "distinct_topics_given": 7,
-        "seconds": 18.7,
-        "reasoning": "The image panel, the strongest evidence, calls this field HP. Measured crypts show no dilation or clear architectural distortion, and the feature scores for basal serration and narrow bases are low/ambiguous. According to WHO 2019, a diagnosis of SSA requires at least one unequivocal architecturally distorted crypt [P1, P5]. Since no such distortion was measured, and the AI panel strongly favors HP, the call is consistent with the evidence. However, because the distinction between HP and SSA is often subtle and sensitive to sectioning [P3, P4], a pathologist must verify the crypt bases by eye.",
+        "seconds": 19.3,
+        "reasoning": "The image panel strongly favors HP (8% probability), which is the most robust evidence provided for this specific field. Measured crypts show no dilation or clear serration, and the feature scores are indeterminate with low reliability. According to WHO 2019, a diagnosis of SSA requires at least one unequivocal architecturally distorted crypt [P1, P5]. Since no such distortion was measured and the AI model is well below the SSA threshold, the evidence supports HP. However, because architectural features are sensitive to sectioning, the pathologist must ensure the crypt bases are actually visible [P3].",
         "check_by_eye": [
-          "Presence of any unequivocally architecturally distorted crypts (e.g., L-shaped, boot-shaped, or horizontal growth), as a single such crypt is sufficient for SSA [P1, P5, P7]",
-          "Confirmation that the crypt bases and muscularis mucosae are actually present in the plane of section, as their absence can mask SSA features [P3]"
+          "Verify if the crypt bases are actually present in this field; if the muscularis mucosae is not visible, the architecture cannot be fully assessed [P3].",
+          "Search for any single unequivocally architecturally distorted crypt (e.g., L-shaped, T-shaped, or basal dilation) which would override the HP call [P1, P5, P7]."
         ],
-        "key_features": []
+        "key_features": [
+          {
+            "feature_id": "serration_to_base",
+            "feature": "basal serration score",
+            "points_to": "neither",
+            "strength": "weak",
+            "why": "A score of 0.51 with very low reliability (0.21) provides no clear direction.",
+            "cites": []
+          }
+        ]
       }
     }
-  ]
+  ],
+  "new_rescored_with_final_checker": {
+    "overclaims": 0,
+    "invented_citations": 0,
+    "answers_saying_where_to_look": 11,
+    "note": "the run counted imperative \"Confirm if ...\" check-by-eye lines as overclaims; the final checker treats them as instructions"
+  }
 }

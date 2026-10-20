@@ -122,6 +122,8 @@ Rules:
   growth along the muscularis mucosae, serration into the base) is enough for SSA. Say plainly when this field cannot
   show crypt bases.
 - If the field is flagged as unlike the training data, say the image evidence may not apply.
+- When you suggest what to check by eye, say WHERE when the measurements give a position (e.g. "the dilated crypt at
+  the upper right", "the region that pushed toward SSA, lower left").
 - Cite only the given excerpts, by [P#]. If they don't support a claim, don't make it.
 Respond with JSON only:
 {"call": "SSA" or "HP", "confidence": 0-100, "alt": the other class, "alt_confidence": 0-100,
@@ -132,10 +134,35 @@ Respond with JSON only:
  "reasoning": "at most 110 words, with [P#] citations",
  "caveats": "one sentence"}"""
 
-# "confirms" is an overclaim; "verify to confirm" is not (lookbehinds skip the instruction forms)
-OVERCLAIM = re.compile(r"\b(?<!to )(?<!would )(?<!can )(?<!help )(confirm(s|ed|ing)?|diagnostic of|definitive(ly)?|pathognomonic|"
+# "confirms" is an overclaim; "verify to confirm" and "confirm whether" are instructions, not claims
+OVERCLAIM = re.compile(r"\b(?<!to )(?<!would )(?<!can )(?<!help )(confirm(s|ed|ing)?\b(?!\s+(?:if|whether))|diagnostic of|definitive(ly)?|pathognomonic|"
                        r"strongly support(s|ed)?|clearly (shows|demonstrates)|proves?|certainly)\b", re.I)
 SEEN = re.compile(r"\b(is|are|were|was) (present|seen|visible|observed|evident|noted)\b|\b(shows?|demonstrates?|reveals?)\b", re.I)
+
+
+def _where(x: float, y: float) -> str:
+    """Plain position in the field from 0..1 coordinates: 'upper left', 'centre', 'lower edge', ..."""
+    v = "upper" if y < 0.34 else "lower" if y > 0.66 else ""
+    h = "left" if x < 0.34 else "right" if x > 0.66 else ""
+    return (f"{v} {h}".strip() or "centre") if (v and h) or not (v or h) else (v + " middle" if v else "middle " + h)
+
+
+def _evidence_regions(heat: dict) -> List[str]:
+    """Where the evidence map says the call came from: the strongest SSA- and HP-pushing regions."""
+    if not heat or heat.get("kind") != "evidence":
+        return []
+    import numpy as np
+    R, C = heat["rows"], heat["cols"]
+    p = np.array(heat["p_ssa"]).reshape(R, C) - 0.5
+    t = np.array(heat["tissue"]).reshape(R, C) >= 0.25
+    out = []
+    for sign, word in ((1, "SSA"), (-1, "HP")):
+        v = np.where(t, sign * p, -1)
+        if v.max() < 0.15:                                   # nothing clearly pushed this way
+            continue
+        r, c = np.unravel_index(int(v.argmax()), v.shape)
+        out.append(f"- The region that pushed the call most toward {word} is at the {_where((c + 0.5) / C, (r + 0.5) / R)} of the field.")
+    return out
 
 
 def _measured(conch: dict) -> tuple:
@@ -158,18 +185,22 @@ def _measured(conch: dict) -> tuple:
     crypt_lines = []
     if allg:
         n_clear = sum(1 for g in allg if g.get("ring", 0) >= 0.85)
-        for tag, key, what in (("dilated", "crypts:dilated", "dilated (wider than the field's other crypts)"),
+        for tag, key, what in (("dilated", "crypts:dilated", "dilated (the whole crypt wider than the field's other crypts; "
+                                                             "whether the widening is at the BASE is not measured)"),
                                ("serrated", "crypts:serrated", "serrated lumen (saw-toothed border)"),
                                ("round regular", "crypts:round", "round, regular crypt (HP- or normal-like)")):
             n = sum(tag in g.get("tags", []) for g in glands)
             if n:
                 widths = [g["width_um"] for g in glands if tag in g.get("tags", [])]
-                crypt_lines.append(f"- [{key}] {n} of {n_clear} clearly ringed crypts {what}; widths {min(widths):.0f}-{max(widths):.0f} um")
+                where = sorted({_where(*g["center"]) for g in glands if tag in g.get("tags", [])})
+                size = f"width {widths[0]:.0f} um" if len(widths) == 1 else f"widths {min(widths):.0f}-{max(widths):.0f} um"
+                crypt_lines.append(f"- [{key}] {n} of {n_clear} clearly ringed crypts {what}; {size}; at the {', '.join(where)}")
                 ids[key] = what
         if not crypt_lines:
             crypt_lines.append(f"- {n_clear} clearly ringed crypts found; none clearly dilated, serrated or round-regular.")
     else:
         crypt_lines.append("- No crypts could be outlined on this field (cut lengthwise, open to the surface, or blurred).")
+    crypt_lines += _evidence_regions(conch.get("heat"))
     feats = []
     for k, v in conch.get("criteria", {}).items():
         if v.get("usable"):
