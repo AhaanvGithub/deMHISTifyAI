@@ -1,0 +1,16 @@
+{
+  "crit:serration_to_base": ["serrated crypts with serration extending to the base of the crypt", "saw-toothed crypt lumens all the way down to the crypt base", "serration involving the full length of the crypts", "serrated architecture reaching the lower third of the crypts", "crypts serrated from surface to base"],
+  "crit:serration_upper_only": ["serration limited to the upper half of the crypts", "serration confined to the surface and upper crypts", "saw-toothed lumens only near the luminal surface", "straight lower crypts with serration only at the top", "superficial serration with smooth crypt bases"],
+  "crit:dilated_crypt_base": ["dilated crypt bases", "widened lower third of the crypts", "crypts that are widest at their base", "bulbous dilated crypt bases", "crypt bases broader than the upper crypt"],
+  "crit:boot_shaped_crypts": ["boot-shaped or L-shaped crypts", "crypt bases turning sideways like a boot", "L-shaped crypts at the base", "crypts with a horizontal foot at the base", "boot-like deformation of the crypt base"],
+  "crit:horizontal_growth": ["crypts growing horizontally along the muscularis mucosae", "crypt bases extending sideways along the muscularis mucosae", "horizontally oriented crypt bases", "lateral spread of crypts at the base of the mucosa", "crypts running parallel to the muscularis mucosae"],
+  "crit:inverted_t_crypts": ["inverted T-shaped or anchor-shaped crypts", "anchor-shaped crypt bases", "inverted-T crypts at the base", "crypt bases branching to both sides like an anchor", "T-shaped crypt bases"],
+  "crit:narrow_crypt_base": ["narrow, straight crypt bases", "tapering narrow crypt bases", "straight test-tube shaped crypts", "crypts narrowing toward the base", "regular narrow crypt bases"],
+  "crit:mucin_at_base": ["mucin-producing cells at the base of the crypts", "mucinous cells in the crypt bases", "goblet or mucin cells reaching the crypt base", "mature mucin-filled cells in the lower crypts", "mucin production in the basal crypts"],
+  "crit:goblet_cells": ["abundant goblet cells", "many goblet cells in the crypts", "goblet cell rich epithelium", "numerous mucin-filled goblet cells", "crypts lined by plentiful goblet cells"],
+  "crit:microvesicular_mucin": ["microvesicular mucin in epithelial cells", "microvesicular mucinous cytoplasm", "fine vacuolated mucin in the epithelium", "small mucin vacuoles in the crypt epithelium", "microvesicular epithelial cells"],
+  "crit:crypt_branching": ["branched crypts", "branching crypts", "crypts that split into branches", "bifurcating crypts", "crypt branching at the base"],
+  "crit:architectural_distortion": ["architecturally distorted crypts", "irregular crypt architecture", "disorganised distorted crypts", "crypts with abnormal shapes and orientation", "distorted crypt architecture"],
+  "crit:normal_proliferative_zone": ["proliferative zone at the crypt base as in normal mucosa", "normal proliferation at the crypt base", "orderly maturation from crypt base to surface", "basal proliferative zone as in normal colon", "regular crypt base proliferation"],
+  "crit:dysplasia": ["cytologic dysplasia with enlarged hyperchromatic nuclei", "dysplastic epithelium with crowded elongated nuclei", "enlarged hyperchromatic pencillate nuclei", "nuclear atypia and stratification", "cytological dysplasia"]
+}

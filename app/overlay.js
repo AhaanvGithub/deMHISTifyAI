@@ -413,16 +413,16 @@ function drawGlands(fc, g) {
   // strongest evidence first, so the glands that drove the call get their labels before any collision
   [...result.glands].sort((a, b) => !!b.label - !!a.label || Math.abs(b.evidence) - Math.abs(a.evidence)).forEach(gl => {
     const col = GLAND_COLORS[gl.label];
+    if (!col) return;  // only crypts with a clear ring and a clear measurement are drawn
     g.beginPath();
     gl.outline.forEach(([x, y], i) => (i ? g.lineTo(x * W, y * Hh) : g.moveTo(x * W, y * Hh)));
     g.closePath();
     g.lineJoin = 'round'; g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 3 * dpr;
-    g.strokeStyle = col || 'rgba(255,255,255,.28)'; g.lineWidth = (col ? 2 : 1) * dpr;
+    g.strokeStyle = col; g.lineWidth = 2 * dpr;
     g.stroke(); g.shadowBlur = 0;
-    if (!col) return;
     // label just above the gland (or below if that spot is taken); skipped if both collide - hover still shows it
     const top = gl.outline.reduce((m, p) => (p[1] < m[1] ? p : m)), bot = gl.outline.reduce((m, p) => (p[1] > m[1] ? p : m));
-    const text = gl.label, w = text.length * 6.2 + 18, h = 20;
+    const text = (gl.tags && gl.tags.length > 1) ? gl.tags.join(' · ') : gl.label, w = text.length * 6.2 + 18, h = 20;
     for (const [px, py] of [[gl.center[0] * rect.width, top[1] * rect.height - h - 2], [gl.center[0] * rect.width, bot[1] * rect.height + 2]]) {
       const x = Math.min(Math.max(px - w / 2, 0), rect.width - w), y = Math.min(Math.max(py, 0), rect.height - h);
       if (!free(x, y, w, h)) continue;

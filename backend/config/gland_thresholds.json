@@ -1,8 +1,8 @@
 {
-  "dilated_um": 52.7,
-  "serrated_roughness": 1.383,
-  "round_solidity": 0.771,
+  "dilated_width_um": 42.5,
+  "serrated_roughness": 1.425,
+  "round_solidity": 0.769,
   "round_eccentricity": 0.75,
   "round_max_um": 24.8,
-  "source": "7108 crypts in 581 MHIST training images (research/gland_thresholds.py)"
+  "source": "6571 crypts in 600 MHIST training images (research/gland_thresholds.py)"
 }

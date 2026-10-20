@@ -2,7 +2,7 @@
 """Set the gland label thresholds (backend/glands.py) from MHIST TRAINING images only.
 
 Measures every crypt in 600 training images (stratified, seed 0) and sets each threshold from the distribution:
-  dilated crypt       : crypt interior diameter at or above the 90th percentile
+  dilated crypt       : crypt interior width (short axis) at or above the 90th percentile
   serrated lumen      : lumen roughness at or above the 75th percentile (crypts with a measurable lumen)
   round regular crypt : solidity at or above the 60th percentile, eccentricity at or below 0.75, and no wider
                         than the median crypt
@@ -28,10 +28,12 @@ tr = pd.concat([d.sample(min(len(d), 300), random_state=0)
 rows = []
 for _, r in tr.iterrows():
     for g in G.measure(Image.open(ROOT / "data/mhist/images" / r["Image Name"])):
-        rows.append({**{k: g[k] for k in ("crypt_um", "lumen_um", "roughness", "solidity", "eccentricity")},
+        if g["ring"] < G.MIN_RING:
+            continue
+        rows.append({**{k: g[k] for k in ("crypt_um", "width_um", "lumen_um", "roughness", "solidity", "eccentricity", "ring")},
                      "label": r["Majority Vote Label"], "image": r["Image Name"]})
 d = pd.DataFrame(rows)
-T = {"dilated_um": round(float(d.crypt_um.quantile(0.90)), 1),
+T = {"dilated_width_um": round(float(d.width_um.quantile(0.90)), 1),
      "serrated_roughness": round(float(d.roughness.dropna().quantile(0.75)), 3),
      "round_solidity": round(float(d.solidity.quantile(0.60)), 3),
      "round_eccentricity": 0.75,
