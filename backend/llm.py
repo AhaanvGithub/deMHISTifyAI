@@ -123,7 +123,8 @@ Rules:
   show crypt bases.
 - If the field is flagged as unlike the training data, say so in your FIRST sentence: the image evidence may not apply.
 - When you suggest what to check by eye, say WHERE when the measurements give a position (e.g. "the dilated crypt at
-  the upper right", "the region that pushed toward SSA, lower left").
+  the upper right", "the region that pushed toward SSA, lower left"). A measured crypt that sits where the panel's
+  evidence map pushes toward its call is the best first place to look.
 - Cite only the given excerpts, by [P#]. If they don't support a claim, don't make it.
 Respond with JSON only:
 {"call": "SSA" or "HP", "confidence": 0-100, "alt": the other class, "alt_confidence": 0-100,
@@ -165,6 +166,16 @@ def _evidence_regions(heat: dict) -> List[str]:
     return out
 
 
+def _overclaims(text: str) -> int:
+    """Overclaiming phrases, not counting negated ones ("does not confirm", "can't be diagnostic")."""
+    n = 0
+    for m in OVERCLAIM.finditer(text or ""):
+        before = text[max(0, m.start() - 30) : m.start()].lower()
+        if not re.search(r"\b(not|n't|no|cannot|without|never)\b", before):
+            n += 1
+    return n
+
+
 def _measured(conch: dict) -> tuple:
     """Text block of what was measured on this field, and the ids the judge may cite as evidence."""
     pnl = conch.get("panel", {})
@@ -194,7 +205,11 @@ def _measured(conch: dict) -> tuple:
                 widths = [g["width_um"] for g in glands if tag in g.get("tags", [])]
                 where = sorted({_where(*g["center"]) for g in glands if tag in g.get("tags", [])})
                 size = f"width {widths[0]:.0f} um" if len(widths) == 1 else f"widths {min(widths):.0f}-{max(widths):.0f} um"
-                crypt_lines.append(f"- [{key}] {n} of {n_clear} clearly ringed crypts {what}; {size}; at the {', '.join(where)}")
+                evs = [g.get("evidence", 0) for g in glands if tag in g.get("tags", [])]
+                push = sum(e > 0.1 for e in evs), sum(e < -0.1 for e in evs)
+                lean = (f"; the image panel's own evidence map pushes toward SSA over {push[0]} and toward HP over {push[1]} of them"
+                        if conch.get("heat", {}).get("kind") == "evidence" else "")
+                crypt_lines.append(f"- [{key}] {n} of {n_clear} clearly ringed crypts {what}; {size}; at the {', '.join(where)}{lean}")
                 ids[key] = what
         if not crypt_lines:
             crypt_lines.append(f"- {n_clear} clearly ringed crypts found; none clearly dilated, serrated or round-regular.")
@@ -281,7 +296,7 @@ def _violations(s: dict, valid: set, ids: dict, not_measured: List[str]) -> int:
     text = " ".join([s.get("reasoning", ""), s.get("caveats", "")] + [f.get("why", "") for f in s.get("key_features", [])]
                     + [c for c in s.get("check_by_eye", []) if isinstance(c, str)])
     v = sum(1 for r in re.findall(r"P\d+", json.dumps(s)) if r not in valid)
-    v += len(OVERCLAIM.findall(text))
+    v += _overclaims(text)
     v += sum(1 for f in s.get("key_features", []) if f.get("feature_id", "").strip("[]") not in ids)
     low = text.lower()
     for nm in not_measured:

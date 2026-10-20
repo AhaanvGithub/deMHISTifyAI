@@ -594,6 +594,7 @@ class Engine:
         """Crypts found and measured per field (backend/glands.py), in 0..1 coordinates of the whole snip, each
         with the cover-up evidence under it (> 0 = that region pushed the call toward SSL)."""
         import glands as GL
+        from skimage.draw import polygon as fill_polygon
         w, h = snip.size
         ev = (np.array(heat["p_ssa"]).reshape(heat["rows"], heat["cols"]) - 0.5) * 2
         out = []
@@ -603,8 +604,14 @@ class Engine:
                 to_snip = lambda x, y: [round((x0 + x * (x1 - x0)) / w, 4), round((y0 + y * (y1 - y0)) / h, 4)]
                 g["outline"] = [to_snip(x, y) for x, y in g["outline"]]
                 g["center"] = to_snip(*g["center"])
-                r = min(heat["rows"] - 1, int(g["center"][1] * heat["rows"]))
-                c = min(heat["cols"] - 1, int(g["center"][0] * heat["cols"]))
-                g["evidence"] = round(float(ev[r, c]), 3)
+                # evidence averaged over the crypt's whole outline (its centre is often the empty lumen)
+                o = np.array(g["outline"])
+                rr, cc = fill_polygon(o[:, 1] * heat["rows"], o[:, 0] * heat["cols"], shape=ev.shape)
+                if len(rr):
+                    g["evidence"] = round(float(ev[rr, cc].mean()), 3)
+                else:
+                    r = min(heat["rows"] - 1, int(g["center"][1] * heat["rows"]))
+                    c = min(heat["cols"] - 1, int(g["center"][0] * heat["cols"]))
+                    g["evidence"] = round(float(ev[r, c]), 3)
                 out.append(g)
         return out

@@ -64,7 +64,7 @@ for _, r in cases.iterrows():
         out[name] = {"call": j["call"], "matches_majority": j["call"] == majority, "agrees_with_panel": j["call"] == conch["panel"]["top"],
                      "consistency": j["consistency"], "rule_breaks": new._violations(shown, valid, ids, not_measured),
                      "invented_citations": sum(1 for c in re.findall(r"P\d+", txt) if c not in valid),
-                     "overclaims": len(new.OVERCLAIM.findall(txt)), "n_citations": len(set(re.findall(r"P\d+", txt))),
+                     "overclaims": new._overclaims(txt), "n_citations": len(set(re.findall(r"P\d+", txt))),
                      "distinct_topics_given": len({p["title"].split(":")[0] for p in papers}), "seconds": round(dt, 1),
                      "reasoning": j.get("reasoning", ""), "check_by_eye": j.get("check_by_eye", []),
                      "key_features": j.get("key_features", [])}
