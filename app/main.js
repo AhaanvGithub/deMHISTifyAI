@@ -21,6 +21,10 @@ function startBackend() {
   backend.on('exit', code => console.log(`[backend] exited ${code}`));
 }
 
+// all text and controls at 90%: the overlay code works in CSS px and reads devicePixelRatio, so the screenshot,
+// selection and heatmap stay pixel-exact at any zoom
+const UI_SCALE = 0.9;
+
 function createLauncher() {
   const { width } = screen.getPrimaryDisplay().workAreaSize;
   launcher = new BrowserWindow({
@@ -28,7 +32,7 @@ function createLauncher() {
     // no OS frame/shadow behind the frameless transparent window (it shows up as a square outline)
     hasShadow: false, thickFrame: false, backgroundColor: '#00000000',
     frame: false, transparent: true, resizable: false, alwaysOnTop: true, show: false, skipTaskbar: true,
-    webPreferences: { preload: path.join(__dirname, 'preload.js') },
+    webPreferences: { preload: path.join(__dirname, 'preload.js'), zoomFactor: UI_SCALE },
   });
   launcher.loadFile('launcher.html');
   launcher.on('blur', () => launcher.hide());
@@ -100,7 +104,7 @@ async function openOverlay() {
   // keep a local handle: callbacks must never touch a newer overlay or one that is already closed
   const win = new BrowserWindow({
     ...display.bounds, frame: false, alwaysOnTop: true, skipTaskbar: true, fullscreen: true,
-    backgroundColor: '#170a25', webPreferences: { preload: path.join(__dirname, 'preload.js') },
+    backgroundColor: '#170a25', webPreferences: { preload: path.join(__dirname, 'preload.js'), zoomFactor: UI_SCALE },
   });
   overlay = win;
   win.loadFile('overlay.html');
