@@ -1,0 +1,27 @@
+{
+  "what": "UniToPatho 800um HP patches (all HP), shrunk to 2.0 um/px, ConvNeXt-Base final model, stain measured per patch",
+  "n_patches": 545,
+  "n_slides": 41,
+  "results": {
+    "none": {
+      "called_HP": 1.0,
+      "mean_P_SSL": 0.2052
+    },
+    "colour averaging": {
+      "called_HP": 1.0,
+      "mean_P_SSL": 0.1984
+    },
+    "Macenko": {
+      "called_HP": 1.0,
+      "mean_P_SSL": 0.1972
+    },
+    "Vahadane": {
+      "called_HP": 1.0,
+      "mean_P_SSL": 0.2023
+    },
+    "derived": {
+      "called_HP": 1.0,
+      "mean_P_SSL": 0.2018
+    }
+  }
+}

@@ -1,0 +1,137 @@
+{
+  "what": "ConvNeXt-Base fold models on their own held-out training folds; simulated labs; test split unused",
+  "results": {
+    "original": {
+      "none": {
+        "auc": 0.9623,
+        "bal_acc": 0.8837
+      },
+      "colour averaging": {
+        "auc": 0.9606,
+        "bal_acc": 0.8815
+      },
+      "Macenko": {
+        "auc": 0.9579,
+        "bal_acc": 0.8653
+      },
+      "Vahadane": {
+        "auc": 0.9536,
+        "bal_acc": 0.8581
+      },
+      "derived": {
+        "auc": 0.9597,
+        "bal_acc": 0.8809
+      }
+    },
+    "pinker": {
+      "none": {
+        "auc": 0.9618,
+        "bal_acc": 0.8792
+      },
+      "colour averaging": {
+        "auc": 0.9609,
+        "bal_acc": 0.8812
+      },
+      "Macenko": {
+        "auc": 0.9571,
+        "bal_acc": 0.8697
+      },
+      "Vahadane": {
+        "auc": 0.9541,
+        "bal_acc": 0.8611
+      },
+      "derived": {
+        "auc": 0.9581,
+        "bal_acc": 0.8776
+      }
+    },
+    "bluer, darker": {
+      "none": {
+        "auc": 0.9615,
+        "bal_acc": 0.8865
+      },
+      "colour averaging": {
+        "auc": 0.961,
+        "bal_acc": 0.8801
+      },
+      "Macenko": {
+        "auc": 0.9537,
+        "bal_acc": 0.8656
+      },
+      "Vahadane": {
+        "auc": 0.9552,
+        "bal_acc": 0.8581
+      },
+      "derived": {
+        "auc": 0.9557,
+        "bal_acc": 0.8776
+      }
+    },
+    "faded": {
+      "none": {
+        "auc": 0.9615,
+        "bal_acc": 0.8753
+      },
+      "colour averaging": {
+        "auc": 0.9563,
+        "bal_acc": 0.8624
+      },
+      "Macenko": {
+        "auc": 0.9512,
+        "bal_acc": 0.8498
+      },
+      "Vahadane": {
+        "auc": 0.9507,
+        "bal_acc": 0.8455
+      },
+      "derived": {
+        "auc": 0.9544,
+        "bal_acc": 0.8665
+      }
+    },
+    "scanner shift": {
+      "none": {
+        "auc": 0.9608,
+        "bal_acc": 0.8772
+      },
+      "colour averaging": {
+        "auc": 0.9562,
+        "bal_acc": 0.8514
+      },
+      "Macenko": {
+        "auc": 0.9546,
+        "bal_acc": 0.8577
+      },
+      "Vahadane": {
+        "auc": 0.9445,
+        "bal_acc": 0.8234
+      },
+      "derived": {
+        "auc": 0.954,
+        "bal_acc": 0.8555
+      }
+    },
+    "everything": {
+      "none": {
+        "auc": 0.9598,
+        "bal_acc": 0.8721
+      },
+      "colour averaging": {
+        "auc": 0.959,
+        "bal_acc": 0.8659
+      },
+      "Macenko": {
+        "auc": 0.9552,
+        "bal_acc": 0.8697
+      },
+      "Vahadane": {
+        "auc": 0.953,
+        "bal_acc": 0.8552
+      },
+      "derived": {
+        "auc": 0.9566,
+        "bal_acc": 0.8763
+      }
+    }
+  }
+}
