@@ -1,8 +1,8 @@
 {
   "screens": 60,
   "with_bar": 51,
-  "scale_read_within_3pct": 40,
-  "scale_wrong_value": 1,
+  "scale_read_within_3pct": 41,
+  "scale_wrong_value": 0,
   "scale_missed": 10,
   "no_bar": 9,
   "no_bar_correctly_none": 9,
@@ -72,8 +72,8 @@
       "bar_found": "True",
       "n_candidates": "1",
       "truth": 0.8,
-      "got": 0.7371794857711756,
-      "scale_ok": false,
+      "got": 0.8012820497512778,
+      "scale_ok": true,
       "square_inside_tissue": 0.998,
       "square_vs_tissue_side": 0.904
     },

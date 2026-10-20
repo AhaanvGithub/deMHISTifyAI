@@ -48,6 +48,13 @@ def ocr_lines(img: Image.Image):
     return asyncio.run(_ocr_async(img))
 
 
+def _round_value(um: float) -> bool:
+    """Scale bars use round lengths: 1, 2, 2.5 or 5 times a power of ten (10, 20, 25, 50, 100, 200, 250, 500 um, ...).
+    Anything else is treated as an OCR slip; a wrong scale is worse than none (the app then uses the tissue square)."""
+    m = um / 10 ** np.floor(np.log10(um))
+    return any(abs(m - v) < 1e-6 for v in (1, 2, 2.5, 5, 10))
+
+
 def _labels(img: Image.Image, zoom: int = 3):
     """(microns, x, y, w, h) for each standalone scale label OCR finds in a small crop (read at `zoom`x).
     Only short lines that are just a label count, so "0.45 mm" inside a sentence is ignored."""
@@ -62,7 +69,7 @@ def _labels(img: Image.Image, zoom: int = 3):
             num = "0." + num[1:]
         val = float(num)
         um = val * 1000 if m.group(2).lower() == "mm" else val
-        if um <= 0:
+        if um <= 0 or not _round_value(um):                       # e.g. "300" is most likely a misread "500"
             continue
         x0 = min(r[0] for _, r in words); y0 = min(r[1] for _, r in words)
         x1 = max(r[0] + r[2] for _, r in words); y1 = max(r[1] + r[3] for _, r in words)
