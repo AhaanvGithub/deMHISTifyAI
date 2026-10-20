@@ -81,4 +81,9 @@ fold. The overnight runner (scratchpad `queue_runner.py`) handled the allowed ho
       px. Score the square's contents resized to 224 px. Handles any magnification; does not fix stain
       differences between labs.
 - [ ] **"Unlike training data" warning**: flag snips whose colour/features are far from MHIST.
+- [ ] **Stain normalisation toward MHIST** (idea, to discuss): measure MHIST's own stain statistics (haematoxylin
+      and eosin channels separately, tissue pixels only), estimate a new slide's shift (per slide/screen, not per
+      snip, so mucin-rich SSL fields keep their colour; possibly regional), and map it toward MHIST before scoring.
+      Check first: (1) no harm on MHIST test images; (2) artificially re-stained MHIST test images lose accuracy
+      without it and recover with it.
 
