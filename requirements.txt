@@ -1,0 +1,37 @@
+# Python 3.12 on Windows (the app uses Windows screen capture and OCR). Versions as used for the reported results.
+# PyTorch with CUDA 12.8: pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.11.0
+torchvision==0.26.0
+timm==1.0.30
+transformers==5.20.1
+huggingface_hub==2.2.0
+open_clip_torch==3.3.0
+# CONCH: pip install git+https://github.com/Mahmoodlab/CONCH.git
+# MUSK: clone https://github.com/lilab-stanford/MUSK and point MUSK_SRC at it; it also needs:
+einops==0.8.2
+fairscale==0.4.13
+
+numpy==2.5.2
+scipy==1.18.1
+pandas==3.0.6
+scikit-learn==1.9.1
+scikit-image==0.26.0
+pillow==12.3.0
+opencv-python==5.0.0.93
+
+# backend service and literature judge
+fastapi==0.146.0
+uvicorn==0.54.0
+python-multipart==0.0.32
+openai==3.35.1
+requests==2.34.2
+pypdf==6.21.1
+
+# scale-bar reading (Windows built-in OCR)
+winrt-runtime==3.2.1
+winrt-Windows.Foundation==3.2.1
+winrt-Windows.Foundation.Collections==3.2.1
+winrt-Windows.Globalization==3.2.1
+winrt-Windows.Graphics.Imaging==3.2.1
+winrt-Windows.Media.Ocr==3.2.1
+winrt-Windows.Storage.Streams==3.2.1

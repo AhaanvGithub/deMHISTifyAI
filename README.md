@@ -3,9 +3,9 @@
 A desktop tool for one of pathology's hardest calls: **sessile serrated lesion (SSL) vs hyperplastic
 polyp (HP)** on H&E. You type your call and how sure you are, snip the slide region on screen, and get:
 
-- an AI panel's call and confidence, trained to match a 7-pathologist consensus
-- a heatmap of where the evidence sits
-- scores for the WHO-2019 features the image models can read
+- an image panel's call and confidence, trained to match a 7-pathologist consensus
+- a map of which parts of the field drove that call, sharpening while you read
+- the crypts in the field outlined and measured (dilated, serrated, round and regular)
 - a literature judge that reasons over published evidence, with citations
 - a verdict comparing your call with the evidence, and what to look at again
 
@@ -18,20 +18,20 @@ Ashby Hackathon 2026 submission by Aiden Wang, Alice Yu and Ahaan Verma. Researc
 1. Start the app: `cd app` then `npm start`. It runs quietly in the background (the Python backend starts
    with it) and opens a demo image with two MHIST-sized fields, A and B, to try it on.
 2. Press **Ctrl+Shift+Space**, type your call (e.g. "sessile serrated lesion, 70%") and press Enter.
-3. Drag a box around one field of tissue. Adjust the tissue box if needed and press Enter.
-4. Read the panel beside your selection. Toggle the heatmap between **AI's call** (P(SSL): HP blue, SSL red)
-   and **Your call** (support for your call).
+3. Drag a box around the tissue. The app places a square field on it:
+   - if the viewer shows a scale bar (e.g. "100 µm"), the square is exactly **448 µm**, one MHIST field; you
+     can move it, and the app says when to zoom in or out;
+   - otherwise it is the largest square that is mostly tissue; you can move and resize it.
+4. Press Enter and read the panel beside your selection. Toggle the map between **AI's call** (what pushed the
+   call toward SSL, red, or HP, blue) and **Your call** (what supports your call). Hover for detail.
 5. Optional: the **gear** sets the decision cut-off. It shows how SSL and HP training images score, with
    presets from "catch at least 95% of SSLs" to "clear at least 99% of HPs". The default is the balanced
    cut-off, which the reported results use.
 
-Snip one field of about 0.45 mm (MHIST's field size, roughly a 5x view). The whole snip is scored as one
-field, exactly as the models were trained.
-
 | Folder | What's in it |
 |---|---|
-| `app/` | Electron desktop app: launcher, snip screen, results panel |
-| `backend/` | Local service on port 8765: `engine.py` (image models), `llm.py` (literature judge), `server.py` |
+| `app/` | Electron desktop app: launcher, snip screen, results panel, cut-off settings |
+| `backend/` | Local service on port 8765: `engine.py` (image panel, map), `glands.py` (crypts), `scalebar.py`, `region.py` (field placement), `llm.py` (literature judge), `server.py` |
 | `research/` | Training and evaluation scripts |
 | `docs/results/` | Result files |
 | `papers/` | Literature library. `papers/library.json` is not distributed; build it from your own OpenEvidence answers with `research/build_library.py` |
@@ -44,14 +44,31 @@ Models and data are not included; each user obtains access themselves (see Repro
 
 | Stage | What happens |
 |---|---|
-| Capture | The screen is captured in true colour (Windows GDI) when the snip screen opens |
-| Tissue box | A local vision model proposes the tissue region inside your selection |
+| Capture | The screen is captured in true colour (Windows GDI, through the backend) when the snip screen opens |
+| Field | The scale bar is read with Windows' built-in OCR to size a 448 µm square; without one, tissue is separated from glass and viewer chrome by colour |
 | Image panel | ConvNeXt-Base and MUSK each score the field; their weighted, calibrated combination gives P(SSL) and the call |
-| Unlike-training-data check | The snip's ConvNeXt features are compared with the 2,175 training images; if they are further away than 99% of training images are from each other, the panel warns that its call may not apply |
-| Heatmap | Tile-sized windows slide across the snip and are scored by the panel |
-| Feature scores | CONCH compares the image with text descriptions of WHO-2019 features; only features with measured reliability are used |
-| Literature judge | An LLM (Lumen) reasons over the image panel's result, the reliable feature scores and a curated passage library, citing only those passages. It never sees the image |
+| Unlike-training-data check | The field's ConvNeXt features are compared with the 2,175 training images; beyond what 99% of training images reach, the panel warns that its call may not apply |
+| Evidence map | Each region of the field is blurred out in turn and the change in ConvNeXt's score is recorded: 16 x 16 regions first, then 32, 64 and 128 while the literature judge runs |
+| Crypts | Crypts are found by their pale interior and ring of nuclei, outlined to the edge of the nuclear band, and measured: width (dilated), lumen edge roughness (serrated), shape (round and regular) |
+| Feature scores | CONCH compares the field with text descriptions of WHO-2019 features; only features whose direction on training images matches the literature are passed on |
+| Literature judge | An LLM (Lumen) reasons over the panel's result, the usable feature scores and a curated passage library, citing only those passages. It never sees the image |
 | Verdict | Compares your call with the image panel and the literature judge |
+
+### Design decisions
+
+| Decision | Why |
+|---|---|
+| Score one square field, the size MHIST tiles show (448 µm) | The models learned SSL vs HP at that field size; a different size or shape changes what they see |
+| Read the scale bar to size the field | Viewers zoom freely; a known scale is the direct way to show the models exactly one training-sized field |
+| Panel of an ImageNet CNN and a pathology model | They make different mistakes; together they beat any single model on training data |
+| Fine-tune instead of frozen features | Frozen features reach ~0.80 balanced accuracy on MHIST; fine-tuning reaches 0.89 (results below) |
+| Two calibrations: the call and the displayed percentage | The call balances missed SSLs and over-called HPs; the percentage reads as "how often the pathologist majority says SSL" |
+| Cut-off set on training data, adjustable in the app | A clinic may prefer catching SSLs over clearing HPs; the trade-off is shown, not hidden |
+| No stain normalisation | Every method tested scored slightly worse than none, on MHIST and on simulated labs; training with colour variation already makes the panel robust |
+| Evidence map by blurring regions out | It measures what actually moved this call, at the field size the model was trained on |
+| Crypts measured, not matched to text | Matching image regions to WHO phrases located features poorly; measured outlines follow real glands, and their thresholds come from MHIST training crypts |
+| Warn on unfamiliar input | Trained on two classes only, the panel would otherwise call anything (glass, photos, other stains) HP |
+| Every number from training data; test scored once | So the reported results show what to expect on new slides |
 
 ---
 
@@ -211,20 +228,25 @@ Supporting analyses:
 | Does weighting SSL vs HP differently change how well cases are ranked? | No: AUC is the same for every weight from 30/70 to 70/30; only the cut-off moves | `docs/results/weight_sweep_learning_curve.json` |
 | Does more training data help? | Yes: AUC 0.878 / 0.896 / 0.906 with 25 / 50 / 100% of train | `docs/results/finetune_learning_curve.json` |
 | Do brightness/contrast/zoom adjustments at prediction time help? | No: all within +-0.002 AUC of the plain image | `research/image_tta_sweep.py` |
-| Do the feature scores match the visible tissue? | Only weakly; they are shown as hints, not proof | `docs/results/feature_reality_check.md` |
+| Do the CONCH feature scores match the visible tissue? | Only weakly; only the 3 of 14 whose direction on training images matches the literature are passed to the literature judge, as hints | `docs/results/feature_reality_check.md`, `docs/results/feature_calibration.json` |
+| Does averaging several phrasings per feature help? | No: 5 phrasings per WHO feature gave 2 usable features instead of 3, and flipped the direction of several | `docs/results/feature_calibration.json` |
+| Do the measured crypt labels agree with the pathologists? | Yes, modestly, on 1,575 training images not used to set the thresholds: dilated and serrated crypts are more common the more pathologists called SSL (Spearman +0.23, +0.27), round regular crypts less (-0.27). Each alone separates SSL from HP at AUC ~0.6, so they explain, they don't decide | `docs/results/gland_check.json` |
+| Is the scale bar read correctly? | On 9 synthetic screens (black, white and mixed labels; µm and mm; three zooms; two without a bar) it read the right scale within 1% on 6 of the 7 screens with a bar and returned nothing for both without one; the miss was a bar drawn directly on tissue | `backend/scalebar.py` |
 | Does stain normalisation help? | No: Reinhard, Macenko, Vahadane and a derived method all score slightly below no normalisation, on MHIST and on four simulated labs (ConvNeXt-Base, held-out training folds). The app uses images as they are | `docs/results/stain_compare.json` |
 | Does it hold up on another hospital's slides? | UniToPatho (Turin; different scanner and stain), scaled to MHIST's field size: ConvNeXt-Base calls 99-100% of 545 hyperplastic polyps (41 slides) HP, depending on how each patch is cropped to one field. Normal colon and adenomas score lower still (median P(SSL) 0.15 and 0.18 vs 0.21 for HP), matching their lack of serration. UniToPatho has no SSLs, so outside SSL detection is untested | `docs/results/unitopatho_check.json` |
 | Does the unlike-training-data check work? | It flags all 16 non-tissue and wrong-stain test images (photos, noise, a brown immunostain, a photo recoloured in H&E colours) and 1% of MHIST training images by design. On UniToPatho it flags 14% of HP, 9% of adenoma and 20% of normal colon fields. Frozen CONCH features flagged 51% of the outside HP and were not used | `research/export_panel.py` |
 
 Scope: trained on MHIST (one lab, about 5x). Slides that look very different, e.g. much higher power or a
 very different stain, are outside what the models have learned; the unlike-training-data check warns about
-many of these.
+many of these. The crypt finder is a measurement, not a trained detector: it finds clearly ringed crypts and
+can miss crypts cut lengthwise or open to the surface.
 
 ---
 
 ## Reproducing
 
-Use `.venv\Scripts\python.exe` (Python 3.12, CUDA). Requires Hugging Face access to CONCH
+Use `.venv\Scripts\python.exe` (Python 3.12, CUDA) with `requirements.txt` (versions as used; see the comments
+in it for PyTorch, CONCH and MUSK). The app itself needs Node.js (`cd app`, `npm install`). Requires Hugging Face access to CONCH
 (`MahmoodLab/CONCH`) and MUSK (`xiangjx/musk`), and the MHIST dataset in `data/mhist/`. MUSK's code is
 loaded from a clone of github.com/lilab-stanford/MUSK via `MUSK_SRC`.
 
@@ -243,6 +265,13 @@ python research/panel.py --members conch_full convnext_base plip_full musk_lora
 
 # export what the app needs (standardisation, calibrations, cut-off chart, unlike-training-data reference)
 python research/export_panel.py
+
+# crypt label thresholds from MHIST training crypts, and the held-out check against pathologist votes
+python research/gland_thresholds.py
+python research/gland_check.py
+
+# feature-score calibration for the literature judge (training images only)
+python research/feature_calibration.py
 
 # demo image opened at start-up (needs the UniToPatho HP patches in data/unitopatho/)
 python research/make_demo_image.py
