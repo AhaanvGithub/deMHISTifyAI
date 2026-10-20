@@ -563,7 +563,7 @@ function renderJudge(j) {
     <div class="alt">- alt: ${LABEL[j.alt]} ${j.alt_consistency}%</div>
     <div class="sub">consistency over ${j.n_samples} runs · model's own estimate ${j.stated_confidence}%${j.agrees_with_panel === false ? ' · <span class="warn">disagrees with the image panel</span>' : j.agrees_with_panel ? ' · agrees with the image panel' : ''}</div>`;
   const feats = (j.key_features || []).map(f =>
-    `<li>${LABEL[f.points_to] ? `<b class="${f.points_to === 'SSA' ? 'ssl' : 'hp'}">${LABEL[f.points_to]}</b> ` : '<b class="muted">either</b> '}${esc(f.feature)}${f.strength ? ` <span class="strength">${String(f.feature_id || '').startsWith('crypts:') ? 'measured' : 'score'} · ${esc(f.strength)}</span>` : ''}: ${cite(f.why)} ${(f.cites || []).map(c => `<sup>${c}</sup>`).join('')}</li>`).join('');
+    `<li>${LABEL[f.points_to] ? `<b class="${f.points_to === 'SSA' ? 'ssl' : 'hp'}">${LABEL[f.points_to]}</b> ` : '<b class="muted">either</b> '}${esc(f.feature)}${f.strength ? ` <span class="strength">${String(f.feature_id || '').startsWith('crypts:') ? 'measured' : 'text match'} · ${esc(f.strength)}</span>` : ''}: ${cite(f.why)} ${(f.cites || []).filter(c => !(f.why || '').includes(c)).map(c => `<sup>${c}</sup>`).join('')}</li>`).join('');  // citations already in the sentence are not repeated
   // each cited passage: what it covers, then the primary papers it draws on
   const cites = (j.citations || []).map(c => {
     const src = (c.sources || []).slice(0, 3).map(s =>
