@@ -131,7 +131,15 @@ the test split to choose the model" vs "used it or did not say")
   trained) -> panel uses `convnext_base`. MUSK-LoRA ran out of memory at batch 4 and is running at batch 2 x
   accum 8 (fold 1 epoch 1 val AUC 0.928; ~28 min/fold -> done ~00:30), then the panel + single test run.
 
-## 9. Stain normalisation (in progress)
+## 9. Stain normalisation (decided: none)
+
+- **Result (per-image source, MHIST averaged target; `docs/results/stain_compare.json`, `unitopatho_check.json`)**:
+  on held-out training images under 5 simulated labs, no normalisation was best almost everywhere (AUC 0.960-0.962
+  whatever the colours); every method slightly hurt clean images (derived least, -0.003 bal acc; Vahadane worst,
+  -0.026). UniToPatho (545 real outside HP patches): 100% called HP under every method (mean P(SSL) ~0.20), but it
+  has no SSL, so it cannot separate "recognises HP" from "defaults to HP on outside images". Weights verified
+  unchanged by SHA-256. **App uses no normalisation**; `backend/stain.py` stays as an option.
+- Earlier notes:
 
 - User's idea: shift a new slide's colours toward MHIST's, measured per slide (whole screen), possibly
   regionally. Implemented as Macenko dye separation + **MHIST's own reference** (`backend/stain.py`,
@@ -155,6 +163,11 @@ the test split to choose the model" vs "used it or did not say")
    bar detection), size a draggable **448 um** square, prompt "zoom out" if it does not fit or "zoom in" if
    under 224 screen px, manual fallback (drag along the scale bar + type its label). Demo in QuPath.
 5. "Unlike training data" warning (out-of-distribution flag).
+5b. **"Don't miss SSL" screening mode** (toggle): a second cut-off chosen on training OOF predictions to catch ~95% of
+   SSL, with its HP false-alarm rate shown. Evidence (ConvNeXt-Base OOF, train): raw 0.5 cut-off misses 17% of SSL
+   vs 6% of HP (errors lean HP); the best-balanced-accuracy cut-off (0.41) gives 90% / 89% and bal acc 0.896 (vs
+   0.884), and the panel already uses that rule; a 95%-SSL cut-off (~0.30) costs ~3 points of balanced accuracy
+   (HP caught 78%), so it is an opt-in mode, not the default.
 6. Literature judge guard rail (stop "strongly supported by features" / claims about non-measurable features;
    needs Lumen to test - ask the user).
 7. Optional: second seed for the best member; disagreement-aware UI (flag likely 4-3 cases).
