@@ -165,12 +165,15 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
                  + " ".join(v["text"] for v in top_feats))
         papers = LIBRARY.search(query)
         judge_future = POOL.submit(llm.research_judge, conch["criteria"], papers, conch["panel"])
-        # while Lumen thinks, sharpen the heatmap on the GPU (stride 1/8 tile instead of 1/4)
-        try:
-            yield _sse("heat", engine.refine_heat(img, conch["magnification"]["tile_px"], sub=8))
-            _free_gpu()
-        except Exception as e:
-            yield _sse("heat_error", {"message": str(e)})
+        # while Lumen thinks, sharpen the heatmap on the GPU: the panel's cover-up map refines 16 -> 32 -> 64 -> 128 cells
+        # per field (older judges: one denser pass)
+        for sub in ((32, 64, 128) if conch.get("judge_mode") == "panel" else (8,)):
+            try:
+                yield _sse("heat", engine.refine_heat(img, conch["magnification"]["tile_px"], sub=sub))
+                _free_gpu()
+            except Exception as e:
+                yield _sse("heat_error", {"message": str(e)})
+                break
         judge = judge_future.result()
         yield _sse("judge", judge)
 

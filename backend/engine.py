@@ -317,10 +317,10 @@ class Engine:
         cw, ch = w / C, h / R
         starts = [(r, c) for r in range(R - sub + 1) for c in range(C - sub + 1)]
         crops = [snip.crop((int(c * cw), int(r * ch), int(c * cw + tw), int(r * ch + th))) for r, c in starts]
+        if self.panel:  # cover-up evidence map (ConvNeXt) + finer CONCH feature map, at the trained field size
+            return self._evidence_heat(snip, tiles, G=sub if sub in self.LEVELS else 16)
         emb, ftp = self.encode(crops)
-        if self.panel:  # the panel's displayed P(SSL) per window
-            p_win = self._shown(self._panel_score(self._panel_logits(crops)[0]))
-        elif self.ft:  # fine-tuned judges: mean P(SSA) over versions on the raw image
+        if self.ft:  # fine-tuned judges: mean P(SSA) over versions on the raw image
             p_win = ftp.mean(axis=1)
         else:
             raw_judges = [n for n, j in enumerate(self.judges) if j["condition"] == "raw"]
@@ -472,6 +472,7 @@ class Engine:
             t.probs = {"SSA": float(p_tile[i]), "HP": float(1 - p_tile[i])}
             t.criteria = {k.split(":", 1)[1]: float(crit[i, n]) for n, k in enumerate(self.criteria_keys)}
         heat = self._dense_heat(snip, tiles)
+        glands = self._glands(snip, tiles, heat)
         votes = {c: sum(r["top"] == c for r in judge_results) for c in CLASSES}
         top = call(p_snip)
         snip_crit = crit[mask].mean(0)
@@ -489,6 +490,7 @@ class Engine:
                 "p_ssl": round(p_snip, 4), "cut": round(cut, 4), "default_cut": self.panel["shown_cut_off"],
             },
             "ood": self._ood(feats[torch.from_numpy(mask).to(feats.device)] if feats is not None else None),
+            "glands": glands,
             "criteria": {
                 k.split(":", 1)[1]: {"text": self.prompts[k], "score": round(float(snip_crit[n]), 3),
                                      "reliability": self.calib.get(k, {}).get("reliability"),
@@ -500,3 +502,104 @@ class Engine:
             "calibrated": bool(self.calib),
             "judge_mode": "panel",
         }
+
+    # ---------- "where": cover-up (occlusion) evidence map, refined over time ----------
+    # cells per field side -> (covered window in cells, CONCH feature window in cells, feature window step).
+    # ConvNeXt sees the central 87.5% of a field (its centre crop, as in training) = the inner 14/16 of the grid;
+    # the cover-up window stays ~30-40 px of the model's 224 px input (~60-80 um on an MHIST-scale field).
+    LEVELS = {16: (3, 8, 2), 32: (5, 16, 2), 64: (8, 16, 4), 128: (16, 32, 8)}
+    OCC_STEP = {16: 1, 32: 1, 64: 2, 128: 4}  # finer levels skip positions (~4x/16x faster); windows still overlap every cell
+
+    @torch.no_grad()
+    def _occlusion(self, field: Image.Image, G: int) -> np.ndarray:
+        """[G, G] change in ConvNeXt's logit when each region is blurred out: > 0 = the region pushed the call
+        toward SSL, < 0 = toward HP. The field is scored exactly as in training (one field, centre crop)."""
+        from PIL import ImageFilter
+        net = self.panel["nets"]["convnext_base"]
+        dev_type = "cuda" if str(self.device).startswith("cuda") else "cpu"
+        occ = self.LEVELS[G][0]
+        n = G * 14 // 16; c = 224 // n; b0 = (G - n) // 2                    # inner cells, px per cell, border
+        x = net.pre(field).to(self.device)                                   # [3, 224, 224]
+        blur = net.pre(field.filter(ImageFilter.GaussianBlur(radius=max(field.size) / 40))).to(self.device)
+        st = self.OCC_STEP[G]
+        last = n - occ
+        grid = sorted(set(list(range(0, last + 1, st)) + [last]))            # include the last row/column
+        pos = [(r, q) for r in grid for q in grid]
+        score = lambda t: (net.cls(torch.nn.functional.normalize(net.m(t).float(), dim=-1)).squeeze(-1) * 10.0).float()
+        with torch.autocast(dev_type, dtype=torch.bfloat16):
+            base = float(score(x.unsqueeze(0))[0])
+        delta = []
+        for i in range(0, len(pos), 64):                                     # build covered copies chunk by chunk
+            chunk = pos[i : i + 64]
+            batch = x.unsqueeze(0).repeat(len(chunk), 1, 1, 1)
+            for j, (r, q) in enumerate(chunk):
+                sl = (slice(None), slice(r * c, (r + occ) * c), slice(q * c, (q + occ) * c))
+                batch[j][sl] = blur[sl]
+            with torch.autocast(dev_type, dtype=torch.bfloat16):
+                delta.append(base - score(batch).cpu())
+        delta = torch.cat(delta).numpy()
+        acc, cnt = np.zeros((n, n)), np.zeros((n, n))
+        for d, (r, q) in zip(delta, pos):
+            acc[r : r + occ, q : q + occ] += d
+            cnt[r : r + occ, q : q + occ] += 1
+        full = np.zeros((G, G))
+        full[b0 : b0 + n, b0 : b0 + n] = acc / np.maximum(cnt, 1)            # outer ring: not seen by the model
+        return full
+
+    def _feature_maps(self, field: Image.Image, G: int) -> np.ndarray:
+        """[n_criteria, G, G] CONCH feature presence from sliding windows smaller than the field."""
+        _, win, step = self.LEVELS[G]
+        w, h = field.size
+        cw, ch = w / G, h / G
+        starts = [(r, q) for r in range(0, G - win + 1, step) for q in range(0, G - win + 1, step)]
+        crops = [field.crop((int(q * cw), int(r * ch), int((q + win) * cw), int((r + win) * ch))) for r, q in starts]
+        crit = self._criteria(self.encode(crops)[0])                         # [n_windows, n_criteria]
+        acc, cnt = np.zeros((len(self.criteria_keys), G, G)), np.zeros((G, G))
+        for (r, q), cv in zip(starts, crit):
+            acc[:, r : r + win, q : q + win] += cv[:, None, None]
+            cnt[r : r + win, q : q + win] += 1
+        return acc / np.maximum(cnt, 1)[None]
+
+    def _evidence_heat(self, snip: Image.Image, tiles: List[Tile], G: int = 16) -> dict:
+        """Heatmap for the panel: per field, where covering the tissue changes the call (cover-up / occlusion map
+        from ConvNeXt, the panel's main member), plus CONCH feature maps, on a G x G grid per field (16 first,
+        then 32 and 64 while the literature judge runs). p_ssa holds 0.5 + evidence (0.5 = no effect,
+        > 0.5 = pushed toward SSL), scaled to the strongest regions."""
+        rows, cols = max(t.row for t in tiles) + 1, max(t.col for t in tiles) + 1
+        R, C = rows * G, cols * G
+        ev = np.zeros((R, C))
+        feats = np.zeros((len(self.criteria_keys), R, C))
+        for t in tiles:
+            field = snip.crop(t.box)
+            r0, c0 = t.row * G, t.col * G
+            ev[r0 : r0 + G, c0 : c0 + G] = self._occlusion(field, G)
+            feats[:, r0 : r0 + G, c0 : c0 + G] = self._feature_maps(field, G)
+        k = max(1, 256 // G)                                                 # px per cell for the tissue check
+        a = np.asarray(snip.resize((C * k, R * k)), dtype=np.float32) / 255.0
+        stained = ((a.mean(2) < 0.85) & ((a.max(2) - a.min(2)) > 0.08)).reshape(R, k, C, k).mean(axis=(1, 3))
+        scale = float(np.percentile(np.abs(ev[stained >= 0.25]), 98)) if (stained >= 0.25).any() else 0.0
+        p = 0.5 + 0.5 * np.tanh(ev / scale) if scale > 1e-6 else np.full_like(ev, 0.5)
+        return {"rows": R, "cols": C, "sub": G, "kind": "evidence", "level": G,
+                "p_ssa": np.round(p, 3).ravel().tolist(), "tissue": np.round(stained, 2).ravel().tolist(),
+                "features": {key.split(":", 1)[1]: np.round(feats[i], 2).ravel().tolist()
+                             for i, key in enumerate(self.criteria_keys)}}
+
+    @staticmethod
+    def _glands(snip: Image.Image, tiles: List[Tile], heat: dict) -> List[dict]:
+        """Crypts found and measured per field (backend/glands.py), in 0..1 coordinates of the whole snip, each
+        with the cover-up evidence under it (> 0 = that region pushed the call toward SSL)."""
+        import glands as GL
+        w, h = snip.size
+        ev = (np.array(heat["p_ssa"]).reshape(heat["rows"], heat["cols"]) - 0.5) * 2
+        out = []
+        for t in tiles:
+            x0, y0, x1, y1 = t.box
+            for g in GL.label(GL.measure(snip.crop(t.box))):
+                to_snip = lambda x, y: [round((x0 + x * (x1 - x0)) / w, 4), round((y0 + y * (y1 - y0)) / h, 4)]
+                g["outline"] = [to_snip(x, y) for x, y in g["outline"]]
+                g["center"] = to_snip(*g["center"])
+                r = min(heat["rows"] - 1, int(g["center"][1] * heat["rows"]))
+                c = min(heat["cols"] - 1, int(g["center"][0] * heat["cols"]))
+                g["evidence"] = round(float(ev[r, c]), 3)
+                out.append(g)
+        return out

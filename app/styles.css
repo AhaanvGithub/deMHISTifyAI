@@ -294,3 +294,12 @@ body.overlay #dim { animation: fadein .5s ease; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* measured crypt labels (overlay.js drawGlands) */
+.gland-label { position: absolute; pointer-events: none; white-space: nowrap; font-size: 11px; line-height: 14px;
+  padding: 2px 8px; border-radius: 7px; border: 1.5px solid; background: rgba(26,12,36,.85); color: var(--text);
+  box-shadow: 0 4px 14px rgba(0,0,0,.45); animation: pop .3s ease-out; }
+.gland-label span { font-weight: 600; }
+.gland-label .ssl { color: var(--ssl); } .gland-label .hp { color: var(--hp); }
+.legend { display: inline-flex; gap: 8px; font-size: 11px; color: var(--muted); }
+.legend i { display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }

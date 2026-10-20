@@ -80,9 +80,17 @@ async function postImage(path, blob, extra = {}) {
   for (const [k, v] of Object.entries(extra)) fd.append(k, v);
   return fetch(API + path, { method: 'POST', body: fd });
 }
+// The tissue box is always square: the models were trained on square fields, and a wide box would be centre-cropped
+// by every model (its ends silently dropped). A proposed box becomes the largest square centred inside it.
+function squareIn(b) {
+  const side = Math.max(32, Math.min(b.w, b.h, selRect.w, selRect.h));
+  const x = Math.min(Math.max(0, b.x + (b.w - side) / 2), selRect.w - side);
+  const y = Math.min(Math.max(0, b.y + (b.h - side) / 2), selRect.h - side);
+  return { x, y, w: side, h: side };
+}
 function setTissue(boxPx, label) {
   // box comes in image pixels of the selection crop
-  tissueBox = { x: boxPx[0] / scale, y: boxPx[1] / scale, w: (boxPx[2] - boxPx[0]) / scale, h: (boxPx[3] - boxPx[1]) / scale };
+  tissueBox = squareIn({ x: boxPx[0] / scale, y: boxPx[1] / scale, w: (boxPx[2] - boxPx[0]) / scale, h: (boxPx[3] - boxPx[1]) / scale });
   place(tissue, tissueBox); tissue.classList.remove('hidden');
   $('tissueTag').textContent = label;
 }
@@ -119,14 +127,17 @@ tissue.addEventListener('mousedown', e => {
   boxDrag = { mode: h, x: e.clientX, y: e.clientY, start: { ...tissueBox } };
 });
 function moveBox(e) {
-  const dx = e.clientX - boxDrag.x, dy = e.clientY - boxDrag.y, s = boxDrag.start, b = { ...s };
-  if (boxDrag.mode === 'move') { b.x = s.x + dx; b.y = s.y + dy; }
-  if (boxDrag.mode.includes('w')) { b.x = s.x + dx; b.w = s.w - dx; }
-  if (boxDrag.mode.includes('e')) { b.w = s.w + dx; }
-  if (boxDrag.mode.includes('n')) { b.y = s.y + dy; b.h = s.h - dy; }
-  if (boxDrag.mode.includes('s')) { b.h = s.h + dy; }
-  b.x = Math.max(0, Math.min(b.x, selRect.w - 32)); b.y = Math.max(0, Math.min(b.y, selRect.h - 32));
-  b.w = Math.max(32, Math.min(b.w, selRect.w - b.x)); b.h = Math.max(32, Math.min(b.h, selRect.h - b.y));
+  const dx = e.clientX - boxDrag.x, dy = e.clientY - boxDrag.y, s = boxDrag.start, m = boxDrag.mode, b = { ...s };
+  if (m === 'move') {
+    b.x = Math.max(0, Math.min(s.x + dx, selRect.w - s.w)); b.y = Math.max(0, Math.min(s.y + dy, selRect.h - s.h));
+  } else {  // corner handle: resize as a square, the opposite corner stays put
+    const left = m.includes('w'), top = m.includes('n');
+    const ax = left ? s.x + s.w : s.x, ay = top ? s.y + s.h : s.y;  // anchor = opposite corner
+    const want = Math.max(left ? s.w - dx : s.w + dx, top ? s.h - dy : s.h + dy);
+    const room = Math.min(left ? ax : selRect.w - ax, top ? ay : selRect.h - ay);
+    const side = Math.max(32, Math.min(want, room));
+    b.w = b.h = side; b.x = left ? ax - side : ax; b.y = top ? ay - side : ay;
+  }
   tissueBox = b; place(tissue, b);
   $('tissueTag').textContent = 'adjusted · press Enter to analyze';
 }
@@ -202,7 +213,13 @@ function finishPanel() { panelDone = true; fitPanel(); }
 function handle(ev, d) {
   if (ev === 'parsed') return renderYou(d);
   if (ev === 'conch') return renderConch(d);
-  if (ev === 'heat') { result.heat = d; $('tissueTag').textContent = `${result.grid.cols} × ${result.grid.rows} tiles · ${d.cols} × ${d.rows} heatmap cells (sharpened) · hover for detail`; return drawHeat(); }
+  if (ev === 'heat') {
+    result.heat = d;
+    $('tissueTag').textContent = d.kind === 'evidence'
+      ? `what drives the call · ${d.level} × ${d.level} per field${d.level < 128 ? ' · sharpening…' : ''} · hover for detail`
+      : `${result.grid.cols} × ${result.grid.rows} tiles · ${d.cols} × ${d.rows} heatmap cells (sharpened) · hover for detail`;
+    return drawHeat();
+  }
   if (ev === 'judge') return renderJudge(d);
   if (ev === 'flags') return renderFlags(d);
   if (ev === 'verdict') return renderVerdict(d);
@@ -238,7 +255,8 @@ function renderConch(r) {
   heat.classList.add('reveal');
   $('litCard').classList.remove('pending');  // panel grows one section at a time as results arrive  // heatmap opens out from the centre the first time
   const mz = r.magnification || {};
-  $('tissueTag').textContent = `${r.grid.cols} × ${r.grid.rows} tiles${mz.auto ? ` · zoom ×${mz.zoom_vs_training} vs training` : ''} · ${r.heat.cols} × ${r.heat.rows} cells · hover for detail`;
+  $('tissueTag').textContent = r.heat.kind === 'evidence' ? `what drives the call · ${r.heat.level} × ${r.heat.level} per field · sharpening…`
+    : `${r.grid.cols} × ${r.grid.rows} tiles${mz.auto ? ` · zoom ×${mz.zoom_vs_training} vs training` : ''} · ${r.heat.cols} × ${r.heat.rows} cells · hover for detail`;
   $('heatControls').classList.remove('hidden');
   drawHeat();
   renderPanelSummary();
@@ -309,7 +327,8 @@ function drawHeat() {
   small.width = H.cols; small.height = H.rows;
   const sg = small.getContext('2d'), im = sg.createImageData(H.cols, H.rows);
   const ai = heatRef === 'ai';
-  const c0 = result.judge_mode === 'panel' ? Cutoff.state().cut : 0.5;
+  const ev = H.kind === 'evidence';  // cover-up map: 0.5 = no effect, above = pushed toward SSL, below = toward HP
+  const c0 = result.judge_mode === 'panel' && !ev ? Cutoff.state().cut : 0.5;
   const centre = p => (p <= c0 ? 0.5 * p / c0 : 0.5 + 0.5 * (p - c0) / (1 - c0));  // cut-off -> middle of the scale
   // A whole-snip field gives (nearly) one value everywhere: a uniform tint says nothing about *where* and only
   // washes out the tissue, so a flat map is not painted (the call and colour bar still show the value).
@@ -320,7 +339,7 @@ function drawHeat() {
     // AI view: fixed P(SSL) scale, HP-leaning tissue blue, SSL-leaning red, undecided (~0.5) fades out.
     // Your-call view: support for your call, clear when unlikely, then cyan -> green -> yellow -> red.
     const v = ai ? p : (ref === 'SSA' ? p : 1 - p);
-    const k = ai ? smooth(0.06, 0.34, Math.abs(p - 0.5)) : smooth(0.22, 0.6, v);
+    const k = ai ? smooth(0.06, 0.34, Math.abs(p - 0.5)) : ev ? smooth(0.06, 0.34, v - 0.5) : smooth(0.22, 0.6, v);
     const alpha = H.tissue[i] < 0.25 || flat ? 0 : (ai ? 0.55 : 0.8) * k;  // never opaque: tissue must stay readable
     im.data.set([...jet(v), Math.round(255 * a * alpha)], i * 4);
   }
@@ -341,8 +360,10 @@ function drawHeat() {
     const cw = heat.width / H.cols, ch = heat.height / H.rows;
     const line = (x0, y0, x1, y1) => { g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke(); };
     g.lineWidth = 1; g.strokeStyle = 'rgba(255,255,255,0.06)';
-    for (let c = 1; c < H.cols; c++) if (c % H.sub) line(Math.round(c * cw) + .5, 0, Math.round(c * cw) + .5, heat.height);
-    for (let r = 1; r < H.rows; r++) if (r % H.sub) line(0, Math.round(r * ch) + .5, heat.width, Math.round(r * ch) + .5);
+    // fine lines no closer than ~12 device px, so a 64-cell map doesn't turn into a grey mesh
+    const every = Math.max(1, Math.ceil(12 * dpr / Math.min(cw, ch)));
+    for (let c = every; c < H.cols; c += every) if (c % H.sub) line(Math.round(c * cw) + .5, 0, Math.round(c * cw) + .5, heat.height);
+    for (let r = every; r < H.rows; r += every) if (r % H.sub) line(0, Math.round(r * ch) + .5, heat.width, Math.round(r * ch) + .5);
     g.strokeStyle = 'rgba(255,255,255,0.28)'; g.lineWidth = Math.max(1, dpr);
     for (let c = H.sub; c < H.cols; c += H.sub) line(Math.round(c * cw), 0, Math.round(c * cw), heat.height);
     for (let r = H.sub; r < H.rows; r += H.sub) line(0, Math.round(r * ch), heat.width, Math.round(r * ch));
@@ -353,19 +374,67 @@ function drawHeat() {
 
   $('colorbar').classList.remove('hidden');
   $('colorbar').classList.toggle('diverging', ai);
-  $('cbLabel').textContent = ai ? 'P(SSL)' : `P(${LABEL[ref]}) · your call`;
-  $('cbTop').textContent = ai ? '1.0 SSL' : '1.0'; $('cbBottom').textContent = ai ? '0 HP' : '0';
-  $('cbMid').textContent = ai && result.judge_mode === 'panel' ? `${Math.round(Cutoff.state().cut * 100)}% cut-off` : '0.5';
+  if (ev) {
+    $('cbLabel').textContent = ai ? 'what drives the call' : `support for ${LABEL[ref]} · your call`;
+    $('cbTop').textContent = ai ? '→ SSL' : 'strong'; $('cbBottom').textContent = ai ? '→ HP' : '';
+    $('cbMid').textContent = ai ? 'no effect' : '';
+  } else {
+    $('cbLabel').textContent = ai ? 'P(SSL)' : `P(${LABEL[ref]}) · your call`;
+    $('cbTop').textContent = ai ? '1.0 SSL' : '1.0'; $('cbBottom').textContent = ai ? '0 HP' : '0';
+    $('cbMid').textContent = ai && result.judge_mode === 'panel' ? `${Math.round(Cutoff.state().cut * 100)}% cut-off` : '0.5';
+  }
   drawFeatures();
 }
 
 // ---------- feature outlines from the literature judge ----------
 const FEAT_COLORS = ['#ffc857', '#c79bff', '#ffffff', '#5eead4'];  // outlines must stand out on tissue and on the jet heatmap
 let keyFeatures = [];
+// ---------- measured crypts (backend/glands.py): outlines follow real glands, labels come from measurements ----------
+const GLAND_COLORS = { 'dilated crypt': '#ffc857', 'serrated lumen': '#c79bff', 'round regular crypt': '#5eead4' };
+function drawGlands(fc, g) {
+  const W = fc.width, Hh = fc.height, dpr = window.devicePixelRatio || 1, rect = tissue.getBoundingClientRect();
+  const placed = [];
+  const free = (x, y, w, h) => !placed.some(b => x < b.x + b.w && x + w > b.x && y < b.y + b.h && y + h > b.y);
+  // strongest evidence first, so the glands that drove the call get their labels before any collision
+  [...result.glands].sort((a, b) => !!b.label - !!a.label || Math.abs(b.evidence) - Math.abs(a.evidence)).forEach(gl => {
+    const col = GLAND_COLORS[gl.label];
+    g.beginPath();
+    gl.outline.forEach(([x, y], i) => (i ? g.lineTo(x * W, y * Hh) : g.moveTo(x * W, y * Hh)));
+    g.closePath();
+    g.lineJoin = 'round'; g.shadowColor = 'rgba(0,0,0,.55)'; g.shadowBlur = 3 * dpr;
+    g.strokeStyle = col || 'rgba(255,255,255,.28)'; g.lineWidth = (col ? 2 : 1) * dpr;
+    g.stroke(); g.shadowBlur = 0;
+    if (!col) return;
+    // label just above the gland (or below if that spot is taken); skipped if both collide - hover still shows it
+    const top = gl.outline.reduce((m, p) => (p[1] < m[1] ? p : m)), bot = gl.outline.reduce((m, p) => (p[1] > m[1] ? p : m));
+    const text = gl.label, w = text.length * 6.2 + 18, h = 20;
+    for (const [px, py] of [[gl.center[0] * rect.width, top[1] * rect.height - h - 2], [gl.center[0] * rect.width, bot[1] * rect.height + 2]]) {
+      const x = Math.min(Math.max(px - w / 2, 0), rect.width - w), y = Math.min(Math.max(py, 0), rect.height - h);
+      if (!free(x, y, w, h)) continue;
+      placed.push({ x, y, w, h });
+      const lab = document.createElement('div');
+      lab.className = 'gland-label';
+      lab.style.borderColor = col; lab.style.left = x + 'px'; lab.style.top = y + 'px';
+      lab.innerHTML = `${esc(text)}${gl.points_to ? ` <span class="${gl.points_to === 'SSA' ? 'ssl' : 'hp'}">→ ${LABEL[gl.points_to]}</span>` : ''}`;
+      tissue.appendChild(lab);
+      break;
+    }
+  });
+}
+const glandAt = (x, y) => (result?.glands || []).find(gl => {  // point-in-polygon, x/y in 0..1 of the snip
+  let inside = false;
+  for (let i = 0, j = gl.outline.length - 1; i < gl.outline.length; j = i++) {
+    const [xi, yi] = gl.outline[i], [xj, yj] = gl.outline[j];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+});
+
 function drawFeatures() {
   const fc = $('feat'), g = fc.getContext('2d');
   g.clearRect(0, 0, fc.width, fc.height);
-  document.querySelectorAll('.feat-label').forEach(e => e.remove());
+  document.querySelectorAll('.feat-label, .gland-label').forEach(e => e.remove());
+  if (result?.glands && $('showFeat').checked) return drawGlands(fc, g);
   if (!result || !$('showFeat').checked || !keyFeatures.length) return;
   const H = result.heat, cw = fc.width / H.cols, ch = fc.height / H.rows, dpr = window.devicePixelRatio || 1;
   keyFeatures.forEach((f, k) => {
@@ -415,10 +484,15 @@ tissue.addEventListener('mousemove', e => {
   const ref = heatRef === 'ai' ? 'SSA' : (parsed?.call || result.panel.top);  // AI view always reads P(SSL)
   const p = H.p_ssa[fr * H.cols + fc], s = ref === 'SSA' ? p : 1 - p;
   const feats = Object.entries(H.features || {}).sort((x, y) => y[1][fr * H.cols + fc] - x[1][fr * H.cols + fc]).slice(0, 2).map(([k]) => k.replace(/_/g, ' '));
+  const gl = glandAt((e.clientX - r.left) / r.width, (e.clientY - r.top) / r.height);
+  const glandLine = gl ? `<div><b style="color:${GLAND_COLORS[gl.label] || 'var(--text)'}">${gl.label || 'crypt'}</b> · ${gl.crypt_um} µm across` +
+    `${gl.roughness != null ? ` · lumen edge roughness ${gl.roughness}` : ''}</div>` : '';
   const tile = `${String.fromCharCode(65 + Math.floor(fr / H.sub))}${Math.floor(fc / H.sub) + 1}`;
-  const subc = `${'abcdefgh'[fr % H.sub]}${(fc % H.sub) + 1}`;
+  const subc = `${(fr % H.sub) + 1}-${(fc % H.sub) + 1}`;  // row-column inside the field
   tip.innerHTML = H.tissue[fr * H.cols + fc] < 0.25 ? `${tile}·${subc} <span class="muted">no tissue</span>`
-    : `${tile}·${subc} <b style="color:rgb(${jet(s)})">P(${LABEL[ref]}) ${Math.round(s * 100)}%</b><div class="muted">strongest here: ${feats.join(', ')}</div>`;
+    : `${tile}·${subc} ${H.kind === 'evidence'
+        ? `<b style="color:rgb(${jet(p)})">${Math.abs(p - 0.5) < 0.06 ? 'little effect on the call' : `pushes toward ${p > 0.5 ? 'SSL' : 'HP'}`}</b>`
+        : `<b style="color:rgb(${jet(s)})">P(${LABEL[ref]}) ${Math.round(s * 100)}%</b>`}${result.glands ? glandLine : `<div class="muted">strongest here: ${feats.join(', ')}</div>`}`;
   tip.style.left = (e.clientX + 14) + 'px'; tip.style.top = (e.clientY + 14) + 'px';
   tip.classList.remove('hidden');
 });

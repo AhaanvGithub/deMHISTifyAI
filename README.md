@@ -118,12 +118,16 @@ On the 977 MHIST test images, scored once with the exact models, weights and cut
 | | Balanced accuracy | AUC | Accuracy | SSL caught | HP caught | Calibration error | Correlation with vote count |
 |---|---|---|---|---|---|---|---|
 | **Panel (ConvNeXt-Base + MUSK)** | **0.888** | **0.956** | **0.887** | **89.2%** | **88.5%** | **2.2%** | **0.858** |
+| Earlier panel "CLIK" (ConvNeXt-Tiny + PLIP + MUSK, last 2 layers) [c] | 0.877 | 0.959 | 0.863 | 93.1% | 82.3% | 4.7% | 0.860 |
 | ConvNeXt-Base alone | 0.853 | 0.948 | 0.827 | 95.3% | 75.4% | 10.0% | 0.840 |
 | PLIP alone | 0.862 | 0.946 | 0.858 | 87.8% | 84.6% | 11.2% | 0.838 |
 | MUSK alone | 0.820 | 0.936 | 0.781 | 96.7% | 67.3% | 5.4% | 0.825 |
 | CONCH alone | 0.831 | 0.932 | 0.804 | 93.3% | 72.8% | 8.4% | 0.816 |
 | Fine-tuned CONCH, last 2 blocks (earlier release) | 0.819 | 0.908 | 0.826 | 79.2% | 84.6% | 3.4% | 0.775 |
 
+[c] CLIK was the best group before ConvNeXt-Base and MUSK with LoRA were trained: the average of its 5
+cross-validation models, with weights, calibration and cut-off fit on training images
+(`docs/results/preliminary_test_check.json`). The final panel replaced it by the same training-data rule.
 Single members use a plain 50% cut-off, so they lean toward SSL; the panel's calibrated cut-off balances
 the two classes. About 1 in 6 test tiles is a 4-3 split among the pathologists, which caps any model: even
 a perfect model would agree with a fresh 7-pathologist majority only about 89-92% of the time. The panel's
@@ -142,6 +146,7 @@ sorted by balanced accuracy; rows that do not report it follow. Blank = not repo
 | Method | How the model is adapted | Balanced acc. | Accuracy | AUC | F1 | ECE | Test images used to choose the model | Source |
 |---|---|---|---|---|---|---|---|---|
 | **deMHISTifyAI panel** (ConvNeXt-Base + MUSK) | Fine-tuned (section above), group chosen on training data | **0.888** | **0.887** | **0.956** | **0.888** | **2.2%** | None | this repo |
+| deMHISTifyAI, earlier panel "CLIK" (ConvNeXt-Tiny + PLIP + MUSK) | Fine-tuned; average of 5 cross-validation models | 0.877 | 0.863 | 0.959 | 0.865 | 4.7% | None | this repo [c] |
 | Virchow2, LoRA fine-tuned | LoRA | | | | ~0.875 (derived) | | None (validation carved from train) | THUNDER [2] |
 | Virchow2 | Frozen + linear | 0.848 | | | 0.836 | 0.6% | None (validation carved from train) | THUNDER [2] |
 | H-optimus-0 | Frozen + linear | 0.837 | | | 0.828 | 1.6% | None (validation carved from train) | THUNDER [2] |
