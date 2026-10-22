@@ -1,5 +1,6 @@
-// deMHISTifyAI desktop shell.
-// Ctrl+Shift+Space -> Spotlight-style bar -> type your call -> Enter -> snip the screen -> results.
+// gutfeeling desktop shell.
+// Ctrl+Shift+Space -> screenshot -> snip window: splash card over the screenshot while the models load, then the
+// screen darkens into the snip view -> results.
 const { app, BrowserWindow, globalShortcut, desktopCapturer, screen, ipcMain, Tray, Menu, nativeImage, shell } = require('electron');
 const fs = require('fs');
 const path = require('path');
@@ -7,10 +8,10 @@ const { spawn } = require('child_process');
 
 const HOTKEY = 'CommandOrControl+Shift+Space';
 const REPO = path.resolve(__dirname, '..');
-// two 448 um fields (MHIST's field size), built by research/make_demo_image.py; set DEMHIST_NO_DEMO=1 to skip
-const DEMO_IMAGE = path.join(REPO, 'data', 'demo', 'demo_hp_ssl.png');
-let launcher, overlay, backend, tray;
-let researcherText = '';
+// six outside-lab fields (3 SSL, 3 HP; SPIDER test split) with a 100 um bar, built by research/make_outside_demo.py;
+// opened at start-up only with DEMHIST_DEMO=1
+const DEMO_IMAGE = path.join(REPO, 'data', 'demo', 'outside_hp_ssl.png');
+let overlay, backend, tray;
 let quitting = false;
 
 function startBackend() {
@@ -25,49 +26,7 @@ function startBackend() {
 // selection and heatmap stay pixel-exact at any zoom
 const UI_SCALE = 0.9;
 
-function createLauncher() {
-  const { width } = screen.getPrimaryDisplay().workAreaSize;
-  launcher = new BrowserWindow({
-    width: 860, height: 124, x: Math.round((width - 860) / 2), y: 160, // pill + 28px margin for its glow
-    // no OS frame/shadow behind the frameless transparent window (it shows up as a square outline)
-    hasShadow: false, thickFrame: false, backgroundColor: '#00000000',
-    frame: false, transparent: true, resizable: false, alwaysOnTop: true, show: false, skipTaskbar: true,
-    webPreferences: { preload: path.join(__dirname, 'preload.js'), zoomFactor: UI_SCALE },
-  });
-  launcher.loadFile('launcher.html');
-  launcher.on('blur', () => launcher.hide());
-  // Esc in the launcher calls window.close(): hide instead, or the hotkey later hits a destroyed window
-  launcher.on('close', e => { if (!quitting) { e.preventDefault(); launcher.hide(); } });
-}
-
 const alive = w => w && !w.isDestroyed();
-
-// The first show of a transparent window is slow (surfaces and GPU layers are created on demand), which made the
-// first hotkey press stutter. Rehearse once at start-up: fully transparent, click-through, never focused.
-let warmTimer = null;
-function warmLauncher() {
-  if (!alive(launcher)) return;
-  launcher.setOpacity(0);
-  launcher.setIgnoreMouseEvents(true);
-  launcher.showInactive();
-  launcher.webContents.send('warm');  // plays the entrance animation once, then parks the pill
-  warmTimer = setTimeout(endWarm, 600);
-}
-function endWarm(keepShown = false) {
-  clearTimeout(warmTimer); warmTimer = null;
-  if (!alive(launcher)) return;
-  if (!keepShown) launcher.hide();
-  launcher.setIgnoreMouseEvents(false);
-  launcher.setOpacity(1);
-}
-
-function showLauncher() {
-  if (!alive(launcher)) createLauncher();
-  if (warmTimer) endWarm(true);  // hotkey pressed during the start-up rehearsal
-  launcher.show();
-  launcher.focus();
-  launcher.webContents.send('focus');
-}
 
 // true-colour capture through the Python backend (Pillow/GDI, ~0.15 s); null if the backend isn't up yet
 async function backendCapture(rect) {
@@ -98,20 +57,41 @@ async function captureScreen() {
   return { display, shot: src.thumbnail.toPNG() };
 }
 
+let opening = false;
 async function openOverlay() {
   if (alive(overlay)) return focusOverlay();
-  const { display, shot } = await captureScreen();
-  // keep a local handle: callbacks must never touch a newer overlay or one that is already closed
-  const win = new BrowserWindow({
-    ...display.bounds, frame: false, alwaysOnTop: true, skipTaskbar: true, fullscreen: true,
-    backgroundColor: '#170a25', webPreferences: { preload: path.join(__dirname, 'preload.js'), zoomFactor: UI_SCALE },
-  });
-  overlay = win;
-  win.loadFile('overlay.html');
-  win.webContents.once('did-finish-load', () => {
-    if (alive(win)) win.webContents.send('init', { screenshot: shot, researcher: researcherText });
-  });
-  win.on('closed', () => { if (overlay === win) overlay = null; });
+  if (opening) return;  // hotkey pressed twice while the screen is being captured
+  opening = true;
+  try {
+    const { display, shot } = await captureScreen();
+    // keep a local handle: callbacks must never touch a newer overlay or one that is already closed
+    // Hidden until the page has drawn the screenshot (it says so with 'overlay-ready'), so it appears as the screen
+    // itself with the splash card on top: no flash of an empty window.
+    const win = new BrowserWindow({
+      ...display.bounds, frame: false, alwaysOnTop: true, skipTaskbar: true, fullscreen: true, show: false,
+      backgroundColor: '#1b1c1e', webPreferences: { preload: path.join(__dirname, 'preload.js'), zoomFactor: UI_SCALE },
+    });
+    overlay = win;
+    const reveal = () => {
+      if (!alive(win) || win.isVisible()) return;
+      win.show(); win.moveTop(); win.focus();
+      // a window opened from a global hotkey often doesn't get keyboard focus on Windows, so its own Esc handler
+      // never fires: Esc is taken globally while the snip window is open
+      globalShortcut.register('Escape', () => { if (alive(win)) win.close(); });
+    };
+    const fallback = setTimeout(reveal, 2000);
+    win.__reveal = () => { clearTimeout(fallback); reveal(); };
+    // the page's warnings and errors in this terminal, next to the backend's log
+    win.webContents.on('console-message', (_e, level, message, line) => { if (level >= 1) console.log(`[overlay] ${message} (line ${line})`); });
+    win.webContents.on('render-process-gone', (_e, d) => console.log(`[overlay] renderer gone: ${d.reason}`));
+    // links (PathologyOutlines, DOIs) open in the default browser
+    win.webContents.setWindowOpenHandler(({ url }) => { if (/^https:\/\//.test(url)) shell.openExternal(url); return { action: 'deny' }; });
+    win.loadFile('overlay.html');
+    win.webContents.once('did-finish-load', () => {
+      if (alive(win)) win.webContents.send('init', { screenshot: shot, researcher: '' });
+    });
+    win.on('closed', () => { globalShortcut.unregister('Escape'); if (overlay === win) overlay = null; });
+  } finally { opening = false; }
 }
 
 // e.g. after Alt+Tab away from an open snip: bring it back instead of ignoring the hotkey
@@ -121,29 +101,20 @@ function focusOverlay() {
   overlay.focus();
 }
 
-ipcMain.on('launcher-submit', async (_e, text) => {
-  researcherText = text;
-  if (alive(launcher)) launcher.hide();
-  setTimeout(openOverlay, 180); // let the launcher fade before the screenshot
-});
+ipcMain.on('overlay-ready', e => { const w = BrowserWindow.fromWebContents(e.sender); if (w && w.__reveal) w.__reveal(); });
 ipcMain.on('overlay-close', () => { if (alive(overlay)) overlay.close(); });
 
 app.whenReady().then(() => {
   startBackend();
-  createLauncher();
-  globalShortcut.register(HOTKEY, () => {
-    if (alive(overlay)) return focusOverlay();
-    showLauncher();
-  });
+  globalShortcut.register(HOTKEY, () => openOverlay());
   tray = new Tray(nativeImage.createEmpty());
-  tray.setToolTip(`deMHISTifyAI — ${HOTKEY.replace('CommandOrControl', 'Ctrl')}`);
+  tray.setToolTip(`gutfeeling — ${HOTKEY.replace('CommandOrControl', 'Ctrl')}`);
   tray.setContextMenu(Menu.buildFromTemplate([
-    { label: 'Open (Ctrl+Shift+Space)', click: () => showLauncher() },
+    { label: 'Open (Ctrl+Shift+Space)', click: () => openOverlay() },
     { label: 'Quit', click: () => app.quit() },
   ]));
-  launcher.webContents.once('did-finish-load', warmLauncher);
-  // start silently: nothing shows until the hotkey. Open the demo slide image in the default photo viewer.
-  if (!process.env.DEMHIST_NO_DEMO && fs.existsSync(DEMO_IMAGE)) shell.openPath(DEMO_IMAGE);
+  // start silently: nothing shows until the hotkey (set DEMHIST_DEMO=1 to also open the demo sheet in the photo viewer)
+  if (process.env.DEMHIST_DEMO && fs.existsSync(DEMO_IMAGE)) shell.openPath(DEMO_IMAGE);
 });
 
 app.on('window-all-closed', e => e.preventDefault()); // stay in the tray

@@ -9,7 +9,7 @@
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #
-# Usage (from the deMHISTifyAI repo root):
+# Usage (from the gutfeeling repo root):
 #   sbatch research/embed_views.sbatch <image_dir> <out_dir> <prompts.json> [extra args, e.g. --limit 50]
 set -euo pipefail
 mkdir -p logs

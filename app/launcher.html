@@ -2,30 +2,67 @@
 <html>
 <head>
 <meta charset="utf-8">
+<title>gutfeeling</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body class="launcher">
-  <form id="f" class="bar">
-    <span class="logo">de<b>MHIST</b>ify</span>
-    <input id="q" autofocus spellcheck="false" placeholder="What do you think it is?  e.g. “sessile serrated lesion, 70%”">
-    <kbd>⏎ then snip</kbd>
-  </form>
+  <div id="f" class="bar splash">
+    <span class="logo">gutfeeling</span>
+    <span class="tagline" id="status">serrated polyps · second read</span>
+    <i class="progress" id="progress"></i>
+  </div>
 <script>
-  const q = document.getElementById('q'), bar = document.getElementById('f');
-  document.getElementById('f').addEventListener('submit', e => {
-    e.preventDefault();
-    const text = q.value.trim();
-    if (!text) return;
-    bar.classList.add('leaving');  // pill shrinks away, then the snip opens
-    setTimeout(() => { window.demhist.submit(text); q.value = ''; bar.classList.remove('leaving'); bar.classList.add('away'); }, 170);
-  });
-  // The page loads hidden at start-up, so its entrance animation would finish unseen. Park the pill while the
+  // Hotkey -> the card fades in and a thin line fills along its bottom while the backend's image models finish loading
+  // (they take ~75 s after start-up; the line tracks that real wait, and the label says so). At least MIN_MS so the
+  // entrance reads as deliberate; at most a few seconds if the backend can't be reached. Then the card fades and the
+  // snip screen opens. No call is asked for.
+  const bar = document.getElementById('f'), status = document.getElementById('status'), progress = document.getElementById('progress');
+  const TAGLINE = status.textContent, MIN_MS = 2200, OFFLINE_MS = 4000, LOAD_EST_MS = 75000;
+  let run = 0;  // each hotkey press starts a new run; older runs stop themselves
+  const setProgress = f => { progress.style.transform = `scaleX(${Math.max(0, Math.min(1, f))})`; };
+  async function ready() {
+    try {
+      const h = await (await fetch(window.demhist.backend + '/health', { signal: AbortSignal.timeout(800) })).json();
+      return h.conch_ready || !!h.conch_error ? 'ready' : 'loading';
+    } catch { return 'offline'; }
+  }
+  async function play() {
+    const me = ++run, t0 = performance.now();
+    bar.classList.remove('away', 'leaving', 'play'); void bar.offsetWidth;  // restart the entrance
+    bar.classList.add('play');
+    status.textContent = TAGLINE; setProgress(0);
+    let state = 'loading', offlineSince = null;
+    for (;;) {
+      if (me !== run) return;
+      const t = performance.now() - t0;
+      state = await ready();
+      if (me !== run) return;
+      if (state === 'offline') offlineSince ??= t; else offlineSince = null;
+      const done = t >= MIN_MS && (state === 'ready' || (offlineSince !== null && t - offlineSince >= OFFLINE_MS));
+      if (done) break;
+      if (state === 'loading' && t > 600) status.textContent = 'loading image models';
+      // models ready: the line fills over the minimum wait. Still loading: the minimum wait fills 60%, and the real
+      // load eases the rest toward 95% over its usual ~75 s (it never claims to be done before it is)
+      const m = Math.min(t / MIN_MS, 1);
+      setProgress(state === 'ready' ? m : 0.6 * m + 0.35 * (1 - Math.exp(-2.5 * t / LOAD_EST_MS)));
+      await new Promise(r => setTimeout(r, 250));
+    }
+    status.textContent = TAGLINE; setProgress(1);
+    await new Promise(r => setTimeout(r, 380));  // let the line reach the end
+    if (me !== run) return;
+    bar.classList.add('leaving');  // card fades, then the snip opens
+    await new Promise(r => setTimeout(r, 170));
+    if (me !== run) return;
+    window.demhist.submit('');
+    bar.classList.remove('leaving', 'play'); bar.classList.add('away'); run++;
+  }
+  // The page loads hidden at start-up, so its entrance animation would finish unseen. Park the card while the
   // window is hidden and replay the entrance each time the hotkey shows it.
   bar.classList.add('away');
-  window.addEventListener('blur', () => bar.classList.add('away'));
-  window.demhist.onFocus(() => { bar.classList.remove('away'); q.focus(); });
+  window.addEventListener('blur', () => { if (!bar.classList.contains('play')) bar.classList.add('away'); });
+  window.demhist.onFocus(play);
   window.demhist.onWarm(() => { bar.classList.remove('away'); setTimeout(() => bar.classList.add('away'), 450); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { bar.classList.add('away'); window.close?.(); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { run++; bar.classList.remove('play'); bar.classList.add('away'); window.close?.(); } });
 </script>
 </body>
 </html>

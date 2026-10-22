@@ -1,4 +1,4 @@
-"""Local backend for the deMHISTifyAI desktop app (http://127.0.0.1:8765).
+"""Local backend for the gutfeeling desktop app (http://127.0.0.1:8765).
 
 POST /capture        x, y, w, h -> true-colour screenshot path (and starts reading the scale bar on it)
 GET  /scale          -> the scale bar read on that screenshot: one field's size in screen pixels
@@ -28,7 +28,7 @@ from PIL import Image
 import llm
 from region import tissue_square
 
-app = FastAPI(title="deMHISTifyAI backend")
+app = FastAPI(title="gutfeeling backend")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
 STATE = {"engine": None, "engine_error": None, "scale": None}
@@ -74,6 +74,17 @@ threading.Thread(target=_load_engine, daemon=True).start()
 
 async def _read(file: UploadFile) -> Image.Image:
     return Image.open(io.BytesIO(await file.read())).convert("RGB")
+
+
+@app.get("/ref/{i}.jpg")
+def reference_thumb(i: int):
+    """Thumbnail of one "similar cases" reference field (research/build_reference_cases.py)."""
+    from fastapi.responses import FileResponse
+    from fastapi import HTTPException
+    path = Path(__file__).resolve().parent.parent / "data" / "reference_cases" / "thumbs" / f"{i}.jpg"
+    if not path.exists():
+        raise HTTPException(404)
+    return FileResponse(path, media_type="image/jpeg")
 
 
 @app.get("/health")
@@ -146,7 +157,7 @@ async def region_guess(image: UploadFile = File(...)):
 
 def trust_flags(researcher: dict, conch: dict, judge: dict) -> list:
     flags = []
-    if not researcher["in_scope"]:
+    if researcher["text"].strip() and not researcher["in_scope"]:  # no text: the app no longer asks for a call
         flags.append("Outside validated scope (colon serrated polyps): results are not validated.")
     if not conch.get("calibrated"):
         flags.append("Feature scores are relative to this snip only (not yet calibrated on MHIST).")
@@ -183,7 +194,7 @@ def _sse(event: str, data) -> str:
 
 
 @app.post("/analyze")
-async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cut: Optional[float] = Form(None)):
+async def analyze(image: UploadFile = File(...), researcher: str = Form(""), cut: Optional[float] = Form(None)):  # no call is asked for: empty is normal
     img = await _read(image)
 
     def stream():
@@ -215,7 +226,7 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
 
         # literature judge (Lumen) runs while the UI animates the image judges
         query = llm.judge_query(conch)  # from what this field shows (measured crypts) plus the WHO criteria
-        papers = LIBRARY.search(query)
+        papers = LIBRARY.search(query, k=5)
         far = bool((conch.get("ood") or {}).get("far"))
         # a photo, noise or something else that isn't colon tissue: no literature reasoning about it (and no LLM calls)
         judge_future = POOL.submit(lambda: {"error": "not_tissue"}) if far else POOL.submit(llm.research_judge, conch, papers)
@@ -251,10 +262,7 @@ async def analyze(image: UploadFile = File(...), researcher: str = Form(...), cu
                     judge = judge_future.result()
                 except Exception:  # never let the literature side break the stream after the image results
                     judge = {"error": "llm_unavailable"}
-                yield _sse("judge", judge)
-                flags = trust_flags(parsed, conch, judge)
-                yield _sse("flags", flags)
-                yield _sse("verdict", llm.not_tissue_verdict() if far else llm.final_verdict(parsed, conch["panel"], judge, flags, conch))
+                yield _sse("judge", judge)  # (the trust-flag list and the final verdict were dropped: they cost time and added little)
         yield _sse("done", {})
 
     return StreamingResponse(stream(), media_type="text/event-stream")

@@ -1,4 +1,4 @@
-"""Lumen (NCSA) side of deMHISTifyAI: paper retrieval, the research LLM judge,
+"""Lumen (NCSA) side of gutfeeling: paper retrieval, the research LLM judge,
 the final verdict, and parsing what the researcher typed.
 
 The LLMs never see the image. They see only what the image models measured (the panel's
@@ -21,7 +21,10 @@ LIBRARY_PATH = ROOT / "papers" / "library.json"
 
 JUDGE_MODEL = os.environ.get("DEMHIST_JUDGE_MODEL", "gemma-4-31b-it")
 VERDICT_MODEL = os.environ.get("DEMHIST_VERDICT_MODEL", "nemotron-3-super-120b-a12b")
-N_SAMPLES = int(os.environ.get("DEMHIST_JUDGE_SAMPLES", "5"))
+N_SAMPLES = int(os.environ.get("DEMHIST_JUDGE_SAMPLES", "3"))
+# the judge's confidence never goes above this: experts don't agree that well either (on MHIST a single pathologist
+# agrees with the 7-pathologist majority 83% of the time; two pathologists agree 73%; all seven on 34% of fields)
+MAX_CONF = int(os.environ.get("DEMHIST_JUDGE_MAX_CONF", "92"))
 
 CLASSES = {"SSA": "Sessile serrated lesion (SSA/SSL)", "HP": "Hyperplastic polyp (HP)"}
 
@@ -62,9 +65,9 @@ class Library:
             self._vec = TfidfVectorizer(stop_words="english", ngram_range=(1, 2), sublinear_tf=True)
             self._mat = self._vec.fit_transform([f"{p['topic']} {p['heading']} {p['text']}" for p in self.papers])
 
-    def search(self, query: str, k: int = 8, pool: int = 30, diversity: float = 0.6) -> List[dict]:
-        """Top-k passages for the query, chosen for relevance AND variety (maximal marginal relevance), so the
-        judge doesn't get eight near-copies of one synthesis."""
+    def search(self, query: str, k: int = 8, pool: int = 40, diversity: float = 0.6, per_topic: int = 1) -> List[dict]:
+        """Top-k passages for the query, chosen for relevance AND variety (maximal marginal relevance, and at most
+        per_topic passages from any one topic), so the judge gets several angles, not near-copies of one synthesis."""
         if not self.papers:
             return []
         sims = (self._mat @ self._vec.transform([query]).T).toarray().ravel()
@@ -75,14 +78,33 @@ class Library:
                 red = max(((self._mat[i] @ self._mat[j].T).toarray()[0, 0] for j in chosen), default=0.0)
                 return (1 - diversity) * sims[i] - diversity * red
             best = max(cand, key=score)
-            chosen.append(best)
             cand.remove(best)
+            if sum(self.papers[j]["topic"] == self.papers[best]["topic"] for j in chosen) >= per_topic:
+                continue
+            chosen.append(best)
         hits = []
         for rank, i in enumerate(chosen):
             p = self.papers[i]
-            hits.append({"ref": f"P{rank + 1}", "id": p["id"], "title": f"{p['topic']}: {p['heading']}",
-                         "excerpt": p["text"][:1800], "sources": p.get("sources", [])})
+            title = p["topic"] if p["heading"].strip() == p["topic"].strip() else f"{p['topic']}: {p['heading']}"
+            srcs = p.get("sources") if isinstance(p.get("sources"), list) else []
+            hits.append({"ref": f"P{rank + 1}", "id": p["id"], "title": title, "topic": p["topic"],
+                         "excerpt": p["text"][:1800], "sources": srcs, "papers": [_short_ref(s) for s in srcs[:3]]})
         return hits
+
+
+def _short_ref(s: dict) -> dict:
+    """A primary paper as pathologists cite it: 'Bettington et al. 2013', with its title and DOI. The library's
+    citation strings vary, so the first author is found by its shape (Surname + initials)."""
+    cit = s.get("citation", "") or ""
+    m = re.search(r"\b([A-Z][a-zA-Z'\-]+(?: [a-z]{2,3})?) ([A-Z]{1,3})(,| et al|\.)", cit)
+    year = str(s.get("year") or "")
+    title = (s.get("title") or cit).strip()
+    if m:
+        title = title.split(m.group(0))[0].strip()           # some titles run on into the author list
+        label = f"{m.group(1)}{' et al.' if (m.group(3) == ',' or 'et al' in cit[m.start():m.start() + 60]) else ''} {year}".strip()
+    else:
+        label = " ".join(title.split()[:6]) + ("..." if len(title.split()) > 6 else "") + (f" {year}" if year else "")
+    return {"label": label, "title": title.rstrip(" ."), "doi": s.get("doi") or ""}
 
 
 # ---------- researcher input ----------
@@ -100,45 +122,45 @@ def parse_researcher(text: str) -> dict:
 
 
 # ---------- research LLM judge ----------
-JUDGE_SYSTEM = """You are a gastrointestinal pathology research assistant. A researcher is deciding between two diagnoses for one
-field of a colon polyp: SSA = sessile serrated lesion (sessile serrated adenoma/polyp) and HP = hyperplastic polyp.
-You CANNOT see the image. Your job is to check whether the image panel's call is consistent with what was MEASURED on
-this field and with the numbered literature excerpts, and to say what a pathologist should verify by eye.
-
-Evidence you get, strongest first:
-1. IMAGE PANEL: two fine-tuned image models combined (test AUC 0.956, balanced accuracy 0.888 on the MHIST benchmark).
-   Its percentage is calibrated to a 7-pathologist majority; it calls SSA above its stated cut-off, not above 50%.
-   This is the strongest evidence about this specific field. Do not overrule it without a specific, cited reason.
-2. MEASURED CRYPTS: crypts outlined and measured on this field (ids like [crypts:dilated]). Each alone is weak evidence
-   (the share of dilated crypts separates SSA from HP at AUC ~0.68 on held-out images). Serration is common to BOTH
-   HP and SSA and is not measured at this resolution.
-3. FEATURE SCORES: CONCH image-text scores (ids like [crit:...]), 0-1 relative to typical polyps. Weak hints only.
-4. LITERATURE: numbered excerpts [P1], [P2], ... from evidence syntheses. Cite them by label.
+JUDGE_SYSTEM = """You support a gastrointestinal pathologist deciding between sessile serrated lesion (SSL) and hyperplastic
+polyp (HP) for one field of a colon polyp. You CANNOT see the image. You get: the image panel's call (two validated
+image models; its call is FINAL), what was measured on this field, and numbered literature excerpts [P1], [P2], ...
+The reader works through 30-40 cases a session: be short and specific to THIS field, never recite textbook criteria.
 
 Rules:
-- Only refer to measured findings by their [bracketed id]. Anything listed under "not measured" was NOT observed: never
-  say it is present or absent; put it under check_by_eye instead.
-- Never say the evidence "confirms", is "diagnostic", "definitive" or "pathognomonic", and never call weak evidence strong.
-- WHO 2019: one unequivocally architecturally distorted crypt (basal dilation, boot/L/inverted-T shapes, horizontal
-  growth along the muscularis mucosae, serration into the base) is enough for SSA. Say plainly when this field cannot
-  show crypt bases.
-- If the field is flagged as unlike the training data, say so in your FIRST sentence: the image evidence may not apply.
-- When you suggest what to check by eye, say WHERE when the measurements give a position (e.g. "the dilated crypt at
-  the upper right", "the region that pushed toward SSA, lower left"). A measured crypt that sits where the panel's
-  evidence map pushes toward its call is the best first place to look.
-- Cite only the given excerpts, by [P#]. If they don't support a claim, don't make it.
+- Your "call" MUST be the image panel's call. Explain why it fits; never argue for the other class. If a measurement
+  points the other way, give it once under "against" and lower your confidence.
+- Only the MEASURED findings (cite them by their [id]) and the panel are known about this image. Never say a feature
+  is present or absent unless it was measured. Do not speculate about the plane of section or whether crypt bases
+  are visible.
+- Write SSL and HP, never SSA.
+- No generic checklists. Each "check" item must point to a PLACE in this field taken from the measurements (e.g. "the
+  2 dilated crypts at the lower right") and say what to look for there.
+- Never use: confirms, diagnostic, definitive, pathognomonic, highly specific, strongly supports, proves.
+- If the field is flagged as unlike the training images, the summary starts with that.
+- Cite an excerpt as [P#] only where it directly supports that sentence; at most 2 citations in the summary.
+- Citations [P#] are only for general facts from the literature (what a feature means, which class it favours),
+  never for a statement about this field. For each point cite the excerpt that addresses it MOST specifically; use
+  the WHO criteria excerpt only for the definition itself, and draw on at least two different excerpts when they
+  are relevant.
+- Describe only what was measured. Never say something is lacking, absent, missing or not seen.
+  Good: "Six round, regular crypts across the field fit HP; regular crypts are typical of HP [P1]."
+  Bad: "The field shows regular architecture [P1]" (cites a paper for this field) and "lacking distortion" (an absence).
+- "confidence" = how likely a 7-pathologist majority would agree with the panel's call, 50-92. Experts themselves
+  match the majority only ~83% of the time, so never exceed 92. 55-70 if the evidence is mixed or the panel score is
+  near 50%; 70-85 if the panel and the measurements agree; above 85 only if everything agrees and the field is typical.
 Respond with JSON only:
-{"call": "SSA" or "HP", "confidence": 0-100, "alt": the other class, "alt_confidence": 0-100,
- "agrees_with_panel": true or false,
- "key_features": [{"feature_id": "a [bracketed id] from MEASURED CRYPTS or FEATURE SCORES", "feature": "short name",
-                   "points_to": "SSA" or "HP" or "neither", "strength": "weak" or "moderate", "why": "one sentence", "cites": ["P#"]}] (0-3 items),
- "check_by_eye": ["a not-measured feature the pathologist should verify, and why, with [P#]"] (1-3 items),
- "reasoning": "at most 110 words, with [P#] citations",
- "caveats": "one sentence"}"""
+{"call": "SSL" or "HP", "confidence": 50-92,
+ "summary": "at most 45 words",
+ "for": [{"id": "a measured [id]", "text": "at most 18 words, saying where"}] (0-2 items),
+ "against": [{"id": "a measured [id]", "text": "at most 18 words"}] (0-1 items),
+ "check": ["at most 18 words: a place in this field and what to look for there"] (1-2 items)}"""
 
 # "confirms" is an overclaim; "verify to confirm" and "confirm whether" are instructions, not claims
 OVERCLAIM = re.compile(r"\b(?<!to )(?<!would )(?<!can )(?<!help )(confirm(s|ed|ing)?\b(?!\s+(?:if|whether))|diagnostic of|definitive(ly)?|pathognomonic|"
                        r"strongly support(s|ed)?|clearly (shows|demonstrates)|proves?|certainly)\b", re.I)
+ABSENCE = re.compile(r"\b(lack(s|ing|ed)?|absen(t|ce)|without|no (sign|evidence|features?)|not (seen|present|observed|visible))\b", re.I)
+FIELD_TALK = re.compile(r"\b(this field|the field|measured|crypts? (at|in|on)|(upper|lower|middle|centre|left|right))\b", re.I)
 SEEN = re.compile(r"\b(is|are|were|was) (present|seen|visible|observed|evident|noted)\b|\b(shows?|demonstrates?|reveals?)\b", re.I)
 
 
@@ -183,9 +205,11 @@ def _measured(conch: dict) -> tuple:
     ids = {}
     lines = []
     if pnl.get("p_ssl") is not None:
-        lines.append(f"- Panel: P(SSA) {round(100 * pnl['p_ssl'])}%, calls SSA above {round(100 * pnl['cut'])}%, so its call "
-                     f"is {pnl['top']}. Members: " + ", ".join(f"{j['id']} {round(100 * j['p_ssl'])}%" for j in conch.get("judges", [])
-                                                           if j.get("p_ssl") is not None) + ".")
+        sc = lambda o: round(100 * o["score"]) if o.get("score") is not None else round(100 * o["p_ssl"])
+        lines.append(f"- Panel: SSA score {sc(pnl)}% (the app's displayed score: above 50% means it calls SSA; underlying "
+                     f"chance a 7-pathologist majority says SSA {round(100 * pnl['p_ssl'])}%), so its call is {pnl['top']}. "
+                     "Member SSA scores: " + ", ".join(f"{j['id']} {sc(j)}%" for j in conch.get("judges", [])
+                                                       if j.get("p_ssl") is not None) + ".")
     else:
         p = pnl.get("top_conf") if pnl.get("top") == "SSA" else pnl.get("alt_conf")
         lines.append(f"- Panel: P(SSA) {p}%, call {pnl.get('top')}, votes {pnl.get('votes')}.")
@@ -220,21 +244,26 @@ def _measured(conch: dict) -> tuple:
     else:
         crypt_lines.append("- No crypts could be outlined on this field (cut lengthwise, open to the surface, or blurred).")
     crypt_lines += _evidence_regions(conch.get("heat"))
-    feats = []
-    for k, v in conch.get("criteria", {}).items():
-        if v.get("usable"):
-            feats.append(f"- [crit:{k}] {v['text']}: score {v['score']:.2f} (reliability {v['reliability']:.2f})")
-            ids[f"crit:{k}"] = v["text"]
-    not_measured = [v["text"] for v in conch.get("criteria", {}).values() if not v.get("usable")]
+    # CONCH text-match "feature scores" are left out: they are guesses, not measurements, and they contradicted
+    # each other (the judge used to argue from them)
+    not_measured = ["crypt base shape (boot, L or inverted-T)", "serration depth", "horizontal growth along the muscularis mucosae",
+                    "whether crypt bases are in the plane of section", "maturation", "goblet cell or microvesicular mucin type"]
     block = ("IMAGE PANEL\n" + "\n".join(lines) + "\n\nMEASURED CRYPTS (outlined and measured on this field)\n" + "\n".join(crypt_lines)
-             + "\n\nFEATURE SCORES\n" + ("\n".join(feats) or "(none usable)")
              + "\n\nNOT MEASURED on this field (never say present or absent): " + "; ".join(not_measured))
     return block, ids, not_measured
 
 
 def judge_query(conch: dict) -> str:
-    """Literature query from what this field actually shows, plus the WHO criteria the judge must weigh."""
-    q = ["sessile serrated lesion hyperplastic polyp WHO 2019 criteria architecturally distorted crypt base dilation"]
+    """Literature query from what this field shows and what the panel called (not a fixed WHO phrase: that made the
+    WHO definitions win every search)."""
+    call = (conch.get("panel") or {}).get("top")
+    q = ["sessile serrated lesion distinguishing features specificity" if call == "SSA" else
+         "hyperplastic polyp features distinguishing from sessile serrated lesion"]
+    score = (conch.get("panel") or {}).get("score")
+    if score is not None and 0.35 <= score <= 0.65:
+        q.append("borderline cases interobserver variability")
+    if (conch.get("ood") or {}).get("flag"):
+        q.append("diagnostic pitfalls staining orientation")
     tags = {t for g in conch.get("glands", []) for t in g.get("tags", [])}
     if "dilated" in tags:
         q.append("dilated crypt base boot L-shaped inverted T horizontal growth muscularis mucosae")
@@ -244,7 +273,6 @@ def judge_query(conch: dict) -> str:
         q.append("regular straight crypts narrow base hyperplastic polyp microvesicular goblet")
     if not conch.get("glands"):
         q.append("tangential sectioning orientation crypt bases not visible small biopsy pitfalls")
-    q.append("interobserver agreement reproducibility distinguishing features")
     return " ".join(q)
 
 
@@ -297,11 +325,17 @@ def _clean_citations(text, valid):
 def _violations(s: dict, valid: set, ids: dict, not_measured: List[str]) -> int:
     """Rule breaks in one judge answer: invented citations, overclaiming, evidence that wasn't measured, and
     claims that a not-measured feature was seen."""
-    text = " ".join([s.get("reasoning", ""), s.get("caveats", "")] + [f.get("why", "") for f in s.get("key_features", [])]
-                    + [c for c in s.get("check_by_eye", []) if isinstance(c, str)])
+    items = [i for i in s.get("for", []) + s.get("against", []) if isinstance(i, dict)]
+    text = " ".join([str(s.get("summary", ""))] + [str(i.get("text", "")) for i in items]
+                    + [c for c in s.get("check", []) if isinstance(c, str)])
     v = sum(1 for r in re.findall(r"P\d+", json.dumps(s)) if r not in valid)
     v += _overclaims(text)
-    v += sum(1 for f in s.get("key_features", []) if f.get("feature_id", "").strip("[]") not in ids)
+    v += sum(1 for i in items if str(i.get("id", "")).strip("[]") not in ids)
+    v += len(ABSENCE.findall(text))                          # claims that something is absent were never measured
+    for sent in re.split(r"(?<=[.!?])\s+", text):           # a paper cited for something about THIS field
+        if re.search(r"P\d+", sent) and FIELD_TALK.search(sent):
+            v += 1
+    v += len(re.findall(r"\bSSA\b", text))                 # the app says SSL
     low = text.lower()
     for nm in not_measured:
         key = nm.lower().split(" or ")[0].split(",")[0][:24]
@@ -320,6 +354,9 @@ def _judge_once(cli: OpenAI, payload: str, temperature: float) -> Optional[dict]
         )
         out = _json_from(r.choices[0].message.content or "")
         call = str(out.get("call", "")).strip().upper()
+        for k in ("for", "against", "check"):          # tolerate a model that returns a string or null
+            if not isinstance(out.get(k), list):
+                out[k] = [out[k]] if out.get(k) else []
         call = {"SSL": "SSA", "SSA/SSL": "SSA", "SESSILE SERRATED LESION": "SSA", "HYPERPLASTIC POLYP": "HP"}.get(call, call)
         if call not in CLASSES:
             return None
@@ -348,8 +385,13 @@ def research_judge(conch: dict, papers: List[dict], panel: Optional[dict] = None
         return {"error": "llm_unavailable"}
 
     valid = {p["ref"] for p in papers}
+    # the panel's call is final (the image models are the measured, validated evidence): the judge explains it.
+    # Answers that still argued for the other class are set aside; if all did, the majority answer is used.
+    pnl_call = (conch.get("panel") or {}).get("top")
     votes = Counter(s["call"] for s in samples)
-    top, n_top = votes.most_common(1)[0]
+    top = pnl_call if pnl_call in CLASSES and votes.get(pnl_call) else votes.most_common(1)[0][0]
+    n_top = votes.get(top, 0)
+    against_all = pnl_call in CLASSES and top != pnl_call   # every answer argued for the other class
     agreeing = [s for s in samples if s["call"] == top]
     for s in agreeing:
         s["_v"] = _violations(s, valid, ids, not_measured)
@@ -357,53 +399,56 @@ def research_judge(conch: dict, papers: List[dict], panel: Optional[dict] = None
     clean = min(s["_v"] for s in agreeing)
     pool = sorted((s for s in agreeing if s["_v"] == clean), key=lambda s: s.get("confidence", 0))
     rep = pool[len(pool) // 2]
-    feats = []
-    for f in rep.get("key_features", []):
-        fid = str(f.get("feature_id", "")).strip("[]")
-        if fid not in ids:                                   # only evidence that was actually measured
-            continue
-        f["feature_id"] = fid.split(":", 1)[1] if fid.startswith("crit:") else fid
-        f["cites"] = [c for c in f.get("cites", []) if c in valid]
-        f["why"] = _clean_citations(f.get("why", ""), valid)
-        f["strength"] = "weak"  # every measured item separates SSA from HP at AUC ~0.6 on its own
-        feats.append(f)
     crit = conch.get("criteria", {})
-    for f in feats:
-        f["why"] = _readable(f["why"], crit)
-    reasoning = _readable(_clean_citations(rep.get("reasoning", ""), valid), crit)
-    check = [_readable(_clean_citations(c, valid), crit) for c in rep.get("check_by_eye", []) if isinstance(c, str)]
+    ssl = lambda t: re.sub(r"\bSSAs?\b", "SSL", t) if isinstance(t, str) else t
+    tidy = lambda t: ssl(_readable(_clean_citations(t, valid), crit))
+    def items(key, n):
+        out = []
+        for i in rep.get(key, []):
+            if isinstance(i, dict) and str(i.get("id", "")).strip("[]") in ids and i.get("text"):
+                out.append({"id": str(i["id"]).strip("[]"), "text": tidy(i["text"])})
+        return out[:n]
+    summary = tidy(rep.get("summary", ""))
+    support, against = items("for", 2), items("against", 1)
+    check = [tidy(c) for c in rep.get("check", []) if isinstance(c, str) and c.strip()][:2]
+    cited = set(re.findall(r"P\d+", json.dumps([summary, support, against, check])))
     alt = "HP" if top == "SSA" else "SSA"
-    pnl_call = (conch.get("panel") or {}).get("top")
+    if pnl_call in CLASSES:
+        top, alt = pnl_call, ("HP" if pnl_call == "SSA" else "SSA")
     return {
         "call": top,
-        "consistency": round(100 * n_top / len(samples)),  # measured: how often it gave this answer
-        "stated_confidence": int(rep.get("confidence", 0)),  # what it claims
         "alt": alt,
-        "alt_consistency": round(100 * votes.get(alt, 0) / len(samples)),
-        "alt_stated_confidence": int(rep.get("alt_confidence", 0)),
+        "consistency": round(100 * n_top / len(samples)),  # measured: how often it gave this answer
+        # what it claims, held to the expert-agreement ceiling (a coin toss if every answer argued the other way)
+        "stated_confidence": 50 if against_all else max(50, min(MAX_CONF, int(float(rep.get("confidence", 0) or 0)))),
+        "max_confidence": MAX_CONF,
         "n_samples": len(samples),
         "agrees_with_panel": (top == pnl_call) if pnl_call else None,
         "rule_breaks": {"shown": clean, "all_samples": [s.get("_v") for s in agreeing]},
-        "key_features": feats,
-        "check_by_eye": check,
-        "reasoning": reasoning,
-        "caveats": _readable(_clean_citations(rep.get("caveats", ""), valid), crit),
-        "citations": [p for p in papers if p["ref"] in set(re.findall(r"P\d+", json.dumps([reasoning, check, feats])))],
+        "summary": summary,
+        "for": support,
+        "against": against,
+        "check": check,
+        "key_features": [],
+        "citations": [{k: p[k] for k in ("ref", "title", "topic", "papers")} for p in papers if p["ref"] in cited],
     }
 
 
 # ---------- final verdict ----------
 VERDICT_SYSTEM = """You write the final summary for a pathology research tool. You cannot see the image.
 Compare the researcher's call and stated certainty with:
-(a) the image panel: two fine-tuned image models combined. Its percentage is calibrated to the 7-pathologist majority
-    ("how often the majority says SSA on MHIST-like fields") and it calls SSA above its stated cut-off, not above 50%.
-    Compare the researcher's stated certainty with that percentage;
+(a) the image panel: two fine-tuned image models combined. The app shows its "score" (top_conf): above 50% means it
+    calls SSA, below 50% HP. When you quote a percentage for the panel, quote that displayed score, never p_ssl (the
+    underlying calibrated chance that a 7-pathologist majority says SSA, which is lower). Compare the researcher's stated
+    certainty with the displayed score;
 (b) what was measured on this field (crypt measurements are weak evidence on their own);
 (c) a literature-grounded reasoning model (its "consistency" is how often it gave the same answer).
 Rules: be direct and brief; point out disagreement, over- or under-confidence, and what to look at again. Never say the
 evidence confirms or is diagnostic. Write percentages as whole numbers (e.g. 50%, or "under 1%") and never quote field
 names such as p_ssl. If the field was flagged as unlike the training data, lead with that. Only name
 features that were measured or that the literature model listed to check by eye. Research tool, not a diagnosis.
+If "researcher" is null, no call was given: compare the image panel with the literature model and the measurements
+instead ("alignment" is whether they agree), and use certainty_note for how sure the image panel is.
 Respond with JSON only:
 {"alignment": "agrees" | "partly agrees" | "disagrees", "headline": "max 10 words",
  "conclusion": "2-4 sentences", "look_again_at": "features or regions to re-check, or empty",
@@ -421,7 +466,7 @@ def not_tissue_verdict() -> dict:
 
 def final_verdict(researcher: dict, panel: dict, judge: dict, flags: List[str], conch: Optional[dict] = None) -> dict:
     measured = _measured(conch)[0] if conch else None
-    payload = json.dumps({"researcher": researcher, "image_panel": panel, "measured_on_this_field": measured, "literature_judge": {
+    payload = json.dumps({"researcher": researcher if researcher.get("text", "").strip() else None, "image_panel": panel, "measured_on_this_field": measured, "literature_judge": {
         k: judge.get(k) for k in ("call", "consistency", "stated_confidence", "alt", "agrees_with_panel", "key_features", "check_by_eye", "reasoning")},
         "trust_flags": flags}, indent=1)
     try:

@@ -2,7 +2,7 @@
 final retrain of each on all of train, then panel selection + the single test evaluation. Runs one job
 at a time inside the allowed hours (2026-10-19 until 20:00, then 22:00 - 2026-10-20 09:00); a job
 running at a cut-off is killed and restarted in the next window (CV resumes from its last finished fold).
-Log: %TEMP%/claude/queue.log (also printed)."""
+Log: %TEMP%/gutfeeling/queue.log (also printed)."""
 import datetime as dt
 import json
 import os
@@ -12,11 +12,11 @@ import time
 
 REPO = r"C:\Users\Ahaan\Desktop\deMHISTifyAI"
 PY = os.path.join(REPO, ".venv", "Scripts", "python.exe")
-LOG = os.path.join(os.environ["TEMP"], "claude", "queue.log")
-ENV = {**os.environ, "MUSK_SRC": os.path.join(os.environ["TEMP"], "claude", "musk_src", "MUSK"),
+LOG = os.path.join(os.environ["TEMP"], "gutfeeling", "queue.log")
+ENV = {**os.environ, "MUSK_SRC": os.path.join(os.environ["TEMP"], "gutfeeling", "musk_src", "MUSK"),
        "PYTHONUNBUFFERED": "1", "PYTORCH_CUDA_ALLOC_CONF": "expandable_segments:True"}
 D = dt.datetime
-WINDOWS_FILE = os.path.join(os.environ["TEMP"], "claude", "windows.json")  # allowed hours, re-read on every check
+WINDOWS_FILE = os.path.join(os.environ["TEMP"], "gutfeeling", "windows.json")  # allowed hours, re-read on every check
 
 
 def windows():

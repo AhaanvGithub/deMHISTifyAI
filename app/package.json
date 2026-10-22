@@ -1,6 +1,6 @@
 {
-  "name": "demhistifyai",
-  "productName": "deMHISTifyAI",
+  "name": "gutfeeling",
+  "productName": "gutfeeling",
   "version": "0.1.0",
   "description": "Research tool: CONCH judges + literature-grounded reasoning for hard pathology calls",
   "main": "main.js",
@@ -9,7 +9,7 @@
     "dist": "electron-builder --win portable"
   },
   "build": {
-    "appId": "ai.demhistify.app",
+    "appId": "ai.gutfeeling.app",
     "win": { "target": "portable" },
     "files": ["**/*", "!dist"]
   },

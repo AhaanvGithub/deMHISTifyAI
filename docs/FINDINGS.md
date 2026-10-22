@@ -10,7 +10,7 @@ Evidence:
 - Prompt wording alone swings zero-shot results by up to ~25% in pathology VLM benchmarks (HistoVL, arXiv 2503.12990; PathLang, arXiv 2610.11329).
 - Our own first test (2026-10-18, 4 MHIST tiles, 8 prompt-only CONCH judges): the panel split 4-4, while individual judges reported 97-100% confidence for opposite answers. Confident and contradictory.
 
-What deMHISTifyAI does about it:
+What gutfeeling does about it:
 - Judges keep the prompt as a starting point but are trained on labelled MHIST images (soft targets = share of the 7 pathologists who said SSL), then calibrated so stated confidence matches observed accuracy.
 - The prompt-only panel is kept as a baseline in our results table so the improvement is measured, not claimed.
 - The app flags "untrained judges" if trained heads are missing.

@@ -36,7 +36,7 @@ decision with its reason, every result, what is running, and what is next.
   peek happened (section 5) and is recorded; it must not influence any choice.
 - **GPU/battery**: no GPU jobs on battery unless allowed; laptop sleeps after 3 min on battery (never when
   plugged in). Lock, don't close the lid. The user gives explicit time windows for compute.
-- Likes live progress in a terminal (`Get-Content "$env:TEMP\claude\queue.log" -Wait -Tail 40`).
+- Likes live progress in a terminal (`Get-Content "$env:TEMP\gutfeeling\queue.log" -Wait -Tail 40`).
 - README must read like a **product** (final choices, no "fixes/changes" history).
 - Commit messages: plain, no AI attribution lines (has been the practice in this repo). Push when asked
   (has been pushing to main routinely after README/plan edits).
@@ -117,14 +117,14 @@ the test split to choose the model" vs "used it or did not say")
 
 ## 8. Running now (overnight queue)
 
-- Allowed hours file: `%TEMP%\claude\windows.json` = until 2026-10-20 09:00 (runners re-read it each check).
+- Allowed hours file: `%TEMP%\gutfeeling\windows.json` = until 2026-10-20 09:00 (runners re-read it each check).
 - Main runner (`research/overnight/queue_runner.py`, terminal tab "app accuracy 977"): all CV done; final
   retrains in progress (CONCH and ConvNeXt done by 20:30, PLIP running, MUSK next).
 - Follow-up (`research/overnight/queue2.py`, background): after the main queue -> ConvNeXt-Base 5-fold
   (replaces Tiny if OOF AUC higher) -> MUSK + LoRA (rank 8 on image-expert q/k/v/out of all 24 layers,
   lr 1e-4, batch 4 x accum 4, retry batch 2 x accum 8 if OOM; replaces 2-layer MUSK if OOF AUC higher) ->
   delete HOLD_PANEL -> `research/panel.py` + **the single test evaluation** -> `docs/results/panel.json`.
-- Log: `%TEMP%\claude\queue.log`. Restart safely: kill python processes matching queue2/queue_runner/kfold_cv,
+- Log: `%TEMP%\gutfeeling\queue.log`. Restart safely: kill python processes matching queue2/queue_runner/kfold_cv,
   then rerun both runners (they skip "DONE" jobs; CV resumes from the last finished fold).
 - Note: `queue_runner.py` sleeps in 60-s naps (a single long sleep stalled when the laptop slept).
 - **Progress 21:20**: all final retrains done. **ConvNeXt-Base won** (OOF AUC 0.962 vs Tiny 0.957; final model
@@ -187,7 +187,7 @@ the test split to choose the model" vs "used it or did not say")
 | `backend/stain.py` | stain normalisation |
 | `docs/research_notes/benchmark_job_plan.md` | job list, findings, to-do |
 | `README.md` | product description, performance, literature tables |
-| MUSK code | clone of github.com/lilab-stanford/MUSK at `%TEMP%\claude\musk_src\MUSK` (`MUSK_SRC`); einops + fairscale installed `--no-deps` |
+| MUSK code | clone of github.com/lilab-stanford/MUSK at `%TEMP%\musk_src\MUSK` (`MUSK_SRC`); einops + fairscale installed `--no-deps` |
 
 ## 12. Addendum (2026-10-19 evening): scale check and outside datasets
 

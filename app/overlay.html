@@ -2,14 +2,18 @@
 <html>
 <head>
 <meta charset="utf-8">
+<title>gutfeeling</title>
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="cutoff.css">
 </head>
-<body class="overlay">
+<body class="overlay booting">
   <canvas id="shot"></canvas>
   <canvas id="dim"></canvas>
+  <!-- focused view (F): darkened, blurred screen behind the enlarged field and the panel -->
+  <div id="focusBg" class="focus-bg"></div>
 
   <div id="chip" class="chip"></div>
+  <div class="wordmark logo">gutfeeling</div>
   <div id="hint" class="hint">Drag to select the slide region · <kbd>Esc</kbd> to cancel</div>
   <div id="sizeTag" class="size-tag hidden"></div>
   <!-- scale bar read on the whole screen before the snip, and the one-field square it gives -->
@@ -37,11 +41,7 @@
 
   <div id="heatControls" class="heat-controls hidden">
     <div class="hc-row">
-      <div class="seg">
-        <button data-ref="ai" class="on">AI's call</button>
-        <button data-ref="researcher">Your call</button>
-      </div>
-      <label>Opacity <input id="opacity" type="range" min="0" max="100" value="45"></label>
+      <label>Opacity <input id="opacity" type="range" min="0" max="100" value="70"></label>
       <label class="chk"><input id="showGrid" type="checkbox" checked> Grid</label>
       <label class="chk"><input id="showFeat" type="checkbox" checked> Crypts</label>
       <span class="legend" title="Measured on the image; thresholds set on MHIST training images"><span><i style="background:var(--ssl)"></i>dilated</span><span><i style="background:var(--hp)"></i>round regular</span></span>
@@ -52,44 +52,35 @@
       <span id="looks" class="looks">
         <button data-look="exposure"><kbd>E</kbd>exposure</button>
         <button data-look="contrast"><kbd>C</kbd>contrast</button>
-        <button data-look="greyscale"><kbd>G</kbd>greyscale</button>
         <button data-look="saturation"><kbd>S</kbd>saturation</button>
-        <button data-look="sharpen"><kbd>D</kbd>sharpen</button>
-        <button data-look="nuclei"><kbd>N</kbd>nuclei only</button>
       </span>
-      <span class="keys-hint">hold <kbd>Space</kbd> to hide the AI · scroll to zoom · <kbd>0</kbd> reset</span>
+      <button id="focusBtn" class="focus-btn" title="Enlarged field and panel, centred (F)"><kbd>F</kbd>focus</button>
+      <span class="keys-hint">hold <kbd>Space</kbd> to hide the AI and panels · scroll to zoom · <kbd>0</kbd> reset view</span>
     </div>
   </div>
 
   <aside id="panel" class="panel hidden">
    <div id="panelInner" class="panel-inner">
     <header>
-      <span class="logo">de<b>MHIST</b>ify</span>
+      <span class="logo">gutfeeling</span>
       <span class="hdr-right"><span class="scope">Validated for: colon serrated polyps</span><button id="gear" class="gear" title="Decision cut-off">⚙</button></span>
     </header>
 
-    <section id="youCard" class="card"></section>
-
     <section class="card">
       <h3>Image judges <small id="judgesNote"></small></h3>
-      <div id="panelSummary" class="summary muted">waiting…</div>
+      <div id="panelSummary" class="summary"><div class="loading"><div class="ld-head"><span>running the image models</span></div><i class="ld-bar"></i><i class="ld-line"></i><i class="ld-line short"></i></div></div>
       <div id="judges" class="judges"></div>
+      <div id="similar" class="similar hidden"></div>
       <div id="cutHint" class="cut-hint"></div>
     </section>
 
     <section id="litCard" class="card pending">
-      <h3>Literature judge <small id="judgeModel">Lumen</small></h3>
-      <div id="litSummary" class="summary muted"><span class="spinner"></span> reading the papers…</div>
+      <h3>Literature judge <small id="judgeModel">Lumen</small><span id="litRefs" class="info refs hidden" tabindex="0">i<span class="info-tip refs-tip"></span></span></h3>
+      <div id="litSummary" class="summary"><div class="loading"><div class="ld-head"><span>reading the literature</span></div><i class="ld-bar"></i><i class="ld-line"></i><i class="ld-line short"></i></div></div>
       <div id="litBody"></div>
     </section>
 
-    <section id="flagsCard" class="card flags hidden"></section>
-
-    <section id="verdictCard" class="card verdict pending">
-      <h3>Verdict</h3>
-      <div id="verdict" class="muted"><span class="spinner"></span> weighing everything…</div>
-    </section>
-
+    <div id="dictionaries" class="dictionaries"></div>
     <footer>Research tool, not for diagnosis.</footer>
    </div>
   </aside>

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Train the 8 deMHISTifyAI judges and evaluate them on the held-out test split.
+"""Train the 8 gutfeeling judges and evaluate them on the held-out test split.
 
 Judge = (prompt set p, image condition c). Each judge is a small logistic head on
 frozen CONCH image features that STARTS from its prompt's zero-shot score:

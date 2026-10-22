@@ -1,4 +1,4 @@
-"""Image side of deMHISTifyAI: tiling, the image judges, heatmap and criteria scores.
+"""Image side of gutfeeling: tiling, the image judges, heatmap and criteria scores.
 
 Judges = the chosen panel (config/panel_deploy.json, written by research/export_panel.py): fine-tuned
 ConvNeXt-Base + MUSK (LoRA), combined with learned weights and calibrated on MHIST training images. CONCH
@@ -40,7 +40,9 @@ CALIB_PATH = ROOT / "backend" / "config" / "calibration.json"
 PANEL_PATH = ROOT / "backend" / "config" / "panel_deploy.json"
 OOD_FAR = 0.65  # unlike-training distance beyond which the field is not colon tissue at all (see Engine._ood)
 OOD_REF_PATH = ROOT / "data" / "models" / "cv" / "ood_ref_convnext_base.npz"
-os.environ.setdefault("MUSK_SRC", str(Path(os.environ.get("TEMP", "")) / "claude" / "musk_src" / "MUSK"))
+# "Similar cases": labelled fields from other labs (research/build_reference_cases.py), compared by the same features
+REF_CASES_PATH = ROOT / "data" / "reference_cases" / "cases.npz"
+os.environ.setdefault("MUSK_SRC", str(Path(os.environ.get("TEMP", "")) / "musk_src" / "MUSK"))
 MEMBER_INFO = {  # how each panel member is shown in the app
     "convnext_base": {"id": "ConvNeXt", "about": "ConvNeXt-Base (ImageNet CNN), fine-tuned on MHIST"},
     "musk_lora": {"id": "MUSK", "about": "MUSK pathology model, fine-tuned on MHIST (LoRA)"},
@@ -126,6 +128,11 @@ class Engine:
         if OOD_REF_PATH.exists():
             ref = np.load(OOD_REF_PATH)
             cfg["ood_ref"] = torch.from_numpy(ref["feats"].astype(np.float32)).to(self.device)
+        if REF_CASES_PATH.exists():
+            rc = np.load(REF_CASES_PATH)
+            cfg["ref_cases"] = {"feats": torch.from_numpy(rc["feats"].astype(np.float32)).to(self.device),
+                                "labels": [str(x) for x in rc["labels"]], "sources": [str(x) for x in rc["sources"]],
+                                "field_um": float(rc["field_um"])}
         return cfg
 
     @torch.no_grad()
@@ -171,6 +178,30 @@ class Engine:
         # "far": beyond anything real tissue reached. Measured on outside data: UniToPatho colon tissue (another lab)
         # reached 0.57 at most; photos and noise 0.71+; a brown immunostain 0.55 (tissue, wrong stain: a caution only)
         return {"distance": round(d, 4), "limit": o["limit"], "flag": d > o["limit"], "far": d > OOD_FAR}
+
+    def _similar(self, feats, k: int = 3, k_mean: int = 5) -> Optional[dict]:
+        """The labelled reference fields nearest to this one (mean of its tiles' ConvNeXt features, cosine
+        similarity), PER CLASS: the k nearest SSL and k nearest HP to show, and which class's k_mean nearest are
+        closer on average. (The pools differ in size, so a plain top-20 vote would just follow the bigger pool.)"""
+        rc = self.panel.get("ref_cases") if self.panel else None
+        if feats is None or rc is None or not len(feats):
+            return None
+        q = torch.nn.functional.normalize(feats.float().mean(0, keepdim=True), dim=-1)
+        sims = (q @ rc["feats"].T)[0].cpu().numpy()
+        sims[sims > 0.97] = -1                     # the same field (e.g. a demo image cut from a reference): never "similar"
+        labels = np.array(rc["labels"])
+        out, mean = {}, {}
+        for c in ("SSL", "HP"):
+            idx = np.flatnonzero(labels == c)
+            if not len(idx):
+                return None
+            order = idx[np.argsort(-sims[idx])]
+            mean[c] = float(sims[order[:k_mean]].mean())
+            out[c] = [{"i": int(i), "label": c, "source": rc["sources"][i], "similarity": round(float(sims[i]), 3)} for i in order[:k]]
+        closer = "SSL" if mean["SSL"] > mean["HP"] else "HP"
+        return {"ssl_cases": out["SSL"], "hp_cases": out["HP"], "closer": closer,
+                "margin": round(abs(mean["SSL"] - mean["HP"]), 3), "field_um": rc["field_um"],
+                "n_ssl": int((labels == "SSL").sum()), "n_hp": int((labels == "HP").sum())}
 
     def _load_finetuned(self) -> List[dict]:
         """Each fine-tuned version only changed CONCH's last 2 blocks + pooling (+ a linear head),
@@ -464,6 +495,10 @@ class Engine:
         p_tile = self._shown(z)
         p_snip = float(self._shown(z[mask].mean()))
         call = lambda p: "SSA" if p > cut else "HP"
+        # displayed score: the cut-off sits at 50%, so an SSA call always reads above 50% and an HP call below
+        # (p_ssl stays the calibrated chance that a 7-pathologist majority says SSA)
+        score = lambda p: 0.5 * p / cut if p <= cut else 0.5 + 0.5 * (p - cut) / (1 - cut)
+        conf = lambda p, c: round(100 * (score(p) if c == "SSA" else 1 - score(p)))
         judge_results = []
         for j in self.judges:
             c = self.panel["members"][j["tag"]]["shown"]
@@ -473,9 +508,9 @@ class Engine:
                 "id": j["id"], "condition": "raw", "votes": True,
                 "prompts": {"SSA": MEMBER_INFO.get(j["tag"], {}).get("about", j["tag"]),
                             "HP": f"weight in panel {self.panel['members'][j['tag']]['weight']:.2f}"},
-                "top": top, "top_conf": round(100 * (p if top == "SSA" else 1 - p)),
-                "alt": "HP" if top == "SSA" else "SSA", "alt_conf": round(100 * (1 - p if top == "SSA" else p)),
-                "p_ssl": round(p, 4)})
+                "top": top, "top_conf": conf(p, top),
+                "alt": "HP" if top == "SSA" else "SSA", "alt_conf": 100 - conf(p, top),
+                "p_ssl": round(p, 4), "score": round(score(p), 4)})
         crit = self._criteria(emb["raw"][0])
         for i, t in enumerate(tiles):
             t.probs = {"SSA": float(p_tile[i]), "HP": float(1 - p_tile[i])}
@@ -494,13 +529,14 @@ class Engine:
             "judges": judge_results,
             "panel": {
                 "votes": votes, "top": top,
-                "top_conf": round(100 * (p_snip if top == "SSA" else 1 - p_snip)),
+                "top_conf": conf(p_snip, top),
                 "alt": "HP" if top == "SSA" else "SSA",
-                "alt_conf": round(100 * (1 - p_snip if top == "SSA" else p_snip)),
+                "alt_conf": 100 - conf(p_snip, top), "score": round(score(p_snip), 4),
                 "agreement": max(votes.values()) / len(judge_results), "n_voters": len(judge_results),
                 "p_ssl": round(p_snip, 4), "cut": round(cut, 4), "default_cut": self.panel["shown_cut_off"],
             },
             "ood": ood,
+            "similar": self._similar(feats[torch.from_numpy(mask).to(feats.device)] if feats is not None else None),
             "glands": glands,
             "criteria": {
                 k.split(":", 1)[1]: {"text": self.prompts[k], "score": round(float(snip_crit[n]), 3),
