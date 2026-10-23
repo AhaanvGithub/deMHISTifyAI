@@ -14,9 +14,9 @@ polyp (HP)** on H&E. Press a hotkey over any slide viewer, snip one field, and g
 Built for pathologists who read 30-40 cases a session: it opens instantly, stays quiet, and every number on screen
 is measured. Ashby Hackathon 2026, by Aiden Wang, Alice Yu and Ahaan Verma. Research tool, not for diagnosis.
 
-**Demo v1:** [watch on YouTube](https://youtu.be/ntY3SeUHYhs)
+**Demo v2:** [watch on YouTube](https://youtu.be/q3kmF1mwB1Q)
 
-[![gutfeeling demo v1](https://img.youtube.com/vi/ntY3SeUHYhs/hqdefault.jpg)](https://youtu.be/ntY3SeUHYhs)
+[![gutfeeling demo v2](https://img.youtube.com/vi/q3kmF1mwB1Q/hqdefault.jpg)](https://youtu.be/q3kmF1mwB1Q)
 
 ---
 
